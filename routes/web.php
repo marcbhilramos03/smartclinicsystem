@@ -7,9 +7,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Admin\CheckupController;
-use App\Http\Controllers\Admin\PatientController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Staff\StaffCheckupController;
+use App\Http\Controllers\Admin\PatientRecordController;
 
 // -a----------------------------
 // Default: Patient Login
@@ -74,18 +75,13 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         'update'  => 'users.update',
         'destroy' => 'users.destroy',
     ]);
-     // 1️⃣ List & search students
-    Route::get('patients', [PatientController::class, 'index'])->name('patients.index');
-
-    // 2️⃣ View a specific student and their records
-    Route::get('patients/{user}', [PatientController::class, 'show'])->name('patients.show');
-
-    // 3️⃣ Create a new record (clinic session or medical history)
-    Route::get('patients/{user}/records/create', [PatientController::class, 'createRecord'])
+     
+    // Patients CRUD
+    Route::get('patients', [PatientRecordController::class, 'index'])->name('patients.index');
+    Route::get('patients/{user}', [PatientRecordController::class, 'show'])->name('patients.show');
+    Route::get('patients/{user}/records/create', [PatientRecordController::class, 'createRecord'])
         ->name('patients.records.create');
-
-    // 4️⃣ Store the new record
-    Route::post('patients/{user}/records', [PatientController::class, 'storeRecord'])
+    Route::post('patients/{user}/records', [PatientRecordController::class, 'storeRecord'])
         ->name('patients.records.store');
 
     Route::get('checkups', [CheckupController::class, 'index'])->name('checkups.index');
@@ -110,10 +106,14 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [StaffController::class, 'profile'])->name('profile');
+    Route::post('/profile', [StaffController::class, 'updateProfile'])->name('profile.update');
 
     Route::get('checkups', [StaffCheckupController::class, 'index'])->name('checkups.index');
     Route::get('checkups/{checkup}', [StaffCheckupController::class, 'show'])->name('checkups.show');
     Route::post('checkups/{checkup}/update', [StaffCheckupController::class, 'update'])->name('checkups.update');
+
+    Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
+
 });
 
 
@@ -121,5 +121,7 @@ Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')
     Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [PatientController::class, 'profile'])->name('profile');
     Route::post('/profile', [PatientController::class, 'updateProfile'])->name('profile.update');
-        
+
+    Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
+
 });
