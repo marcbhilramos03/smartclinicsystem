@@ -11,7 +11,7 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Patient\PatientController;
 use App\Http\Controllers\Patient\RecordsController;
 use App\Http\Controllers\Staff\StaffCheckupController;
-use App\Http\Controllers\Admin\MedicalRecordController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\PatientRecordController;
 
 // -a----------------------------
@@ -100,6 +100,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Archived inventory
     Route::get('/inventory/archived', [InventoryController::class, 'archived'])->name('inventory.archived');
+
+    Route::get('/reports/inventory', [ReportsController::class, 'inventoryReport'])->name('reports.inventory');
+    Route::get('/reports/checkups', [ReportsController::class, 'checkupsReport'])->name('admin.reports.checkups');
+    Route::get('/reports/patients', [ReportsController::class, 'patientReport'])->name('reports.patients');
 
     });
 

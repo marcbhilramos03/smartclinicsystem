@@ -8,11 +8,28 @@
         @csrf
         @method('PUT')
 
+        <!-- Current stock display -->
         <div class="mb-3">
-            <label>Stock Quantity</label>
-            <input type="number" name="stock_quantity" class="form-control" min="0" value="{{ $inventory->stock_quantity }}" required>
+            <label>Current Stock Quantity</label>
+            <input type="number" class="form-control" value="{{ $inventory->stock_quantity }}" disabled>
         </div>
 
+        <!-- Quantity adjustment -->
+        <div class="mb-3">
+            <label>Quantity Adjustment</label>
+            <div class="input-group">
+                <select name="adjustment_type" class="form-control" required>
+                    <option value="add">Add</option>
+                    <option value="subtract">Subtract</option>
+                </select>
+                <input type="number" name="quantity_change" class="form-control" value="0" min="0" required>
+            </div>
+            <small class="form-text text-muted">
+                Select "Add" to increase stock or "Subtract" to decrease stock, then enter the amount.
+            </small>
+        </div>
+
+        <!-- Status -->
         <div class="mb-3">
             <label>Status</label>
             <select name="status" class="form-control" required>
@@ -23,6 +40,7 @@
             </select>
         </div>
 
+        <!-- Notes -->
         <div class="mb-3">
             <label>Notes</label>
             <textarea name="notes" class="form-control">{{ $inventory->notes }}</textarea>

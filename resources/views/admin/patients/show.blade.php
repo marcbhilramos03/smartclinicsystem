@@ -2,103 +2,140 @@
 
 @section('content')
 <div class="container">
-    <h1>{{ $user->first_name }} {{ $user->middle_name ?? '' }} {{ $user->last_name }} - Records</h1>
-    <a href="{{ route('admin.patients.records.create', $user->user_id) }}" class="btn btn-success mb-3">Add Record</a>
+    <h2 class="mb-4">Patient Medical Record</h2>
 
-    @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    {{-- Patient Information --}}
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Personal Information</div>
+        <div class="card-body">
+            <p><strong>Student ID:</strong> {{ $user->personalInformation->school_id ?? 'N/A' }}</p>
+            <p><strong>Name:</strong> {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}</p>            <p><strong>Contact:</strong> {{ $user->personalInformation->contact_number ?? 'N/A' }}</p>
+            <p><strong>Address:</strong> {{ $user->personalInformation->address ?? 'N/A' }}</p>
+        </div>
+    </div>
+
+    {{-- Emergency Contacts --}}
+    @if($user->personalInformation && $user->personalInformation->emergencyContacts->count() > 0)
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">Emergency Contacts</div>
+        <div class="card-body">
+            @foreach($user->personalInformation->emergencyContacts as $contact)
+                <p><strong>{{ $contact->name }}</strong> ({{ $contact->relationship }}) - {{ $contact->contact_no }}</p>
+            @endforeach
+        </div>
+    </div>
     @endif
 
- @if($user->personalInformation)
-    <h4>Personal Information</h4>
-    <ul>
-        <li><strong>School ID:</strong> {{ $user->personalInformation->school_id ?? '-' }}</li>
-        <li><strong>Gender:</strong> {{ $user->personalInformation->gender ?? '-' }}</li>
-        <li><strong>Date of Birth:</strong> {{ $user->personalInformation->birthdate ?? '-' }}</li>
-        <li><strong>Contact Number:</strong> {{ $user->personalInformation->contact_number ?? '-' }}</li>
-        <li><strong>Address:</strong> {{ $user->personalInformation->address ?? '-' }}</li>
-    </ul>
+    {{-- Clinic Sessions --}}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Clinic Sessions</div>
+        <div class="card-body">
+            @if($user->clinicSessions->isEmpty())
+                <p>No clinic sessions recorded.</p>
+            @else
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Reason</th>
+                            <th>Remedy</th>
+                            <th>Medications</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($user->clinicSessions as $session)
+                        <tr>
+                            <td>{{ \Carbon\Carbon::parse($session->session_date)->format('F d, Y') }}</td>
+                            <td>{{ $session->reason }}</td>
+                            <td>{{ $session->remedy ?? 'N/A' }}</td>
+                            <td>
+                                @forelse($session->medications as $med)
+                                    {{ $med->inventory->item_name ?? 'Unknown' }} ({{ $med->dosage }})
+                                @empty
+                                    N/A
+                                @endforelse
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
 
-    <h4>Emergency Contacts</h4>
-@if($user->personalInformation && $user->personalInformation->emergencyContacts->isNotEmpty())
-    <ul>
-    @foreach($user->personalInformation->emergencyContacts as $contact)
-        <li>
-            <strong>Name:</strong> {{ $contact->name }} |
-            <strong>Relationship:</strong> {{ $contact->relationship ?? '-' }} |
-            <strong>Phone:</strong> {{ $contact->phone_number ?? '-' }}
-        </li>
-    @endforeach
-    </ul>
-@else
-    <p>No emergency contact recorded.</p>
-@endif
+    {{-- Medical History --}}
+    <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">Medical History</div>
+        <div class="card-body">
+            @if($user->medicalHistories->isEmpty())
+                <p>No medical history recorded.</p>
+            @else
+                <ul>
+                    @foreach($user->medicalHistories as $history)
+                        <li>
+                            <strong>{{ ucfirst($history->history_type) }}:</strong> 
+                            {{ $history->description }} 
+                            ({{ \Carbon\Carbon::parse($history->date_recorded)->format('F d, Y') }})
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
+        </div>
+    </div>
 
-@else
-    <p>No personal information recorded.</p>
-@endif
+    {{-- Checkups --}}
+    <div class="card mb-5">
+        <div class="card-header bg-info text-white">Checkups (Vitals & Dental)</div>
+        <div class="card-body">
+            @if($user->checkups->isEmpty())
+                <p>No checkups recorded yet.</p>
+            @else
+                @foreach($user->checkups as $checkup)
+                <div class="border rounded p-3 mb-3">
+                    <h5 class="text-primary mb-2">Checkup on {{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</h5>
+                    <p><strong>Performed by:</strong> {{ $checkup->staff->first_name ?? 'N/A' }} {{ $checkup->staff->last_name ?? '' }}</p>
+                    <p><strong>Notes:</strong> {{ $checkup->notes ?? 'No additional notes' }}</p>
 
-
-   <h3>Clinic Sessions</h3>
-@if($user->clinicSessions->isEmpty())
-    <p>No clinic sessions recorded.</p>
-@else
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Reason / Notes</th>
-                <th>Admin / Staff In Charge</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($user->clinicSessions as $session)
-            <tr>
-                <td>{{ $session->session_date }}</td>
-                <td>
-                    <strong>Reason:</strong> {{ Str::limit($session->reason, 50) }}<br>
-                    <strong>Remedy Given:</strong> {{ Str::limit($session->remedy, 50) }}
-                    @if($session->medications->isNotEmpty())
-                        <br><strong>Medications:</strong>
-                        <ul class="mb-0">
-                            @foreach($session->medications as $med)
-                                <li>{{ $med->inventory->item_name ?? '-' }} - {{ $med->dosage ?? '' }} {{ $med->duration ?? '' }}</li>
-                            @endforeach
-                        </ul>
+                    {{-- Vitals --}}
+                    @if($checkup->vitals)
+                    <table class="table table-sm table-bordered mt-3">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Height (cm)</th>
+                                <th>Weight (kg)</th>
+                                <th>Blood Pressure</th>
+                                <th>Pulse Rate</th>
+                                <th>Temperature (°C)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ $checkup->vitals->height ?? 'N/A' }}</td>
+                                <td>{{ $checkup->vitals->weight ?? 'N/A' }}</td>
+                                <td>{{ $checkup->vitals->blood_pressure ?? 'N/A' }}</td>
+                                <td>{{ $checkup->vitals->pulse_rate ?? 'N/A' }}</td>
+                                <td>{{ $checkup->vitals->temperature ?? 'N/A' }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    @else
+                        <p>No vital records available.</p>
                     @endif
-                </td>
-                <td>{{ $session->admin->first_name ?? '-' }} {{ $session->admin->middle_name ?? '' }} {{ $session->admin->last_name ?? '' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-@endif
 
+                    {{-- Dental --}}
+                    @if($checkup->dental)
+                        <h6 class="mt-3">Dental Record:</h6>
+                        <p><strong>Status:</strong> {{ $checkup->dental->dental_status ?? 'N/A' }}</p>
+                        <p><strong>Notes:</strong> {{ $checkup->dental->notes ?? 'None' }}</p>
+                    @else
+                        <p>No dental record available.</p>
+                    @endif
+                </div>
+                @endforeach
+            @endif
+        </div>
+    </div>
 
-<h3>Medical Histories</h3>
-@if($user->medicalHistories->isEmpty())
-    <p>No medical history recorded.</p>
-@else
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Date Recorded</th>
-                <th>Type / Description</th>
-                <th>Admin / Staff In Charge</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($user->medicalHistories as $history)
-            <tr>
-                <td>{{ $history->date_recorded ?? '-' }}</td>
-                <td>
-                    <strong>{{ ucfirst($history->history_type) }}:</strong> {{ Str::limit($history->description, 50) }}
-                </td>
-                <td>{{ $history->admin->first_name ?? '-' }} {{ $history->admin->last_name ?? '' }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-@endif
-
+    <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary">Back to List</a>
+</div>
 @endsection

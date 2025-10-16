@@ -49,44 +49,54 @@ class InventoryController extends Controller
     {
         return view('admin.inventory.edit', compact('inventory'));
     }
+public function update(Request $request, Inventory $inventory)
+{
+    $validated = $request->validate([
+        'adjustment_type' => 'required|in:add,subtract',
+        'quantity_change' => 'required|integer|min:0',
+        'status' => 'required|in:available,damaged,used,expired',
+        'notes' => 'nullable|string',
+    ]);
 
-    // Update stock or status of an inventory item
-    public function update(Request $request, Inventory $inventory)
-    {
-        $validated = $request->validate([
-            'stock_quantity' => 'required|integer|min:0',
-            'status' => 'required|in:available,damaged,used,expired',
-            'notes' => 'nullable|string',
+    // Calculate new stock
+    $quantityChange = $validated['quantity_change'];
+    if ($validated['adjustment_type'] == 'subtract') {
+        $quantityChange = -$quantityChange;
+    }
+
+    $newQuantity = max(0, $inventory->stock_quantity + $quantityChange);
+
+    // Archive if needed
+    if (in_array($validated['status'], ['used', 'damaged', 'expired'])) {
+        ArchivedInventory::create([
+            'inventory_id' => $inventory->id,
+            'item_name' => $inventory->item_name,
+            'type' => $inventory->type,
+            'brand' => $inventory->brand,
+            'unit' => $inventory->unit,
+            'quantity' => abs($quantityChange),
+            'status' => $validated['status'],
+            'archived_date' => Carbon::now(),
+            'notes' => $validated['notes'],
         ]);
 
-        // If the status is "used", "damaged", or "expired", archive the item
-        if (in_array($validated['status'], ['used', 'damaged', 'expired'])) {
-            ArchivedInventory::create([
-                'inventory_id' => $inventory->id,
-                'item_name' => $inventory->item_name,
-                'type' => $inventory->type,
-                'brand' => $inventory->brand,
-                'unit' => $inventory->unit,
-                'quantity' => $validated['stock_quantity'],
-                'status' => $validated['status'],
-                'archived_date' => Carbon::now(),
-                'notes' => $validated['notes'],
-            ]);
+        $inventory->stock_quantity = max(0, $inventory->stock_quantity - abs($quantityChange));
+        $inventory->status = 'available';
+        $inventory->notes = $validated['notes'];
+        $inventory->save();
 
-            // Remove or reset the inventory quantity
-            $inventory->update([
-                'stock_quantity' => 0,
-                'status' => 'available',
-            ]);
-
-            return redirect()->route('admin.inventory.index')->with('success', 'Inventory archived successfully.');
-        }
-
-        // Otherwise, just update quantity/notes
-        $inventory->update($validated);
-
-        return redirect()->route('admin.inventory.index')->with('success', 'Inventory updated successfully.');
+        return redirect()->route('admin.inventory.index')->with('success', 'Inventory archived successfully.');
     }
+
+    // Otherwise, update normally
+    $inventory->update([
+        'stock_quantity' => $newQuantity,
+        'status' => $validated['status'],
+        'notes' => $validated['notes'],
+    ]);
+
+    return redirect()->route('admin.inventory.index')->with('success', 'Inventory updated successfully.');
+}
 
     // Delete an inventory item
     public function destroy(Inventory $inventory)

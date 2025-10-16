@@ -26,7 +26,7 @@
                 <td>{{ $item->unit ?? '-' }}</td>
                 <td>{{ $item->quantity }}</td>
                 <td>{{ ucfirst($item->status) }}</td>
-                <td>{{ $item->archived_date }}</td>
+                <td>{{ \Carbon\Carbon::parse($item->archived_date)->format('Y-m-d') }}</td>
                 <td>{{ $item->notes ?? '-' }}</td>
             </tr>
             @endforeach

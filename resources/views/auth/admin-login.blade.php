@@ -1,45 +1,149 @@
 @extends('layouts.guest')
 
 @section('content')
-<div class="text-center">
-    <h1 class="h4 text-gray-900 mb-4">Admin / Staff Login</h1>
-    <p class="small text-gray-700 mb-4">Enter your email and password to access the dashboard</p>
-</div>
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        font-family: 'Poppins', sans-serif;
+        background: #f8f9fc; /* light background */
+    }
 
-<form method="POST" action="{{ route('login-admin') }}" class="user">
-    @csrf
-        @if ($errors->has('login_error'))
-        <div class="alert alert-danger">
-            {{ $errors->first('login_error') }}
+    /* Center Wrapper */
+    .login-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        padding: 1rem;
+    }
+
+    /* Login Card */
+    .login-card {
+        background: #ffffff;
+        color: #343a40;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        padding: 3rem 2.5rem;
+        width: 100%;
+        max-width: 480px;
+        text-align: center;
+        position: relative;
+    }
+
+    .login-title {
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+
+    .login-subtitle {
+        font-size: 1rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    /* Inputs */
+    .form-control {
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .form-control:focus {
+        border-color: #4e73df;
+        box-shadow: 0 0 0 0.15rem rgba(78,115,223,0.25);
+    }
+
+    /* Button */
+    .btn-primary {
+        background-color: #4e73df;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 0.75rem;
+        font-weight: 600;
+        width: 100%;
+        font-size: 1rem;
+        transition: background 0.3s ease;
+    }
+
+    .btn-primary:hover {
+        background-color: #3458c0;
+    }
+
+    /* Links */
+    .small a {
+        color: #4e73df;
+        text-decoration: none;
+    }
+
+    .small a:hover {
+        color: #2e59d9;
+    }
+
+    @media (max-width: 768px) {
+        .login-card {
+            padding: 2rem 1.5rem;
+            max-width: 95%;
+        }
+        .login-title { font-size: 1.6rem; }
+    }
+</style>
+
+<div class="login-wrapper">
+    <div class="login-card">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo" width="80" class="mb-3">
+        <h1 class="login-title">Admin / Staff Login</h1>
+        <p class="login-subtitle">Enter your email and password to access the dashboard</p>
+
+        <form method="POST" action="{{ route('login-admin') }}">
+            @csrf
+
+            @if ($errors->has('login_error'))
+                <div class="alert alert-danger py-2">
+                    {{ $errors->first('login_error') }}
+                </div>
+            @endif
+
+            <div class="mb-3 text-start">
+                <input type="email" 
+                       name="email" 
+                       placeholder="Enter Email Address..."
+                       value="{{ old('email') }}"
+                       class="form-control @error('email') is-invalid @enderror"
+                       required autofocus>
+                @error('email')
+                    <div class="text-danger small">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div class="mb-4 text-start">
+                <input type="password" 
+                       name="password" 
+                       placeholder="Password"
+                       class="form-control @error('password') is-invalid @enderror"
+                       required>
+                @error('password')
+                    <div class="text-danger small">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <button type="submit" class="btn btn-primary mt-2">Login</button>
+        </form>
+
+        <div class="mt-3 text-center small">
+            <a href="#">Forgot Password?</a>
         </div>
-        @endif
-    
-    {{-- Email --}}
-    <div class="form-group mb-3">
-        <input type="email" name="email" class="form-control form-control-user @error('email') is-invalid @enderror"
-               placeholder="Enter Email Address..." value="{{ old('email') }}" required autofocus>
+
+        <div class="text-center small mt-2">
+            <a href="{{ route('patient.login.form') }}">← Patient Login</a>
+        </div>
     </div>
-
-    {{-- Password --}}
-    <div class="form-group mb-3">
-        <input type="password" name="password" class="form-control form-control-user @error('password') is-invalid @enderror"
-               placeholder="Password" required>
-        @error('password')
-            <span class="text-danger small">{{ $message }}</span>
-        @enderror
-    </div>
-
-    {{-- Submit Button --}}
-    <button type="submit" class="btn btn-primary btn-user btn-block">
-        Login
-    </button>
-</form>
-
-<hr>
-<div class="text-center">
-    <a class="small" href="#">Forgot Password?</a>
-</div>
-<div class="text-center mt-2">
-    <a class="small" href="{{ route('patient.login.form') }}">Patient Login</a>
 </div>
 @endsection

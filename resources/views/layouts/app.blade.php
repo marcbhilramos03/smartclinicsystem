@@ -189,7 +189,7 @@
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->first_name }}</span>
-                            <img class="img-profile rounded-circle" src="{{ auth()->user()->profile_photo_url }}">
+                            <img class="img-profile rounded-circle" src="{{ asset('images/profile.png') }}">
                         </a>
                         <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
                             @if(auth()->user()->isAdmin())

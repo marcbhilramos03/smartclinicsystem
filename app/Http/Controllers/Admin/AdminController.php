@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Illuminate\Foundation\Auth\User;
 
 class AdminController extends Controller
 {
@@ -18,9 +19,25 @@ class AdminController extends Controller
         $user = auth()->user();
         return view('admin.profile', compact('user'));
     }
-        public function dashboard()
-    {
-        return view('admin.dashboard');
+     public function dashboard()
+{
+    $totalStaff = User::where('role', 'staff')->count();
+    $totalPatients = User::where('role', 'patient')->count();
+    $totalUsers = User::count(); // total users including admin
+
+    // Example chart data
+    $patientsLabels = ['Jan', 'Feb', 'Mar', 'Apr'];
+    $patientsData = [10, 15, 12, 20];
+
+    $inventoryLabels = ['Medicine A', 'Medicine B', 'Medicine C'];
+    $inventoryData = [50, 30, 20];
+
+    return view('admin.dashboard', compact(
+        'totalStaff', 'totalPatients', 'totalUsers',
+        'patientsLabels', 'patientsData',
+        'inventoryLabels', 'inventoryData'
+    ));
+
     }
     public function updateProfile(Request $request)
     {
