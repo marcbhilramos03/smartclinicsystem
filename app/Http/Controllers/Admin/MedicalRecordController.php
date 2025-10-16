@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+use App\Models\MedicalRecord;
+use App\Http\Controllers\Controller;
+    
 
 use Illuminate\Http\Request;
 
@@ -31,7 +34,7 @@ class MedicalRecordController extends Controller
 
         } else {
             // Patient sees only their own records
-            $records = MedicalRecord::where('user_id', $user->user_id)
+            $records = MedicalRecord::where('user_id', auth()->id())
                 ->with([
                     'checkup.staff',
                     'clinicSession.admin',
@@ -40,7 +43,7 @@ class MedicalRecordController extends Controller
                 ->latest()->paginate(10);
         }
 
-        return view('medical_records.index', compact('records'));
+        return view('patient.medical_re', compact('records'));
     }
 
     /**

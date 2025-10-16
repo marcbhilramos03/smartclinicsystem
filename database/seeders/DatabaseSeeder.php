@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call your main UserSeeder
         $this->call(UserSeeder::class);
-
+        $this->call(InventorySeeder::class);    
         // Add a test user
         User::factory()->create([
             'first_name' => 'Test',

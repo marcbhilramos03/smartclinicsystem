@@ -16,6 +16,7 @@ class MedicalHistory extends Model
         'history_type',    // allergy, illness, vaccination
         'description',
         'date_recorded',
+        'admin_id',        // who recorded this
     ];
 
     /**
@@ -25,4 +26,11 @@ class MedicalHistory extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+    public function admin()
+    {
+    return $this->belongsTo(User::class, 'admin_id'); // foreign key is admin_id
+    }
+    /**
+     * The medical record this history is associated with.
+     */
 }

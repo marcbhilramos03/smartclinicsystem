@@ -23,14 +23,14 @@
             <input type="email" name="email" class="form-control" required value="{{ old('email', $user->email) }}">
         </div>
 
-        <div class="mb-3">
+        {{-- <div class="mb-3">
             <label>Role</label>
             <select name="role" class="form-select" required>
                 <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
                 <option value="clinic_staff" {{ $user->role == 'clinic_staff' ? 'selected' : '' }}>Clinic Staff</option>
                 <option value="patient" {{ $user->role == 'patient' ? 'selected' : '' }}>Patient</option>
             </select>
-        </div>
+        </div> --}}
 
         <button class="btn btn-success">Update</button>
         <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancel</a>

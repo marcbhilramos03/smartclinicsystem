@@ -7,9 +7,11 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Admin\CheckupController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\Admin\InventoryController;
+use App\Http\Controllers\Patient\PatientController;
+use App\Http\Controllers\Patient\RecordsController;
 use App\Http\Controllers\Staff\StaffCheckupController;
+use App\Http\Controllers\Admin\MedicalRecordController;
 use App\Http\Controllers\Admin\PatientRecordController;
 
 // -a----------------------------
@@ -122,6 +124,7 @@ Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')
     Route::get('/profile', [PatientController::class, 'profile'])->name('profile');
     Route::post('/profile', [PatientController::class, 'updateProfile'])->name('profile.update');
 
-    Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
-
+     Route::get('/medical-records', [RecordsController::class, 'index'])->name('medical_records.index');
+    Route::get('/medical-records/show/{type}/{id}', [RecordsController::class, 'show'])->name('medical_records.show');
 });
+

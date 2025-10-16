@@ -92,6 +92,8 @@
                 ],
                 'patient' => [
                     ['route' => 'patient.dashboard', 'icon' => 'fa-tachometer-alt', 'label' => 'Dashboard'],
+                    ['route' => 'patient.medical_records.index', 'icon' => 'fa-file-medical', 'label' => 'My Medical Records'],
+                    // ['route' => 'patient.appointments', 'icon' => 'fa-calendar-check',  'label' => 'My Appointments'],
                 ],
                 default => []
             };

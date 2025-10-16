@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\PersonalInformation;
+use App\Models\EmergencyContact;
 
 class UserSeeder extends Seeder
 {
@@ -55,22 +56,32 @@ class UserSeeder extends Seeder
         ];
 
         foreach ($patients as $p) {
+            // Create the user record
             $user = User::create([
                 'first_name' => $p['first_name'],
                 'middle_name' => null,
                 'last_name' => $p['last_name'],
                 'role' => 'patient',
                 'email' => null,
-                'password' => null,
+                'password' => Hash::make('password123'), // optional default password
             ]);
 
-            // Personal information
-            PersonalInformation::create([
+            // Create personal information
+            $personalInfo = PersonalInformation::create([
                 'user_id' => $user->user_id,
                 'school_id' => $p['school_id'],
                 'gender' => 'Male',
                 'birthdate' => '2010-01-01',
                 'contact_number' => '09123456789',
+                'address' => '123 Street, City',
+            ]);
+
+            // Create emergency contact
+            EmergencyContact::create([
+                'personal_information_id' => $personalInfo->id,
+                'name' => 'Parent of ' . $p['first_name'],
+                'relationship' => 'Parent',
+                'phone_number' => '09987654321',
                 'address' => '123 Street, City',
             ]);
         }

@@ -14,7 +14,7 @@
     <ul>
         <li><strong>School ID:</strong> {{ $user->personalInformation->school_id ?? '-' }}</li>
         <li><strong>Gender:</strong> {{ $user->personalInformation->gender ?? '-' }}</li>
-        <li><strong>Date of Birth:</strong> {{ $user->personalInformation->dob ?? '-' }}</li>
+        <li><strong>Date of Birth:</strong> {{ $user->personalInformation->birthdate ?? '-' }}</li>
         <li><strong>Contact Number:</strong> {{ $user->personalInformation->contact_number ?? '-' }}</li>
         <li><strong>Address:</strong> {{ $user->personalInformation->address ?? '-' }}</li>
     </ul>

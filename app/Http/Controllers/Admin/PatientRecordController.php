@@ -47,7 +47,7 @@ public function show(User $user)
     }
 
     // Store record
-   public function storeRecord(Request $request, User $user)
+  public function storeRecord(Request $request, User $user)
 {
     $type = $request->input('record_type');
 
@@ -56,36 +56,34 @@ public function show(User $user)
             'session_date' => 'required|date',
             'reason' => 'required|string',
             'remedy' => 'nullable|string',
-            'medications' => 'nullable|array', 
-            'medications.*.inventory_id' => 'required_with:medications|exists:inventory,id',
-            'medications.*.dosage' => 'nullable|string',
-            'medications.*.duration' => 'nullable|string',
-            'medications.*.quantity' => 'nullable|integer|min:1',
+            'medication' => 'nullable|string', // simple optional medication
         ]);
-         MedicalRecord::create([
-        'user_id' => $user->user_id,
-        'clinic_session_id' => $session->id,
-         ]);
+
         // Create the clinic session
         $session = ClinicSession::create([
             'user_id' => $user->user_id,
-            'staff_id' => auth()->user()->user_id, // admin in-charge
+            'staff_id' => auth()->id(), // current logged-in admin/staff
             'session_date' => $validated['session_date'],
             'reason' => $validated['reason'],
             'remedy' => $validated['remedy'] ?? null,
+            'admin_id' => auth()->id(), // who recorded this
         ]);
 
-        // Create medications if provided
-        if (!empty($validated['medications'])) {
-            foreach ($validated['medications'] as $med) {
-                $session->medications()->create([
-                    'inventory_id' => $med['inventory_id'],
-                    'dosage' => $med['dosage'] ?? null,
-                    'duration' => $med['duration'] ?? null,
-                    'quantity' => $med['quantity'] ?? 1,
-                ]);
-            }
+        // Optional: create medication record if medication field is filled
+        if (!empty($validated['medication'])) {
+            $session->medications()->create([
+                'inventory_id' => null, // optional, if not linked to inventory
+                'dosage' => $validated['medication'],
+                'duration' => null,
+                'quantity' => 1,
+            ]);
         }
+
+        // Create MedicalRecord link
+        MedicalRecord::create([
+            'user_id' => $user->user_id,
+            'clinic_session_id' => $session->id,
+        ]);
 
     } elseif ($type === 'medical_history') {
         $validated = $request->validate([
@@ -94,21 +92,24 @@ public function show(User $user)
             'date_recorded' => 'nullable|date',
         ]);
 
-        MedicalHistory::create(array_merge($validated, [
-            'user_id' => $user->user_id
-        ]));
-        
-        $history = MedicalHistory::create(array_merge($validated, [
-            'user_id' => $user->user_id
-        ]));
+        $history = MedicalHistory::create([
+            'user_id' => $user->user_id,
+            'history_type' => $validated['history_type'],
+            'description' => $validated['description'],
+            'date_recorded' => $validated['date_recorded'] ?? now(),
+            'admin_id' => auth()->id(), // current logged-in admin/staff
+        ]);
+
         MedicalRecord::create([
             'user_id' => $user->user_id,
             'medical_history_id' => $history->id,
-    ]);
+        ]);
     }
 
-    return redirect()->route('admin.patients.show', $user)
-                     ->with('success', 'Record added successfully.');
+    return redirect()
+        ->route('admin.patients.show', $user)
+        ->with('success', 'Record added successfully.');
 }
+
 }
 

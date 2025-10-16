@@ -15,6 +15,7 @@ class ClinicSession extends Model
         'session_date',
         'reason',
         'remedy'
+        
     ];
 
     /**
@@ -39,5 +40,12 @@ class ClinicSession extends Model
     public function medications()
     {
         return $this->hasMany(Medication::class, 'session_id', 'id');
+    }
+    /**
+     * The medical record this session is associated with.
+     */
+    public function medicalRecord()
+    {
+        return $this->belongsTo(MedicalRecord::class, 'medical_record_id');
     }
 }

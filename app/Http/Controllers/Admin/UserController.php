@@ -17,12 +17,15 @@ class UserController extends Controller
     /**
      * Display a listing of users.
      */
-    public function index()
-    { // optional if you’re using policies
-        $users = User::paginate(10);
+public function index()
+{
+    // Fetch all users except those with the 'admin' role
+    $users = User::where('role', '!=', 'admin')->paginate(10);
 
-        return view('admin.users.index', compact('users'));
-    }
+
+    // Pass them to the view
+    return view('admin.users.index', compact('users'));
+}
 
     /**
      * Show the form for creating a new user.
@@ -131,7 +134,7 @@ public function store(Request $request)
     {
         $validated = $request->validate([
             'name'  => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->user_id . ',user_id',
             'role'  => 'required|string',
         ]);
 

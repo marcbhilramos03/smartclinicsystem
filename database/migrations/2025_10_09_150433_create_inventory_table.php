@@ -33,7 +33,7 @@ return new class extends Migration
             $table->string('unit')->nullable();
             $table->integer('quantity'); // number of units moved to archive
             $table->enum('status', ['used', 'expired', 'damaged']); // why archived
-            $table->date('archived_date')->useCurrent();
+            $table->date('archived_date')->default(DB::raw('CURRENT_DATE'));
             $table->text('notes')->nullable();
             $table->timestamps();
 
