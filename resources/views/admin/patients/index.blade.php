@@ -1,40 +1,68 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4">Search Students</h1>
+<style>
+    /* Make content full width */
+    .full-width-content {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0; /* align with sidebar */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
 
-    <form action="{{ route('admin.patients.index') }}" method="GET" class="mb-3 d-flex gap-2">
-        <input type="text" name="query" value="{{ $query ?? '' }}" placeholder="Search by School ID or Name" class="form-control">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </form>
+    /* Make tables stretch full width */
+    .full-width-content table {
+        width: 100%;
+    }
+</style>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Name</th>
-                <th>School ID</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($students as $student)
-            <tr>
-                <td>{{ $student->first_name }} {{ $student->middle_name ?? '' }} {{ $student->last_name }}</td>
-                <td>{{ $student->personalInformation->school_id ?? '-' }}</td>
-                <td class="d-flex gap-1 flex-wrap">
-                    <a href="{{ route('admin.patients.show', $student->user_id) }}" class="btn btn-info btn-sm">View Records</a>
-                    <a href="{{ route('admin.patients.records.create', $student->user_id) }}" class="btn btn-success btn-sm">Add Record</a>
-                </td>
-            </tr>
-            @empty
-            <tr>
-                <td colspan="3" class="text-center">No students found.</td>
-            </tr>
-            @endforelse
-        </tbody>
-    </table>
+<div class="full-width-content mb-4">
+    <h1 class="mb-4">Manage Patients</h1>
 
-    {{ $students->withQueryString()->links() }}
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Patients</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>School ID</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($patients as $patient)
+                        <tr>
+                            <td>{{ $loop->iteration + ($patients->currentPage()-1)*$patients->perPage() }}</td>
+                            <td>{{ $patient->first_name }} {{ $patient->middle_name ?? '' }} {{ $patient->last_name }}</td>
+                            <td>{{ $patient->personalInformation->school_id ?? '-' }}</td>
+                            <td>
+                                <a href="{{ route('admin.patients.show', $patient) }}" class="btn btn-sm btn-info text-white">View</a>
+                                <a href="{{ route('admin.patients.records.create', $patient) }}" class="btn btn-sm btn-secondary">Add Record</a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No patients found.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            {{ $patients->links() }}
+        </div>
+    </div>
 </div>
 @endsection

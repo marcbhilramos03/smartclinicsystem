@@ -7,11 +7,12 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Staff\StaffController;
 use App\Http\Controllers\Admin\CheckupController;
+use App\Http\Controllers\Admin\ReportsController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Patient\PatientController;
 use App\Http\Controllers\Patient\RecordsController;
 use App\Http\Controllers\Staff\StaffCheckupController;
-use App\Http\Controllers\Admin\ReportsController;
+use App\Http\Controllers\Admin\PatientImportController;
 use App\Http\Controllers\Admin\PatientRecordController;
 
 // -a----------------------------
@@ -69,15 +70,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
         Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
 
-           Route::resource('users', UserController::class)->names([
-        'index'   => 'users.index',
-        'create'  => 'users.create',
-        'store'   => 'users.store',
-        'edit'    => 'users.edit',
-        'update'  => 'users.update',
-        'destroy' => 'users.destroy',
-    ]);
-     
+    // Users CRUD
+    Route::resource('users', UserController::class);
+    
+    // Patient Import Routes
+    Route::get('patients/import', [PatientImportController::class, 'showImportForm'])
+        ->name('patients.import-form');
+    Route::post('patients/import', [PatientImportController::class, 'import'])
+        ->name('patients.import');
+        
     // Patients CRUD
     Route::get('patients', [PatientRecordController::class, 'index'])->name('patients.index');
     Route::get('patients/{user}', [PatientRecordController::class, 'show'])->name('patients.show');
@@ -85,6 +86,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('patients.records.create');
     Route::post('patients/{user}/records', [PatientRecordController::class, 'storeRecord'])
         ->name('patients.records.store');
+    
 
     Route::get('checkups', [CheckupController::class, 'index'])->name('checkups.index');
     Route::get('checkups/create', [CheckupController::class, 'create'])->name('checkups.create');
@@ -118,7 +120,7 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::get('checkups/{checkup}', [StaffCheckupController::class, 'show'])->name('checkups.show');
     Route::post('checkups/{checkup}/update', [StaffCheckupController::class, 'update'])->name('checkups.update');
 
-    Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
+    // Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
 
 });
 

@@ -6,22 +6,22 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-       Schema::create('checkups', function (Blueprint $table) {
-    $table->id();
-    $table->unsignedBigInteger('user_id'); // patient
-    $table->unsignedBigInteger('staff_id'); // staff performing the checkup
-    $table->date('date');
-    $table->text('notes')->nullable();
-    $table->timestamps();
+        // Checkups table
+        Schema::create('checkups', function (Blueprint $table) {
+            $table->id();
 
-    $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
-    $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
-});
+            $table->unsignedBigInteger('staff_id'); // staff performing the checkup
+            $table->unsignedBigInteger('course_information_id'); // batch scheduling
+
+            $table->date('date');
+            $table->text('notes')->nullable(); // general notes
+            $table->timestamps();
+
+            $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
+            $table->foreign('course_information_id')->references('id')->on('course_information')->onDelete('cascade');
+        });
 
         // Vitals table
         Schema::create('vitals', function (Blueprint $table) {
@@ -41,17 +41,20 @@ return new class extends Migration
         Schema::create('dental', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('checkup_id');
+
             $table->string('dental_status')->nullable();
+            $table->integer('cavities')->nullable();
+            $table->integer('missing_teeth')->nullable();
+            $table->boolean('gum_disease')->default(false);
+            $table->boolean('oral_hygiene')->default(true);
             $table->text('notes')->nullable();
+
             $table->timestamps();
 
             $table->foreign('checkup_id')->references('id')->on('checkups')->onDelete('cascade');
         });
-    }   
+    }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('dental');

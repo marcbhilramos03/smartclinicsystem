@@ -23,6 +23,12 @@
             </div>
 
             @if($user->role === 'patient')
+                @php
+                    $info = $user->personalInformation;
+                    $courseInfo = $info?->courseInformation?->first();
+                    $emergency = $info?->emergencyContacts?->first();
+                @endphp
+
                 <div class="mb-3">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}">
@@ -35,10 +41,7 @@
                     <label for="last_name" class="form-label">Last Name</label>
                     <input type="text" name="last_name" class="form-control" value="{{ old('last_name', $user->last_name) }}">
                 </div>
-                @php
-                    $info = $user->personalInformation;
-                    $emergency = $info?->emergencyContacts?->first();
-                @endphp
+
                 <div class="mb-3">
                     <label for="school_id" class="form-label">School ID</label>
                     <input type="text" name="school_id" class="form-control" value="{{ old('school_id', $info->school_id ?? '') }}">
@@ -52,6 +55,21 @@
                     <textarea name="address" class="form-control">{{ old('address', $info->address ?? '') }}</textarea>
                 </div>
 
+                <!-- Course Information -->
+                <hr>
+                <h5>Academic Information</h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="course" class="form-label">Course</label>
+                        <input type="text" name="course" class="form-control" value="{{ old('course', $courseInfo->course ?? '') }}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="grade_level" class="form-label">Year Level</label>
+                        <input type="text" name="grade_level" class="form-control" value="{{ old('grade_level', $courseInfo->grade_level ?? '') }}">
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
                 <hr>
                 <h5>Emergency Contact</h5>
                 <div class="mb-3">
@@ -70,7 +88,9 @@
                     <label for="emergency_address" class="form-label">Address</label>
                     <textarea name="emergency_address" class="form-control">{{ old('emergency_address', $emergency->address ?? '') }}</textarea>
                 </div>
+
             @else
+                <!-- For Staff/Doctor Users -->
                 <div class="mb-3">
                     <label for="first_name" class="form-label">First Name</label>
                     <input type="text" name="first_name" class="form-control" value="{{ old('first_name', $user->first_name) }}">

@@ -10,34 +10,35 @@ class Checkup extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
         'staff_id',
         'date',
+        'course',
+        'grade_level',
         'notes',
         'checkup_type',
     ];
 
-    // The student who had the checkup
+    // Relationship: patient (student)
     public function patient()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
-    // The staff who performed the checkup
+    // Relationship: staff (doctor/nurse)
     public function staff()
     {
-        return $this->belongsTo(User::class, 'staff_id', 'user_id');
+        return $this->belongsTo(User::class, 'staff_id');
     }
 
-    // One checkup has one vitals record
+    // Relationship: vitals
     public function vitals()
     {
-        return $this->hasOne(Vitals::class, 'checkup_id', 'id');
+        return $this->hasOne(Vital::class);
     }
 
-    // One checkup has one dental record
+    // Relationship: dental
     public function dental()
     {
-        return $this->hasOne(Dental::class, 'checkup_id', 'id');
+        return $this->hasOne(Dental::class);
     }
 }

@@ -29,10 +29,10 @@ class Medication extends Model
     /**
      * The inventory item prescribed
      */
-    public function inventory()
-    {
-        return $this->belongsTo(Inventory::class, 'inventory_id', 'id');
-    }
+   public function inventory() {
+    return $this->belongsTo(Inventory::class);
+}
+
 
     /**
      * Override create method to deduct stock and archive used units

@@ -1,7 +1,28 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<style>
+    /* Full width content */
+    .full-width-content {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0; /* align with sidebar */
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Make tables full width */
+    .full-width-content table {
+        width: 100%;
+    }
+
+    /* Adjust tab button spacing */
+    .full-width-content .nav-tabs .d-flex.gap-2 {
+        margin-left: auto;
+    }
+</style>
+
+<div class="full-width-content mb-4">
     <h1 class="mb-4">Inventory Management</h1>
 
     @if(session('success'))

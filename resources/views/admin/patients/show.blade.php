@@ -5,27 +5,18 @@
     <h2 class="mb-4">Patient Medical Record</h2>
 
     {{-- Patient Information --}}
-    <div class="card mb-4">
-        <div class="card-header bg-primary text-white">Personal Information</div>
-        <div class="card-body">
-            <p><strong>Student ID:</strong> {{ $user->personalInformation->school_id ?? 'N/A' }}</p>
-            <p><strong>Name:</strong> {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}</p>            <p><strong>Contact:</strong> {{ $user->personalInformation->contact_number ?? 'N/A' }}</p>
-            <p><strong>Address:</strong> {{ $user->personalInformation->address ?? 'N/A' }}</p>
-        </div>
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span>Personal Information</span>
+        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-light">View User</a>
     </div>
-
-    {{-- Emergency Contacts --}}
-    @if($user->personalInformation && $user->personalInformation->emergencyContacts->count() > 0)
-    <div class="card mb-4">
-        <div class="card-header bg-danger text-white">Emergency Contacts</div>
-        <div class="card-body">
-            @foreach($user->personalInformation->emergencyContacts as $contact)
-                <p><strong>{{ $contact->name }}</strong> ({{ $contact->relationship }}) - {{ $contact->contact_no }}</p>
-            @endforeach
-        </div>
+    <div class="card-body">
+        <p><strong>Student ID:</strong> {{ $user->personalInformation?->school_id ?? 'N/A' }}</p>
+        <p><strong>Name:</strong> {{ $user->first_name }} {{ $user->middle_name ?? '' }} {{ $user->last_name }}</p>
+        <p><strong>Contact:</strong> {{ $user->personalInformation?->contact_number ?? 'N/A' }}</p>
+        <p><strong>Address:</strong> {{ $user->personalInformation?->address ?? 'N/A' }}</p>
     </div>
-    @endif
-
+</div>
     {{-- Clinic Sessions --}}
     <div class="card mb-4">
         <div class="card-header bg-success text-white">Clinic Sessions</div>

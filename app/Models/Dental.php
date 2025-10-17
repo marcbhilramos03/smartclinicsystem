@@ -9,17 +9,19 @@ class Dental extends Model
 {
     use HasFactory;
 
-    protected $table = 'dental';
-    
     protected $fillable = [
         'checkup_id',
         'dental_status',
+        'cavities',
+        'missing_teeth',
+        'gum_disease',
+        'oral_hygiene',
         'notes',
     ];
 
-    // Each dental record belongs to a checkup
+    // Relationship: belongs to checkup
     public function checkup()
     {
-        return $this->belongsTo(Checkup::class, 'checkup_id', 'id');
+        return $this->belongsTo(Checkup::class);
     }
 }

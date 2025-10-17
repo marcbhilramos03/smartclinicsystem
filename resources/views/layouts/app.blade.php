@@ -19,54 +19,61 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
+<style>
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
 
-    <style>
-        html, body {
-            height: 100%;
-            overflow: hidden; /* Prevent full-page scroll */
-        }
+    #wrapper {
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
 
-        #wrapper {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        overflow-y: auto;
+        z-index: 1030;
+        width: 210px; /* Wider sidebar */
+    }
 
-        .sidebar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            overflow-y: auto;
-            z-index: 1030;
-        }
+    #content-wrapper {
+        margin-left: 250px; /* Match sidebar width */
+        width: calc(100% - 210px);
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+    }
 
-        #content-wrapper {
-            margin-left: 250px; /* Adjust if sidebar width changes */
-            width: calc(100% - 250px);
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-        }
+    nav.topbar {
+        position: sticky;
+        top: 0;
+        z-index: 1020;
+    }
 
-        nav.topbar {
-            position: sticky;
-            top: 0;
-            z-index: 1020;
-        }
+    .content-wrapper {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1.5rem;
+        background-color: #f8f9fc;
+    }
 
-        .content-wrapper {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            background-color: #f8f9fc;
-        }
+    footer.sticky-footer {
+        background: #fff;
+        border-top: 1px solid #e3e6f0;
+    }
 
-        footer.sticky-footer {
-            background: #fff;
-            border-top: 1px solid #e3e6f0;
-        }
-    </style>
+    /* Optional: make nav text more readable */
+    .sidebar .nav-link span {
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+</style>
+
 </head>
 
 <body id="page-top">
@@ -149,83 +156,87 @@
         </ul>
         <!-- End Sidebar -->
 
-        <!-- Content Wrapper -->
-        <div id="content-wrapper">
-            <!-- Topbar -->
-            <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow topbar">
-                <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle me-3">
-                    <i class="fa fa-bars"></i>
-                </button>
+<!-- Content Wrapper -->
+<div id="content-wrapper">
+    <!-- Topbar -->
+    <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 shadow topbar">
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle me-3">
+            <i class="fa fa-bars"></i>
+        </button>
 
-                @if(session('warning'))
-                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                        {{ session('warning') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                        {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                @endif
-
-                @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
-                    <form action="{{ route('search.patients') }}" method="GET"
-                        class="d-none d-sm-inline-block form-inline me-auto ms-md-3 my-2 my-md-0 mw-100 navbar-search">
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control bg-light border-0 small"
-                                   placeholder="Search patients..." aria-label="Search" aria-describedby="basic-addon2">
-                            <button class="btn btn-primary" type="submit">
-                                <i class="fas fa-search fa-sm"></i> Search
-                            </button>
-                        </div>
-                    </form>
-                @endif
-
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->first_name }}</span>
-                            <img class="img-profile rounded-circle" src="{{ asset('images/profile.png') }}">
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
-                            @if(auth()->user()->isAdmin())
-                                <a class="dropdown-item" href="{{ route('admin.profile') }}">
-                                    <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
-                                </a>
-                            @elseif(auth()->user()->isStaff())
-                                <a class="dropdown-item" href="{{ route('staff.profile') }}">
-                                    <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
-                                </a>
-                            @elseif(auth()->user()->isPatient())
-                                <a class="dropdown-item" href="{{ route('patient.profile') }}">
-                                    <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
-                                </a>
-                            @endif
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout
-                            </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
-                        </div>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Scrollable Content -->
-            <div class="content-wrapper">
-                <div class="container-fluid">
-                    @yield('content')
+        @if(auth()->user()->role === 'admin' || auth()->user()->role === 'staff')
+            <form action="{{ route('search.patients') }}" method="GET"
+                  class="d-none d-sm-inline-block form-inline me-auto ms-md-3 my-2 my-md-0 navbar-search"
+                  style="max-width: 900px;">
+                <div class="input-group">
+                    <input type="text" name="search" class="form-control bg-light border-1 small"
+                           placeholder="Search patients..." aria-label="Search" aria-describedby="basic-addon2">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search fa-sm"></i> Search
+                    </button>
                 </div>
-            </div>
+            </form>
+        @endif
+
+        <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                   data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="me-2 d-none d-lg-inline text-gray-600 small">{{ auth()->user()->first_name }}</span>
+                    <img class="img-profile rounded-circle" src="{{ asset('images/profile.png') }}">
+                </a>
+                <div class="dropdown-menu dropdown-menu-end shadow animated--grow-in" aria-labelledby="userDropdown">
+                    @if(auth()->user()->isAdmin())
+                        <a class="dropdown-item" href="{{ route('admin.profile') }}">
+                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
+                        </a>
+                    @elseif(auth()->user()->isStaff())
+                        <a class="dropdown-item" href="{{ route('staff.profile') }}">
+                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
+                        </a>
+                    @elseif(auth()->user()->isPatient())
+                        <a class="dropdown-item" href="{{ route('patient.profile') }}">
+                            <i class="fas fa-user fa-sm fa-fw me-2 text-gray-400"></i> Profile
+                        </a>
+                    @endif
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="{{ route('logout') }}"
+                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                        <i class="fas fa-sign-out-alt fa-sm fa-fw me-2 text-gray-400"></i> Logout
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Scrollable Content -->
+    <div class="content-wrapper">
+        <div class="container-fluid">
+
+            {{-- ✅ Move alerts here --}}
+            @if(session('warning'))
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    {{ session('warning') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+
+            {{-- ✅ Main Page Content --}}
+            @yield('content')
+
         </div>
     </div>
+</div>
 
     <!-- Scroll to Top Button -->
     <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>

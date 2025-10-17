@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vitals extends Model
+class Vital extends Model
 {
     use HasFactory;
 
@@ -16,12 +16,11 @@ class Vitals extends Model
         'blood_pressure',
         'pulse_rate',
         'temperature',
-        'bmi',
     ];
 
-    // Each vitals record belongs to a checkup
+    // Relationship: belongs to checkup
     public function checkup()
     {
-        return $this->belongsTo(Checkup::class, 'checkup_id', 'id');
+        return $this->belongsTo(Checkup::class);
     }
 }

@@ -11,12 +11,14 @@ use App\Http\Controllers\Controller;
 
 class PatientRecordController extends Controller
 {
-    // Search & list students
+    /**
+     * Search & list patients
+     */
     public function index(Request $request)
     {
         $query = $request->input('query');
 
-        $students = User::where('role', 'patient')
+        $patients = User::where('role', 'patient')
             ->whereHas('personalInformation', function ($q) use ($query) {
                 if ($query) {
                     $q->where('school_id', 'like', "%$query%");
@@ -24,31 +26,37 @@ class PatientRecordController extends Controller
             })
             ->paginate(10);
 
-        return view('admin.patients.index', compact('students', 'query'));
+        return view('admin.patients.index', compact('patients', 'query'));
     }
 
-    // Show full medical record of a patient (including checkups)
+    /**
+     * Show full medical record of a patient (including checkups)
+     */
     public function show(User $user)
     {
         $user->load([
             'personalInformation.emergencyContacts',
             'clinicSessions.medications.inventory',
             'medicalHistories',
-            'checkups.vitals',   // ✅ includes vital signs
-            'checkups.dental',   // ✅ includes dental info
-            'checkups.staff',    // ✅ includes the staff who conducted it
+            'checkups.vitals',
+            'checkups.dental',
+            'checkups.staff',
         ]);
 
         return view('admin.patients.show', compact('user'));
     }
 
-    // Show form to add a new record (clinic session or medical history only)
+    /**
+     * Show form to add a new record
+     */
     public function createRecord(User $user)
     {
         return view('admin.patients.create_record', compact('user'));
     }
 
-    // Store only clinic session or medical history
+    /**
+     * Store a clinic session or medical history
+     */
     public function storeRecord(Request $request, User $user)
     {
         $type = $request->input('record_type');
@@ -61,15 +69,16 @@ class PatientRecordController extends Controller
                 'medication' => 'nullable|string',
             ]);
 
+            // Create clinic session
             $session = ClinicSession::create([
-                'user_id' => $user->user_id,
+                'user_id' => $user->id,
                 'staff_id' => auth()->id(),
                 'session_date' => $validated['session_date'],
                 'reason' => $validated['reason'],
                 'remedy' => $validated['remedy'] ?? null,
-                'admin_id' => auth()->id(),
             ]);
 
+            // Optional medication
             if (!empty($validated['medication'])) {
                 $session->medications()->create([
                     'inventory_id' => null,
@@ -79,8 +88,9 @@ class PatientRecordController extends Controller
                 ]);
             }
 
+            // Link clinic session to medical record
             MedicalRecord::create([
-                'user_id' => $user->user_id,
+                'user_id' => $user->id,
                 'clinic_session_id' => $session->id,
             ]);
 
@@ -92,7 +102,7 @@ class PatientRecordController extends Controller
             ]);
 
             $history = MedicalHistory::create([
-                'user_id' => $user->user_id,
+                'user_id' => $user->id,
                 'history_type' => $validated['history_type'],
                 'description' => $validated['description'],
                 'date_recorded' => $validated['date_recorded'] ?? now(),
@@ -100,7 +110,7 @@ class PatientRecordController extends Controller
             ]);
 
             MedicalRecord::create([
-                'user_id' => $user->user_id,
+                'user_id' => $user->id,
                 'medical_history_id' => $history->id,
             ]);
         }

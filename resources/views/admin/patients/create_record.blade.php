@@ -87,7 +87,7 @@
         </div>
 
         <button type="submit" class="btn btn-success mt-3">Save Record</button>
-        <a href="{{ route('admin.patients.show', $user) }}" class="btn btn-secondary mt-3">Cancel</a>
+        <a href="{{ route('admin.patients.index', $user) }}" class="btn btn-secondary mt-3">Cancel</a>
     </form>
 </div>
 
