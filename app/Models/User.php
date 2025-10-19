@@ -60,11 +60,6 @@ class User extends Authenticatable
         return $this->hasMany(ClinicSession::class, 'user_id', 'user_id');
     }
 
-    public function checkups()
-    {
-        return $this->hasMany(Checkup::class, 'user_id', 'user_id');
-    }
-
     // 🩺 Admin (nurse) handles clinic sessions & medical histories
     public function handledClinicSessions()
     {
@@ -85,4 +80,10 @@ class User extends Authenticatable
     {
         return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
     }
+    public function checkups()
+{
+    return $this->belongsToMany(Checkup::class, 'checkup_patients', 'patient_id', 'checkup_id')
+                ->withTimestamps();
+}
+
 }

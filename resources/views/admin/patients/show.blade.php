@@ -1,52 +1,159 @@
 @extends('layouts.app')
 
-@section('content')
-<div class="container">
-    <h2 class="mb-4">Patient Medical Record</h2>
+@section('page-title', 'Patient Record')
 
-    {{-- Patient Information --}}
-<div class="card mb-4">
-    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-        <span>Personal Information</span>
-        <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-light">View User</a>
+@section('content')
+<style>
+    /* Make layout full-width */
+    .container-fluid {
+        max-width: 100%;
+    }
+
+    /* Card styling */
+    .custom-card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .card-header {
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    /* Section headers */
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1rem;
+        border-left: 4px solid #0d6efd;
+        padding-left: 10px;
+    }
+
+    /* Table styling */
+    table th {
+        background-color: #f8f9fa;
+        color: #333;
+        font-weight: 600;
+    }
+
+    table td {
+        vertical-align: middle;
+    }
+
+    /* Soft card background */
+    .bg-soft {
+        background-color: #f9fafc;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    {{-- Header --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold text-primary mb-0">
+            <i class="bi bi-person-vcard"></i> Patient Record: {{ $user->first_name }} {{ $user->last_name }}
+        </h1>
+        <a href="{{ route('admin.patients.records.create', $user) }}" class="btn btn-success px-4 py-2 shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Add Record
+        </a>
     </div>
-    <div class="card-body">
-        <p><strong>Student ID:</strong> {{ $user->personalInformation?->school_id ?? 'N/A' }}</p>
-        <p><strong>Name:</strong> {{ $user->first_name }} {{ $user->middle_name ?? '' }} {{ $user->last_name }}</p>
-        <p><strong>Contact:</strong> {{ $user->personalInformation?->contact_number ?? 'N/A' }}</p>
-        <p><strong>Address:</strong> {{ $user->personalInformation?->address ?? 'N/A' }}</p>
-    </div>
-</div>
-    {{-- Clinic Sessions --}}
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">Clinic Sessions</div>
+
+    {{-- Personal Information --}}
+    <div class="custom-card mb-4 bg-soft">
+        <div class="card-header bg-primary text-white">
+            Personal Information
+        </div>
         <div class="card-body">
-            @if($user->clinicSessions->isEmpty())
-                <p>No clinic sessions recorded.</p>
+            <div class="row mb-2">
+                <div class="col-md-4"><strong>Name:</strong> {{ $user->first_name }} {{ $user->middle_name ?? '' }} {{ $user->last_name }}</div>
+                <div class="col-md-4"><strong>School ID:</strong> {{ $user->personalInformation->school_id ?? 'N/A' }}</div>
+                <div class="col-md-4"><strong>Course/Grade:</strong> {{ $user->personalInformation->courseInformation->course ?? 'N/A' }}</div>
+                <div class="col-md-4"><strong>Age:</strong>
+                    @if($user->personalInformation && $user->personalInformation->birthdate)
+                        {{ \Carbon\Carbon::parse($user->personalInformation->birthdate)->age }} years
+                    @else
+                        N/A
+                    @endif
+                </div>
+                <div class="col-md-4"><strong>Birthdate:</strong> {{ $user->personalInformation->birthdate ?? 'N/A' }}</div>
+                <div class="col-md-4"><strong>Gender:</strong> {{ ucfirst($user->personalInformation->gender) ?? 'N/A' }}</div>
+                <div class="col-md-4"><strong>Address:</strong> {{ $user->personalInformation->address ?? 'N/A' }}</div>
+                <div class="col-md-4"><strong>Contact Number:</strong> {{ $user->personalInformation->contact_number ?? 'N/A' }}</div>
+            </div>
+
+            <h5 class="mt-3">Emergency Contacts</h5>
+@if($user->personalInformation->emergencyContacts && $user->personalInformation->emergencyContacts->isNotEmpty())
+    <div class="row g-3 mt-2">
+        @foreach($user->personalInformation->emergencyContacts as $contact)
+                    <p class="col mb-4"><strong>Name:</strong> {{ $contact->name }}</p>
+                    <p class="col mb-4"><strong>Relationship:</strong> {{ $contact->relationship }}</p>
+                    <p class="colmb-4"><strong>Contact No:</strong> {{ $contact->phone_number }}</p>
+                
+        @endforeach
+    </div>
+@else
+    <p class="text-muted">No emergency contacts available.</p>
+@endif
+
+    </div>
+
+    {{-- Clinic Sessions --}}
+    <div class="custom-card mb-4">
+        <div class="card-header bg-info text-white">Clinic Sessions</div>
+        <div class="card-body">
+            @if($clinicSessions->isEmpty())
+                <p class="text-muted">No clinic sessions recorded.</p>
             @else
-                <table class="table table-bordered">
+                <table class="table table-hover table-bordered">
                     <thead>
                         <tr>
                             <th>Date</th>
+                            <th>Handled By</th>
                             <th>Reason</th>
-                            <th>Remedy</th>
-                            <th>Medications</th>
+                            <th>Remedy / Notes</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($user->clinicSessions as $session)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($session->session_date)->format('F d, Y') }}</td>
-                            <td>{{ $session->reason }}</td>
-                            <td>{{ $session->remedy ?? 'N/A' }}</td>
-                            <td>
-                                @forelse($session->medications as $med)
-                                    {{ $med->inventory->item_name ?? 'Unknown' }} ({{ $med->dosage }})
-                                @empty
-                                    N/A
-                                @endforelse
-                            </td>
-                        </tr>
+                        @foreach($clinicSessions as $session)
+                            <tr>
+                                <td>{{ $session->session_date }}</td>
+                                <td>{{ $session->admin->first_name ?? '' }} {{ $session->admin->last_name ?? '' }}</td>
+                                <td>{{ $session->reason }}</td>
+                                <td>{{ $session->remedy ?? '-' }}</td>
+                            </tr>
+                            @if($session->medications && $session->medications->isNotEmpty())
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="bg-light p-2 rounded">
+                                            <strong>Medications Prescribed:</strong>
+                                            <table class="table table-sm table-bordered mt-2">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Medicine</th>
+                                                        <th>Dosage</th>
+                                                        <th>Duration</th>
+                                                        <th>Qty Used</th>
+                                                        <th>Current Stock</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach($session->medications as $med)
+                                                        <tr>
+                                                            <td>{{ $med->inventory->item_name ?? 'N/A' }}</td>
+                                                            <td>{{ $med->dosage ?? '-' }}</td>
+                                                            <td>{{ $med->duration ?? '-' }}</td>
+                                                            <td>{{ $med->quantity }}</td>
+                                                            <td>{{ $med->inventory->quantity ?? 'N/A' }}</td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -54,79 +161,66 @@
         </div>
     </div>
 
-    {{-- Medical History --}}
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">Medical History</div>
-        <div class="card-body">
-            @if($user->medicalHistories->isEmpty())
-                <p>No medical history recorded.</p>
-            @else
-                <ul>
-                    @foreach($user->medicalHistories as $history)
-                        <li>
-                            <strong>{{ ucfirst($history->history_type) }}:</strong> 
-                            {{ $history->description }} 
-                            ({{ \Carbon\Carbon::parse($history->date_recorded)->format('F d, Y') }})
-                        </li>
-                    @endforeach
-                </ul>
-            @endif
-        </div>
-    </div>
-
     {{-- Checkups --}}
-    <div class="card mb-5">
-        <div class="card-header bg-info text-white">Checkups (Vitals & Dental)</div>
+    <div class="custom-card mb-4">
+        <div class="card-header bg-success text-white">Checkup Records</div>
         <div class="card-body">
-            @if($user->checkups->isEmpty())
-                <p>No checkups recorded yet.</p>
+            @if($checkups->isEmpty())
+                <p class="text-muted">No checkup records found.</p>
             @else
-                @foreach($user->checkups as $checkup)
-                <div class="border rounded p-3 mb-3">
-                    <h5 class="text-primary mb-2">Checkup on {{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</h5>
-                    <p><strong>Performed by:</strong> {{ $checkup->staff->first_name ?? 'N/A' }} {{ $checkup->staff->last_name ?? '' }}</p>
-                    <p><strong>Notes:</strong> {{ $checkup->notes ?? 'No additional notes' }}</p>
-
-                    {{-- Vitals --}}
-                    @if($checkup->vitals)
-                    <table class="table table-sm table-bordered mt-3">
-                        <thead class="table-light">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Findings</th>
+                            <th>Recommendations</th>
+                            <th>Checked By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($checkups as $checkup)
                             <tr>
-                                <th>Height (cm)</th>
-                                <th>Weight (kg)</th>
-                                <th>Blood Pressure</th>
-                                <th>Pulse Rate</th>
-                                <th>Temperature (°C)</th>
+                                <td>{{ $checkup->date }}</td>
+                                <td>{{ ucfirst($checkup->type ?? '-') }}</td>
+                                <td>{{ $checkup->findings ?? '-' }}</td>
+                                <td>{{ $checkup->recommendations ?? '-' }}</td>
+                                <td>{{ $checkup->admin->first_name ?? '' }} {{ $checkup->admin->last_name ?? '' }}</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>{{ $checkup->vitals->height ?? 'N/A' }}</td>
-                                <td>{{ $checkup->vitals->weight ?? 'N/A' }}</td>
-                                <td>{{ $checkup->vitals->blood_pressure ?? 'N/A' }}</td>
-                                <td>{{ $checkup->vitals->pulse_rate ?? 'N/A' }}</td>
-                                <td>{{ $checkup->vitals->temperature ?? 'N/A' }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    @else
-                        <p>No vital records available.</p>
-                    @endif
-
-                    {{-- Dental --}}
-                    @if($checkup->dental)
-                        <h6 class="mt-3">Dental Record:</h6>
-                        <p><strong>Status:</strong> {{ $checkup->dental->dental_status ?? 'N/A' }}</p>
-                        <p><strong>Notes:</strong> {{ $checkup->dental->notes ?? 'None' }}</p>
-                    @else
-                        <p>No dental record available.</p>
-                    @endif
-                </div>
-                @endforeach
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </div>
     </div>
 
-    <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary">Back to List</a>
+    {{-- Medical Histories --}}
+    <div class="custom-card mb-4">
+        <div class="card-header bg-warning text-dark">Medical Histories</div>
+        <div class="card-body">
+            @if($medicalHistories->isEmpty())
+                <p class="text-muted">No medical histories recorded.</p>
+            @else
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Date Recorded</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($medicalHistories as $history)
+                            <tr>
+                                <td>{{ ucfirst($history->history_type) }}</td>
+                                <td>{{ $history->description }}</td>
+                                <td>{{ $history->date_recorded }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            @endif
+        </div>
+    </div>
 </div>
 @endsection

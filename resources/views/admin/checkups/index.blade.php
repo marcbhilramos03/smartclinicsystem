@@ -1,56 +1,49 @@
 @extends('layouts.app')
 
+@section('page-title', 'Checkup Schedules')
+
 @section('content')
-<style>
-    /* Full width content */
-    .full-width-content {
-        width: 100%;
-        max-width: 100%;
-        margin-left: 0; /* align with sidebar */
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
-
-    /* Make table full width */
-    .full-width-content table {
-        width: 100%;
-    }
-</style>
-
-<div class="full-width-content mb-4">
-    <h1>Scheduled Checkups</h1>
-    <a href="{{ route('admin.checkups.create') }}" class="btn btn-primary mb-3">Schedule Checkup</a>
-
-    <div class="card">
-        <div class="card-body p-0">
-            <table class="table table-bordered mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Student</th>
-                        <th>Staff</th>
-                        <th>Date</th>
-                        <th>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($checkups as $checkup)
-                    <tr>
-                        <td>{{ $checkup->patient->first_name }} {{ $checkup->patient->last_name }}</td>
-                        <td>{{ $checkup->staff->first_name }} {{ $checkup->staff->last_name }}</td>
-                        <td>{{ $checkup->date }}</td>
-                        <td>{{ $checkup->notes }}</td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="4" class="text-center text-muted">No scheduled checkups found.</td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-        <div class="card-footer">
-            {{ $checkups->links() }}
-        </div>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="fw-bold text-primary">Checkup Schedules</h2>
+        <a href="{{ route('admin.checkups.create') }}" class="btn btn-primary">+ New Checkup</a>
     </div>
+
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-primary">
+            <tr>
+                <th>#</th>
+                <th>Course/Grade</th>
+                <th>Type</th>
+                <th>Staff</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($checkups as $checkup)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $checkup->courseInformation->course ?? 'N/A' }}</td>
+                    <td class="text-capitalize">{{ $checkup->checkup_type }}</td>
+                    <td>{{ $checkup->staff->first_name }} {{ $checkup->staff->last_name }}</td>
+                    <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</td>
+                    <td>
+                        <a href="{{ route('admin.checkups.show', $checkup->id) }}" class="btn btn-sm btn-info">View</a>
+                        <form action="{{ route('admin.checkups.destroy', $checkup->id) }}" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this checkup?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            @empty
+                <tr><td colspan="6" class="text-center">No checkups found</td></tr>
+            @endforelse
+        </tbody>
+    </table>
 </div>
 @endsection

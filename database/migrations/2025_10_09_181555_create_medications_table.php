@@ -14,7 +14,7 @@ return new class extends Migration
     $table->unsignedBigInteger('inventory_id'); // links to inventory
     $table->string('dosage')->nullable();
     $table->string('duration')->nullable();
-    $table->integer('quantity')->default(1);
+    $table->integer('stock_quantity')->default(1);
     $table->timestamps();
 
     $table->foreign('session_id')->references('id')->on('clinic_sessions')->onDelete('cascade');

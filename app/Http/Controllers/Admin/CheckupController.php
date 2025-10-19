@@ -6,83 +6,64 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Checkup;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Models\CourseInformation;
 
 class CheckupController extends Controller
 {
-    // List all checkups
+    // Show all checkups
     public function index()
     {
-        $checkups = Checkup::with(['patient', 'staff'])->paginate(10);
+        $checkups = Checkup::with(['staff', 'courseInformation'])->latest()->get();
+
         return view('admin.checkups.index', compact('checkups'));
     }
 
-    // Show form to create checkup
+    // Show create form
     public function create()
     {
-        $students = User::where('role', 'patient')->get();
-        $staffs = User::where('role', 'staff')->get();
-        return view('admin.checkups.create', compact('students', 'staffs'));
+    $staff = User::whereIn('role', ['staff'])->get();
+        $courses = CourseInformation::all();
+
+        return view('admin.checkups.create', compact('staff', 'courses'));
     }
 
-    // Store checkup
+    // Store new checkup
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'user_id' => 'nullable|exists:users,id', // individual student
-            'staff_id' => 'required|exists:users,id',
+        $request->validate([
+            'staff_id' => 'required|exists:users,user_id',
+            'course_information_id' => 'required|exists:course_information,id',
+            'checkup_type' => 'required|in:vital,dental',
             'date' => 'required|date',
             'notes' => 'nullable|string',
-            'checkup_type' => 'required|string',
-            'course' => 'nullable|string',        // batch scheduling
-            'grade_level' => 'nullable|string',   // batch scheduling
         ]);
 
-        // Individual checkup
-        if ($validated['user_id']) {
-            Checkup::create($validated);
-        } else {
-            // Batch checkup: get students from personal information
-            $students = User::where('role', 'patient')
-                ->join('personal_informations', 'users.id', '=', 'personal_informations.user_id')
-                ->when($validated['course'], fn($q) => $q->where('personal_informations.course', $validated['course']))
-                ->when($validated['grade_level'], fn($q) => $q->where('personal_informations.grade_level', $validated['grade_level']))
-                ->select('users.*')
-                ->get();
+        Checkup::create([
+            'admin_id' => auth()->user()->user_id,
+            'staff_id' => $request->staff_id,
+            'course_information_id' => $request->course_information_id,
+            'checkup_type' => $request->checkup_type,
+            'date' => $request->date,
+            'notes' => $request->notes,
+        ]);
 
-            if ($students->isEmpty()) {
-                return redirect()->back()->with('error', 'No students found for the selected course/grade level.');
-            }
-
-            DB::transaction(function() use ($students, $validated) {
-                foreach ($students as $student) {
-                    Checkup::create([
-                        'user_id' => $student->id,
-                        'staff_id' => $validated['staff_id'],
-                        'date' => $validated['date'],
-                        'notes' => $validated['notes'] ?? null,
-                        'checkup_type' => $validated['checkup_type'],
-                        'course' => $student->personal_information->course ?? null,
-                        'grade_level' => $student->personal_information->grade_level ?? null,
-                    ]);
-                }
-            });
-        }
-
-        return redirect()->route('admin.checkups.index')->with('success', 'Checkup(s) scheduled successfully.');
+        return redirect()->route('admin.checkups.index')->with('success', 'Checkup created successfully.');
     }
 
-    // Optional: show checkup details
-    public function show(Checkup $checkup)
+    // Show checkup details
+    public function show($id)
     {
-        $checkup->load(['patient', 'staff', 'vitals', 'dental']);
+        $checkup = Checkup::with(['staff', 'courseInformation'])->findOrFail($id);
+
         return view('admin.checkups.show', compact('checkup'));
     }
 
-    // Optional: delete a checkup
-    public function destroy(Checkup $checkup)
+    // Delete checkup
+    public function destroy($id)
     {
+        $checkup = Checkup::findOrFail($id);
         $checkup->delete();
+
         return redirect()->route('admin.checkups.index')->with('success', 'Checkup deleted successfully.');
     }
 }

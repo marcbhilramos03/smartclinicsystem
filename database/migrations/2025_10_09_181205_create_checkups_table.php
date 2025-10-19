@@ -11,7 +11,7 @@ return new class extends Migration
         // Checkups table
         Schema::create('checkups', function (Blueprint $table) {
             $table->id();
-
+            $table->unsignedBigInteger('admin_id');
             $table->unsignedBigInteger('staff_id'); // staff performing the checkup
             $table->unsignedBigInteger('course_information_id'); // batch scheduling
 
@@ -19,6 +19,7 @@ return new class extends Migration
             $table->text('notes')->nullable(); // general notes
             $table->timestamps();
 
+            $table->foreign('admin_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('course_information_id')->references('id')->on('course_information')->onDelete('cascade');
         });
@@ -32,13 +33,15 @@ return new class extends Migration
             $table->string('blood_pressure')->nullable();
             $table->integer('pulse_rate')->nullable();
             $table->decimal('temperature', 4, 1)->nullable();
+            $table->decimal('respiratory_rate', 4, 1)->nullable();
+            $table->integer('bmi')->nullable();
             $table->timestamps();
 
             $table->foreign('checkup_id')->references('id')->on('checkups')->onDelete('cascade');
         });
 
         // Dental table
-        Schema::create('dental', function (Blueprint $table) {
+        Schema::create('dentals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('checkup_id');
 

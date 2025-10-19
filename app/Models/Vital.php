@@ -5,19 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Dental extends Model
+class Vital extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'checkup_id',
         'patient_id',
-        'dental_status',
-        'cavities',
-        'missing_teeth',
-        'gum_disease',
-        'oral_hygiene',
-        'notes',
+        'height',
+        'weight',
+        'blood_pressure',
+        'pulse_rate',
+        'temperature',
+        'respiratory_rate',
+        'bmi',
     ];
 
     public function checkup()

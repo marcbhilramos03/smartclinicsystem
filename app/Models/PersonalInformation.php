@@ -31,7 +31,7 @@ class PersonalInformation extends Model
     {
         return $this->hasMany(EmergencyContact::class, 'personal_information_id', 'id');
     }
-    public function courseInformation()
+    public function course()
 {
     return $this->hasOne(CourseInformation::class, 'personal_information_id', 'id');
 }

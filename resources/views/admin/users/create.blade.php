@@ -21,7 +21,7 @@
                 <select name="role" id="role" class="form-select">
                     <option value="">Select Role</option>
                     <option value="patient" {{ old('role') == 'patient' ? 'selected' : '' }}>Patient</option>
-                    <option value="clinic_staff" {{ old('role') == 'clinic_staff' ? 'selected' : '' }}>Staff</option>
+                    <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                     <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                 </select>
                 @error('role') <small class="text-danger">{{ $message }}</small> @enderror
@@ -99,6 +99,11 @@
                 <div class="mb-3">
                     <label for="first_name_staff" class="form-label">First Name</label>
                     <input type="text" name="first_name" class="form-control" value="{{ old('first_name') }}">
+
+                </div>
+                <div class="mb-3">
+                    <label for="middle_name_staff" class="form-label">Middle Name</label>
+                    <input type="text" name="middle_name" class="form-control" value="{{ old('middle_name') }}">    
                 </div>
                 <div class="mb-3">
                     <label for="last_name_staff" class="form-label">Last Name</label>
@@ -145,7 +150,7 @@
         if(role === 'patient') {
             patientFields.style.display = 'block';
             staffFields.style.display = 'none';
-        } else if(role === 'clinic_staff' || role === 'admin') {
+        } else if(role === 'staff' || role === 'admin') {
             patientFields.style.display = 'none';
             staffFields.style.display = 'block';
         } else {

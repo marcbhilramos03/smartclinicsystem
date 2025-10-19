@@ -2,9 +2,8 @@
 
 @section('content')
 <div class="container">
-    <h1>Add Record for {{ $user->name }}</h1>
+    <h1>Add Record for {{ $user->first_name }} {{ $user->last_name }}</h1>
 
-    {{-- Validation Errors --}}
     @if($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -15,7 +14,6 @@
         </div>
     @endif
 
-    {{-- Form --}}
     <form action="{{ route('admin.patients.records.store', $user) }}" method="POST">
         @csrf
 
@@ -29,69 +27,62 @@
             </select>
         </div>
 
-        {{-- CLINIC SESSION FIELDS --}}
+        {{-- Clinic Session --}}
         <div id="clinic-session-fields" style="display:none;">
-            <h5 class="mt-4">Clinic Session Details</h5>
+            <h5>Clinic Session Details</h5>
             <hr>
 
             <div class="mb-3">
                 <label class="form-label">Session Date</label>
-                <input type="date" name="session_date" class="form-control" value="{{ old('session_date') }}">
+                <input type="date" name="session_date" class="form-control">
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Reason</label>
-                <textarea name="reason" class="form-control" rows="3" placeholder="Enter reason for visit">{{ old('reason') }}</textarea>
+                <textarea name="reason" class="form-control"></textarea>
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Notes / Remedy</label>
-                <textarea name="remedy" class="form-control" rows="3" placeholder="Enter notes or remedy">{{ old('remedy') }}</textarea>
+                <textarea name="remedy" class="form-control"></textarea>
             </div>
 
-            {{-- Optional Medications --}}
+            {{-- Medications --}}
             <div class="mb-3">
-                <h5>Medications <small class="text-muted">(Optional)</small></h5>
+                <h5>Medications <small>(Optional)</small></h5>
                 <button type="button" class="btn btn-sm btn-primary mb-2" id="addMedication">+ Add Medication</button>
-
-                <div id="medication-list">
-                    {{-- Medications will be appended here --}}
-                </div>
+                <div id="medication-list"></div>
             </div>
         </div>
 
-        {{-- MEDICAL HISTORY FIELDS --}}
+        {{-- Medical History --}}
         <div id="medical-history-fields" style="display:none;">
-            <h5 class="mt-4">Medical History Details</h5>
+            <h5>Medical History</h5>
             <hr>
-
             <div class="mb-3">
                 <label class="form-label">History Type</label>
                 <select name="history_type" class="form-control">
                     <option value="">Select Type</option>
-                    <option value="allergy" {{ old('history_type') == 'allergy' ? 'selected' : '' }}>Allergy</option>
-                    <option value="illness" {{ old('history_type') == 'illness' ? 'selected' : '' }}>Illness</option>
-                    <option value="vaccination" {{ old('history_type') == 'vaccination' ? 'selected' : '' }}>Vaccination</option>
+                    <option value="allergy">Allergy</option>
+                    <option value="illness">Illness</option>
+                    <option value="vaccination">Vaccination</option>
                 </select>
             </div>
-
             <div class="mb-3">
                 <label class="form-label">Description</label>
-                <textarea name="description" class="form-control" rows="3" placeholder="Enter details">{{ old('description') }}</textarea>
+                <textarea name="description" class="form-control"></textarea>
             </div>
-
             <div class="mb-3">
                 <label class="form-label">Date Recorded</label>
-                <input type="date" name="date_recorded" class="form-control" value="{{ old('date_recorded') }}">
+                <input type="date" name="date_recorded" class="form-control">
             </div>
         </div>
 
         <button type="submit" class="btn btn-success mt-3">Save Record</button>
-        <a href="{{ route('admin.patients.index', $user) }}" class="btn btn-secondary mt-3">Cancel</a>
+        <a href="{{ route('admin.patients.index') }}" class="btn btn-secondary mt-3">Cancel</a>
     </form>
 </div>
 
-{{-- Dynamic Fields Script --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const recordType = document.querySelector('select[name="record_type"]');
@@ -99,41 +90,40 @@ document.addEventListener('DOMContentLoaded', function() {
     const historyFields = document.getElementById('medical-history-fields');
     const medicationList = document.getElementById('medication-list');
     const addMedicationBtn = document.getElementById('addMedication');
+    let medIndex = 0;
 
-    // Toggle between Clinic Session and Medical History
     function toggleFields() {
         clinicFields.style.display = recordType.value === 'clinic_session' ? 'block' : 'none';
         historyFields.style.display = recordType.value === 'medical_history' ? 'block' : 'none';
     }
     recordType.addEventListener('change', toggleFields);
-    toggleFields(); // Initialize state
+    toggleFields();
 
-    // Add medication row dynamically
-    let medIndex = 0;
+    // Add medication
     addMedicationBtn.addEventListener('click', function() {
         const medRow = document.createElement('div');
-        medRow.classList.add('border', 'rounded', 'p-3', 'mb-2', 'bg-light');
+        medRow.classList.add('border', 'p-2', 'mb-2', 'rounded', 'bg-light');
         medRow.innerHTML = `
             <div class="row g-2 align-items-end">
                 <div class="col-md-4">
-                    <label class="form-label">Medicine</label>
+                    <label>Medicine</label>
                     <select name="medications[${medIndex}][inventory_id]" class="form-control">
                         <option value="">Select Medicine</option>
                         @foreach(\App\Models\Inventory::all() as $item)
-                            <option value="{{ $item->id }}">{{ $item->item_name }}</option>
+                            <option value="{{ $item->id }}">{{ $item->item_name }} (Stock: {{ $item->quantity }})</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Dosage</label>
-                    <input type="text" name="medications[${medIndex}][dosage]" class="form-control" placeholder="e.g. 1 tablet">
+                    <label>Dosage</label>
+                    <input type="text" name="medications[${medIndex}][dosage]" class="form-control">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Duration</label>
-                    <input type="text" name="medications[${medIndex}][duration]" class="form-control" placeholder="e.g. 3 days">
+                    <label>Duration</label>
+                    <input type="text" name="medications[${medIndex}][duration]" class="form-control">
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Quantity</label>
+                    <label>Quantity</label>
                     <input type="number" name="medications[${medIndex}][quantity]" class="form-control" min="1" value="1">
                 </div>
                 <div class="col-md-12 mt-2 text-end">
@@ -145,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         medIndex++;
     });
 
-    // Remove medication row
+    // Remove medication
     medicationList.addEventListener('click', function(e) {
         if (e.target.classList.contains('remove-medication')) {
             e.target.closest('.border').remove();

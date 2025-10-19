@@ -2,35 +2,35 @@
 
 @section('content')
 <div class="container">
-    <h1>My Assigned Checkups</h1>
+    <h2 class="mb-4">My Assigned Checkups</h2>
 
+    @if($checkups->count())
     <table class="table table-bordered">
         <thead>
             <tr>
-                <th>Student</th>
+                <th>Course / Grade</th>
+                <th>Checkup Type</th>
                 <th>Date</th>
-                <th>Vitals/Dental</th>
+                <th>Admin</th>
                 <th>Action</th>
             </tr>
         </thead>
         <tbody>
             @foreach($checkups as $checkup)
             <tr>
-                <td>{{ $checkup->patient->first_name }} {{ $checkup->patient->last_name }}</td>
-                <td>{{ $checkup->date }}</td>
+                <td>{{ $checkup->course->course ?? 'N/A' }}</td>
+                <td>{{ ucfirst($checkup->checkup_type) }}</td>
+                <td>{{ $checkup->date->format('F d, Y') }}</td>
+                <td>{{ $checkup->admin->first_name ?? '' }} {{ $checkup->admin->last_name ?? '' }}</td>
                 <td>
-                    @if($checkup->vitals || $checkup->dental)
-                        Completed
-                    @else
-                        Pending
-                    @endif
+                    <a href="{{ route('staff.checkups.show', $checkup->id) }}" class="btn btn-primary btn-sm">View</a>
                 </td>
-                <td><a href="{{ route('staff.checkups.show', $checkup) }}" class="btn btn-primary btn-sm">Fill Checkup</a></td>
             </tr>
             @endforeach
         </tbody>
     </table>
-
-    {{ $checkups->links() }}
+    @else
+        <p>No checkups assigned.</p>
+    @endif
 </div>
 @endsection

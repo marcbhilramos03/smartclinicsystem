@@ -5,22 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Vital extends Model
+class CheckupPatient extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'checkup_id',
-        'height',
-        'weight',
-        'blood_pressure',
-        'pulse_rate',
-        'temperature',
+        'patient_id',
     ];
 
-    // Relationship: belongs to checkup
     public function checkup()
     {
         return $this->belongsTo(Checkup::class);
     }
+
+ public function patient()
+{
+    return $this->belongsTo(User::class, 'patient_id', 'user_id'); // make sure 'user_id' is PK
+}
+
 }

@@ -95,9 +95,10 @@ class UserController extends Controller
                 $validated = $request->validate([
                     'first_name'     => 'required|string|max:255',
                     'last_name'      => 'required|string|max:255',
+                    'middle_name'    => 'nullable|string|max:255',
                     'email'          => 'required|string|email|max:255|unique:users',
                     'password'       => 'required|string|min:8|confirmed',
-                    'role'           => 'required|string|in:admin,clinic_staff',
+                    'role'           => 'required|string|in:admin,staff',
                     'profession'     => 'nullable|string|max:255',
                     'license_type'   => 'nullable|string|max:255',
                     'specialization' => 'nullable|string|max:255',
@@ -200,6 +201,7 @@ class UserController extends Controller
 
                 $user->update([
                     'first_name'     => ucwords(trim($validated['first_name'])),
+                    'middle_name'    => null,   
                     'last_name'      => ucwords(trim($validated['last_name'])),
                     'email'          => strtolower(trim($validated['email'])),
                     'profession'     => ucwords(trim($validated['profession'] ?? '')),

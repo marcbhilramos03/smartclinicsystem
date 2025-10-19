@@ -15,11 +15,11 @@ class Medication extends Model
         'inventory_id',
         'dosage',
         'duration',
-        'quantity'
+        'stock_quantity'
     ];
 
     /**
-     * The clinic session this medication belongs to
+     * Clinic session this medication belongs to
      */
     public function clinicSession()
     {
@@ -27,23 +27,33 @@ class Medication extends Model
     }
 
     /**
-     * The inventory item prescribed
+     * Inventory item prescribed
      */
-   public function inventory() {
-    return $this->belongsTo(Inventory::class);
-}
-
+    public function inventory()
+    {
+        return $this->belongsTo(Inventory::class);
+    }
 
     /**
-     * Override create method to deduct stock and archive used units
+     * Automatically deduct stock and archive usage when medication is created
      */
-    public static function booted()
+    protected static function booted()
     {
         static::created(function ($medication) {
-            $inventory = Inventory::find($medication->inventory_id);
+            if ($medication->inventory_id) {
+                $inventory = Inventory::find($medication->inventory_id);
+                if ($inventory && $inventory->stock_quantity >= $medication->stock_quantity) {
+                    $inventory->decrement('quantity', $medication->stock_quantity);
 
-            if ($inventory && $inventory->isUsable()) {
-                $inventory->archive($medication->quantity, 'used', 'Prescribed in clinic session ID: '.$medication->session_id);
+                    // Archive used units (assuming your Inventory has an archive method)
+                    if (method_exists($inventory, 'archive')) {
+                        $inventory->archive(
+                            $medication->quantity,
+                            'used',
+                            'Prescribed in clinic session ID: ' . $medication->session_id
+                        );
+                    }
+                }
             }
         });
     }

@@ -14,6 +14,7 @@ use App\Http\Controllers\Patient\RecordsController;
 use App\Http\Controllers\Staff\StaffCheckupController;
 use App\Http\Controllers\Admin\PatientImportController;
 use App\Http\Controllers\Admin\PatientRecordController;
+use App\Http\Controllers\Staff\StaffCheckupRecordController;
 
 // -a----------------------------
 // Default: Patient Login
@@ -88,9 +89,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         ->name('patients.records.store');
     
 
-    Route::get('checkups', [CheckupController::class, 'index'])->name('checkups.index');
-    Route::get('checkups/create', [CheckupController::class, 'create'])->name('checkups.create');
-    Route::post('checkups', [CheckupController::class, 'store'])->name('checkups.store');
+    Route::resource('checkups', CheckupController::class);
+
 
     // Inventory CRUD
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
@@ -109,20 +109,28 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     });
 
-
-// Staff Profile
+//staff routes
 Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->group(function () {
+
+    // Dashboard & Profile
     Route::get('/dashboard', [StaffController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [StaffController::class, 'profile'])->name('profile');
     Route::post('/profile', [StaffController::class, 'updateProfile'])->name('profile.update');
 
-    Route::get('checkups', [StaffCheckupController::class, 'index'])->name('checkups.index');
-    Route::get('checkups/{checkup}', [StaffCheckupController::class, 'show'])->name('checkups.show');
-    Route::post('checkups/{checkup}/update', [StaffCheckupController::class, 'update'])->name('checkups.update');
+    // Checkups assigned to staff (resource routes)
+    Route::resource('checkups', StaffCheckupController::class)->only(['index','show']);
 
-    // Route::get('records', [MedicalRecordController::class, 'index'])->name('records.index');
-
+    // Checkup records (students in a batch)
+    Route::prefix('checkups/{checkupId}/records')->name('checkup_records.')->group(function () {
+        
+        Route::get('create/{studentId}', [StaffCheckupRecordController::class, 'create'])->name('create'); // add record
+        Route::post('store', [StaffCheckupRecordController::class, 'store'])->name('store'); // store record
+        Route::get('{recordId}/edit', [StaffCheckupRecordController::class, 'edit'])->name('edit'); // edit record
+        Route::put('{recordId}', [StaffCheckupRecordController::class, 'update'])->name('update'); // update record
+        Route::delete('{recordId}', [StaffCheckupRecordController::class, 'destroy'])->name('destroy'); // delete record
+    });
 });
+
 
 
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {

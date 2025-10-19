@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
 class MedicalRecord extends Model
 {
     use HasFactory;
@@ -14,30 +13,44 @@ class MedicalRecord extends Model
         'checkup_id',
         'vitals_id',
         'dental_id',
-        'clinic_session_id'
+        'clinic_session_id',
+        'medical_history_id',
     ];
 
-    // The patient who owns this record
+    // The student who owns this record
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    // One medical record can have many medical histories
-    public function medicalHistories()
+    // Each record may have one clinic session
+    public function clinicSession()
     {
-        return $this->hasMany(MedicalHistory::class, 'user_id', 'user_id');
+        return $this->belongsTo(ClinicSession::class, 'clinic_session_id');
     }
 
-    // One record can have many checkups
-    public function checkups()
+    // Each record may have one checkup
+    public function checkup()
     {
-        return $this->hasMany(Checkup::class, 'user_id', 'user_id');
+        return $this->belongsTo(Checkup::class, 'checkup_id');
     }
 
-    // One record can have many clinic sessions
-    public function clinicSessions()
+    // Each record may have one vitals
+    public function vitals()
     {
-        return $this->hasMany(ClinicSession::class, 'user_id', 'user_id');
+        return $this->belongsTo(Vitals::class, 'vitals_id');
+    }
+
+    // Each record may have one dental
+    public function dental()
+    {
+        return $this->belongsTo(Dental::class, 'dental_id');
+    }
+
+    // Each record may have one medical history
+    public function medicalHistory()
+    {
+        return $this->belongsTo(MedicalHistory::class, 'medical_history_id');
     }
 }
+
