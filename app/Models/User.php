@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\CheckupPatient;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
@@ -81,9 +82,15 @@ class User extends Authenticatable
         return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
     }
     public function checkups()
-{
+    {
     return $this->belongsToMany(Checkup::class, 'checkup_patients', 'patient_id', 'checkup_id')
-                ->withTimestamps();
-}
+    ->withTimestamps();
+
+    }
+    public function patient()
+    {
+    return $this->hasOne(CheckupPatient::class, 'patient_id'); 
+    // 'student_id' is the foreign key in checkup_patients table
+    }
 
 }

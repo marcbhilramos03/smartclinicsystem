@@ -10,6 +10,7 @@ class Vital extends Model
     use HasFactory;
 
     protected $fillable = [
+        'checkup_patient_id',
         'checkup_id',
         'patient_id',
         'height',
@@ -29,5 +30,9 @@ class Vital extends Model
     public function patient()
     {
         return $this->belongsTo(User::class, 'patient_id', 'user_id');
+    }
+    public function checkupPatient()
+    {
+    return $this->belongsTo(CheckupPatient::class, 'checkup_patient_id');
     }
 }

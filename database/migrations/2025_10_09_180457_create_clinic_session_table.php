@@ -12,7 +12,7 @@ return new class extends Migration
     $table->id();
     $table->unsignedBigInteger('user_id');  // patient
     $table->unsignedBigInteger('admin_id'); // admin who added the session
-    $table->date('session_date');
+    $table->datetime('session_date');
     $table->text('reason');
     $table->text('remedy')->nullable();
     $table->timestamps();

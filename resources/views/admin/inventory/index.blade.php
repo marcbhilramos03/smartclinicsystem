@@ -24,7 +24,6 @@
 
 <div class="full-width-content mb-4">
     <h1 class="mb-4">Inventory Management</h1>
-
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -42,6 +41,9 @@
             </button>
         </li>
         <li class="d-flex mb-3 gap-2">
+            <a href="{{ route('admin.inventory.archived') }}" class="btn btn-info text-black    ">View Archived</a>
+        </li>
+        <li class="d-flex mb-3 ml-2">
             <a href="{{ route('admin.inventory.create') }}" class="btn btn-primary">Add Item</a>
         </li>
     </ul>

@@ -19,7 +19,9 @@
 
 <div class="full-width-content mb-4">
     <h1>Archived Inventory</h1>
-
+        <li class="d-flex mb-3 gap-2">
+            <a href="{{ route('admin.inventory.index') }}" class="btn btn-primary">Back</a>
+        </li>
     <div class="card">
         <div class="card-body p-0">
             <table class="table table-bordered mb-0">

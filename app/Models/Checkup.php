@@ -35,24 +35,26 @@ class Checkup extends Model
         return $this->belongsTo(CourseInformation::class, 'course_information_id');
     }
 
-    public function vitals()
-    {
-        return $this->hasMany(Vital::class);
-    }
+   public function vitals()
+{
+    return $this->hasMany(Vital::class, 'checkup_id');
+}
 
-    public function dental()
-    {
-        return $this->hasMany(Dental::class);
-    }
-    public function students()
+public function dentals()
+{
+    return $this->hasMany(Dental::class, 'checkup_id');
+}
+
+public function checkupPatients()
+{
+    return $this->hasMany(CheckupPatient::class, 'checkup_id');
+}
+
+public function students()
 {
     return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id')
                 ->withTimestamps();
 }
-// Checkup.php
-public function checkupPatients()
-{
-    return $this->hasMany(CheckupPatient::class);
-}
+
 
 }

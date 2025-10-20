@@ -2,121 +2,105 @@
 
 namespace App\Http\Controllers\Staff;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Checkup;
-use App\Models\CheckupPatient;
-use App\Models\Vital;
-use App\Models\Dental;
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Models\{Checkup, CheckupPatient, User, Vital, Dental};
 
 class StaffCheckupRecordController extends Controller
 {
-    // List students in a checkup (already handled by StaffCheckupController@show)
-    public function index($checkupId)
+    /**
+     * Show list of students (patients) for this checkup
+     */
+    public function students($checkupId)
     {
-        $checkup = Checkup::findOrFail($checkupId);
-        $students = CheckupPatient::with('patient.personalInformation')
-            ->where('checkup_id', $checkupId)
+        $checkup = Checkup::with('course')->findOrFail($checkupId);
+
+        // Fetch students whose course matches the checkup’s course
+        $students = User::where('role', 'patient')
+            ->whereHas('personalInformation.course', function ($query) use ($checkup) {
+                $query->where('course', $checkup->course->course);
+            })
             ->get();
 
-        return view('staff.checkup_records.index', compact('checkup', 'students'));
+        return view('staff.checkups.students', compact('checkup', 'students'));
     }
 
-    // Show form to add a record for a student
-    public function create($checkupId, $studentId)
+    /**
+     * Show form to add a record (vital or dental)
+     */
+    public function addRecordForm($checkupId, $studentId)
     {
         $checkup = Checkup::findOrFail($checkupId);
         $student = User::findOrFail($studentId);
 
-        // Check if record already exists
-        $existingRecord = null;
-        if ($checkup->type === 'vital') {
-            $existingRecord = Vital::where('checkup_id', $checkupId)->where('checkup_patient_id', $studentId)->first();
-        } else {
-            $existingRecord = Dental::where('checkup_id', $checkupId)->where('checkup_patient_id', $studentId)->first();
-        }
+        // Ensure a checkup-patient record exists (or create one)
+        $checkupPatient = CheckupPatient::firstOrCreate([
+            'checkup_id' => $checkupId,
+            'patient_id' => $studentId,
+        ]);
 
-        return view('staff.checkup_records.create', compact('checkup', 'student', 'existingRecord'));
+        $checkupType = strtolower($checkup->checkup_type);
+
+        if ($checkupType === 'vital') {
+            return view('staff.records.vital_form', compact('checkup', 'student', 'checkupPatient'));
+        } elseif ($checkupType === 'dental') {
+            return view('staff.records.dental_form', compact('checkup', 'student', 'checkupPatient'));
+        } else {
+            return back()->with('error', 'Unknown checkup type.');
+        }
     }
 
-    // Store student record
-    public function store(Request $request, $checkupId)
+    /**
+     * Store the record (vital or dental)
+     */
+    public function storeRecord(Request $request, $checkupId, $studentId)
     {
         $checkup = Checkup::findOrFail($checkupId);
-        $patientId = $request->input('patient_id');
+        $student = User::findOrFail($studentId);
 
-        if ($checkup->type === 'vital') {
+        // Ensure checkup-patient record exists
+        $checkupPatient = CheckupPatient::firstOrCreate([
+            'checkup_id' => $checkup->id,
+            'patient_id' => $student->user_id,
+        ]);
+
+        $checkupPatientId = $checkupPatient->id;
+        $type = strtolower($checkup->checkup_type);
+
+        if ($type === 'vital') {
+            $validated = $request->validate([
+                'height' => 'required|numeric',
+                'weight' => 'required|numeric',
+                'blood_pressure' => 'required|string',
+                'pulse_rate' => 'required|numeric',
+                'temperature' => 'required|numeric',
+                'respiratory_rate' => 'required|numeric',
+                'bmi' => 'nullable|numeric',
+            ]);
+
             Vital::create([
-                'checkup_id' => $checkupId,
-                'checkup_patient_id' => $patientId,
-                'height' => $request->height,
-                'weight' => $request->weight,
-                'blood_pressure' => $request->blood_pressure,
-                'pulse_rate' => $request->pulse_rate,
-                'temperature' => $request->temperature,
-                'respiratory_rate' => $request->respiratory_rate,
-                'bmi' => $request->bmi,
+                'checkup_id' => $checkup->id,
+                'checkup_patient_id' => $checkupPatientId,
+            ] + $validated);
+        }
+
+        if ($type === 'dental') {
+            $validated = $request->validate([
+                'dental_status' => 'nullable|string',
+                'cavities' => 'nullable|integer',
+                'missing_teeth' => 'nullable|integer',
+                'gum_disease' => 'boolean',
+                'oral_hygiene' => 'boolean',
+                'notes' => 'nullable|string',
             ]);
-        } else {
+
             Dental::create([
-                'checkup_id' => $checkupId,
-                'checkup_patient_id' => $patientId,
-                'dental_status' => $request->dental_status,
-                'cavities' => $request->cavities,
-                'missing_teeth' => $request->missing_teeth,
-                'gum_disease' => $request->gum_disease,
-                'oral_hygiene' => $request->oral_hygiene,
-                'notes' => $request->notes,
-            ]);
+                'checkup_id' => $checkup->id,
+                'checkup_patient_id' => $checkupPatientId,
+            ] + $validated);
         }
 
-        return redirect()->route('staff.checkups.show', $checkupId)->with('success', 'Record added successfully.');
-    }
-
-    // Show form to edit a record
-    public function edit($checkupId, $recordId)
-    {
-        $checkup = Checkup::findOrFail($checkupId);
-
-        if ($checkup->type === 'vital') {
-            $record = Vital::findOrFail($recordId);
-        } else {
-            $record = Dental::findOrFail($recordId);
-        }
-
-        $student = $record->checkupPatient->patient;
-
-        return view('staff.checkup_records.edit', compact('checkup', 'student', 'record'));
-    }
-
-    // Update a record
-    public function update(Request $request, $checkupId, $recordId)
-    {
-        $checkup = Checkup::findOrFail($checkupId);
-
-        if ($checkup->type === 'vital') {
-            $record = Vital::findOrFail($recordId);
-            $record->update($request->only(['height','weight','blood_pressure','pulse_rate','temperature','respiratory_rate','bmi']));
-        } else {
-            $record = Dental::findOrFail($recordId);
-            $record->update($request->only(['dental_status','cavities','missing_teeth','gum_disease','oral_hygiene','notes']));
-        }
-
-        return redirect()->route('staff.checkups.show', $checkupId)->with('success', 'Record updated successfully.');
-    }
-
-    // Delete a record
-    public function destroy($checkupId, $recordId)
-    {
-        $checkup = Checkup::findOrFail($checkupId);
-
-        if ($checkup->type === 'vital') {
-            Vital::findOrFail($recordId)->delete();
-        } else {
-            Dental::findOrFail($recordId)->delete();
-        }
-
-        return redirect()->route('staff.checkups.show', $checkupId)->with('success', 'Record deleted successfully.');
+        return redirect()->route('staff.checkups.show', $checkupId)
+            ->with('success', ucfirst($type) . ' record added successfully.');
     }
 }

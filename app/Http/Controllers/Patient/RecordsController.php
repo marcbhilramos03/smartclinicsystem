@@ -9,28 +9,31 @@ use App\Models\ClinicSession;
 use Illuminate\Support\Facades\Auth;
 
 class RecordsController extends Controller
+{public function index()
 {
-    public function index()
-    {
-        $userId = Auth::id();
+    $userId = Auth::id();
 
-        $medicalHistories = MedicalHistory::where('user_id', $userId)
-            ->with('admin')
-            ->latest('date_recorded')
-            ->get();
+    $medicalHistories = MedicalHistory::where('user_id', $userId)
+        ->with('admin')
+        ->latest('date_recorded')
+        ->get();
 
-        $checkups = Checkup::where('user_id', $userId)
-            ->with(['staff', 'vitals', 'dental'])
-            ->latest('date')
-            ->get();
+    // Fetch checkups for the current student through the pivot table
+    $checkups = Checkup::whereHas('students', function ($query) use ($userId) {
+        $query->where('users.user_id', $userId);
+    })
+    ->with(['staff', 'vitals', 'dentals'])
+    ->latest('date')
+    ->get();
 
-        $clinicSessions = ClinicSession::where('user_id', $userId)
-            ->with('admin')
-            ->latest('session_date')
-            ->get();
+    $clinicSessions = ClinicSession::where('user_id', $userId) // if clinic_sessions table has user_id
+        ->with('admin')
+        ->latest('session_date')
+        ->get();
 
-        return view('patient.medical_records', compact('medicalHistories', 'checkups', 'clinicSessions'));
-    }
+    return view('patient.medical_records', compact('medicalHistories', 'checkups', 'clinicSessions'));
+}
+
 
     public function show($type, $id)
     {

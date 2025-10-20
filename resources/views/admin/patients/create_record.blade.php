@@ -22,20 +22,22 @@
             <label class="form-label">Record Type</label>
             <select name="record_type" class="form-control" required>
                 <option value="">Select</option>
-                <option value="clinic_session">Clinic Session</option>
+                <option value="clinic_session">Clinic Visit</option>
                 <option value="medical_history">Medical History</option>
             </select>
         </div>
 
         {{-- Clinic Session --}}
         <div id="clinic-session-fields" style="display:none;">
-            <h5>Clinic Session Details</h5>
+            <h5>Clinic Visit Details</h5>
             <hr>
 
             <div class="mb-3">
-                <label class="form-label">Session Date</label>
-                <input type="date" name="session_date" class="form-control">
+                <label for="session_date">Session Date & Time</label>
+                <input type="datetime-local" id="session_date" name="session_date" class="form-control"
+                    value="{{ old('session_date', now()->format('Y-m-d\TH:i')) }}" required>
             </div>
+
 
             <div class="mb-3">
                 <label class="form-label">Reason</label>
@@ -65,7 +67,7 @@
                     <option value="">Select Type</option>
                     <option value="allergy">Allergy</option>
                     <option value="illness">Illness</option>
-                    <option value="vaccination">Vaccination</option>
+                    <option value="vaccination">Imunization</option>
                 </select>
             </div>
             <div class="mb-3">

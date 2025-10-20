@@ -14,14 +14,36 @@ class CheckupPatient extends Model
         'patient_id',
     ];
 
+    /**
+     * The checkup this record belongs to
+     */
     public function checkup()
     {
         return $this->belongsTo(Checkup::class);
     }
 
- public function patient()
-{
-    return $this->belongsTo(User::class, 'patient_id', 'user_id'); // make sure 'user_id' is PK
-}
+    /**
+     * The user (student) who is the patient
+     */
+    public function patient()
+    {
+        // assuming 'users.user_id' is your student’s primary key, not 'id'
+        return $this->belongsTo(User::class, 'patient_id', 'user_id');
+    }
 
+    /**
+     * Vital record for this checkup-patient
+     */
+    public function vitals()
+    {
+        return $this->hasOne(Vital::class, 'checkup_patient_id');
+    }
+
+    /**
+     * Dental record for this checkup-patient
+     */
+    public function dental()
+    {
+        return $this->hasOne(Dental::class, 'checkup_patient_id');
+    }
 }

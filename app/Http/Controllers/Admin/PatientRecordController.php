@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
+use App\Models\Checkup;
+use App\Models\Inventory;
+use App\Models\Medication;
 use Illuminate\Http\Request;
 use App\Models\ClinicSession;
-use App\Models\MedicalHistory;
 use App\Models\MedicalRecord;
-use App\Models\Checkup;
-use App\Models\Medication;
-use App\Models\Inventory;
+use App\Models\CheckupPatient;
+use App\Models\MedicalHistory;
 use App\Http\Controllers\Controller;
 
 class PatientRecordController extends Controller
@@ -35,35 +36,35 @@ class PatientRecordController extends Controller
     /**
      * Show full medical record of a patient
      */
-    public function show(User $user)
-    {
-        // Load personal info & emergency contacts
-        $user->load('personalInformation.emergencyContacts', 'personalInformation.courseInformation');
+   public function show(User $user)
+{
+    // Load personal info & emergency contacts
+    $user->load('personalInformation.emergencyContacts', 'personalInformation.course');
 
-        // 1️⃣ Batch checkups based on student's course
-        $courseId = $user->personalInformation->course_information_id ?? null;
-        $checkups = collect();
-        if ($courseId) {
-            $checkups = Checkup::where('course_information_id', $courseId)
-                ->with(['vitals', 'dental', 'staff'])
-                ->get();
-        }
+    // Fetch checkups assigned to this student via checkup_patients
+    $checkups = CheckupPatient::with([
+        'checkup.staff',
+        'vitals',
+        'dental'
+    ])->where('patient_id', $user->user_id)->get();
 
-        // 2️⃣ Clinic sessions of the student
-        $clinicSessions = $user->clinicSessions()
-            ->with('medications.inventory', 'admin')
-            ->get();
+    // Clinic sessions
+    $clinicSessions = $user->clinicSessions()
+        ->with('medications.inventory', 'admin')
+        ->get();
 
-        // 3️⃣ Medical histories of the student
-        $medicalHistories = $user->medicalHistories()->get();
+    // Medical histories
+    $medicalHistories = $user->medicalHistories()->get();
 
-        return view('admin.patients.show', compact(
-            'user',
-            'checkups',
-            'clinicSessions',
-            'medicalHistories'
-        ));
-    }
+    return view('admin.patients.show', compact(
+        'user',
+        'checkups',
+        'clinicSessions',
+        'medicalHistories'
+    ));
+}
+
+
 
     /**
      * Show form to add a new record (clinic session or medical history)
