@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use Illuminate\Http\Request;
-use App\Models\EmergencyContact;
-use Illuminate\Support\Facades\DB;
-use App\Models\PersonalInformation;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Models\PersonalInformation;
+use App\Models\Credential;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -15,12 +15,21 @@ class UserController extends Controller
     use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
     /**
-     * Display a listing of users.
+     * Display a listing of patients and staff.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $patients = User::where('role', 'patient')->paginate(10, ['*'], 'patients_page');
-        $staff = User::where('role', '!=', 'patient')->paginate(10, ['*'], 'staff_page');
+        $perPage = 10;
+
+        $patients = User::with('personalInformation')
+            ->where('role', 'patient')
+            ->orderBy('last_name')
+            ->paginate($perPage, ['*'], 'patients_page');
+
+        $staff = User::with('credential')
+            ->where('role', 'staff')
+            ->orderBy('last_name')
+            ->paginate($perPage, ['*'], 'staff_page');
 
         return view('admin.users.index', compact('patients', 'staff'));
     }
@@ -38,193 +47,89 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        DB::transaction(function() use ($request) {
+        DB::transaction(function () use ($request) {
 
             if ($request->role === 'patient') {
                 $validated = $request->validate([
-                    'first_name'         => 'required|string|max:255',
-                    'middle_name'        => 'nullable|string|max:255',
-                    'last_name'          => 'required|string|max:255',
-                    'school_id'          => 'required|string|unique:personal_information,school_id',
-                    'gender'             => 'nullable|string|max:50',
-                    'birthdate'          => 'nullable|date',
-                    'contact_number'     => 'nullable|string|max:20',
-                    'address'            => 'nullable|string|max:255',
-                    'course'             => 'nullable|string|max:255',
-                    'grade_level'        => 'nullable|string|max:255',
-                    'emergency_name'     => 'nullable|string|max:255',
-                    'emergency_relation' => 'nullable|string|max:255',
-                    'emergency_phone'    => 'nullable|string|max:20',
-                    'emergency_address'  => 'nullable|string|max:255',
+                    'first_name'        => 'required|string|max:255',
+                    'middle_name'       => 'nullable|string|max:255',
+                    'last_name'         => 'required|string|max:255',
+                    'gender'            => 'nullable|string|max:50',
+                    'date_of_birth'     => 'nullable|date',
+                    'phone_number'      => 'nullable|string|max:20',
+                    'address'           => 'nullable|string|max:255',
+                    'school_id'         => 'required|string|unique:personal_information,school_id',
+                    'course'            => 'nullable|string|max:255',
+                    'grade_level'       => 'required|string|max:255',
+                    'emer_con_name'     => 'nullable|string|max:255',
+                    'emer_con_rel'      => 'nullable|string|max:255',
+                    'emer_con_phone'    => 'nullable|string|max:20',
+                    'emer_con_address'  => 'nullable|string|max:255',
                 ]);
 
                 $user = User::create([
-                    'first_name'  => ucwords(trim($validated['first_name'])),
-                    'middle_name' => isset($validated['middle_name']) ? ucwords(trim($validated['middle_name'])) : null,
-                    'last_name'   => ucwords(trim($validated['last_name'])),
-                    'role'        => 'patient',
-                    'email'       => null,
-                    'password'    => Hash::make('password123'),
-                ]);
-
-                $personalInfo = $user->personalInformation()->create([
-                    'school_id'      => $validated['school_id'],
+                    'first_name'     => ucwords(trim($validated['first_name'])),
+                    'middle_name'    => $validated['middle_name'] ?? null,
+                    'last_name'      => ucwords(trim($validated['last_name'])),
+                    'role'           => 'patient',
+                    'email'          => null,
+                    'password'       => Hash::make('password123'),
                     'gender'         => $validated['gender'] ?? null,
-                    'birthdate'      => $validated['birthdate'] ?? null,
-                    'contact_number' => $validated['contact_number'] ?? null,
+                    'date_of_birth'  => $validated['date_of_birth'] ?? null,
+                    'phone_number'   => $validated['phone_number'] ?? null,
                     'address'        => $validated['address'] ?? null,
                 ]);
 
-                // Save course information
-                $personalInfo->courseInformation()->create([
-                    'course'      => $validated['course'] ?? null,
-                    'grade_level' => $validated['grade_level'] ?? null,
+                PersonalInformation::create([
+                    'user_id'          => $user->user_id,
+                    'school_id'        => $validated['school_id'],
+                    'course'           => $validated['course'] ?? null,
+                    'grade_level'      => $validated['grade_level'],
+                    'emer_con_name'    => $validated['emer_con_name'] ?? null,
+                    'emer_con_rel'     => $validated['emer_con_rel'] ?? null,
+                    'emer_con_phone'   => $validated['emer_con_phone'] ?? null,
+                    'emer_con_address' => $validated['emer_con_address'] ?? null,
                 ]);
-
-                // Save emergency contact
-                if ($request->filled('emergency_name') || $request->filled('emergency_phone') || $request->filled('emergency_relation')) {
-                    $personalInfo->emergencyContacts()->create([
-                        'name'         => ucwords(trim($request->emergency_name)),
-                        'relationship' => ucwords(trim($request->emergency_relation ?? '')),
-                        'phone_number' => $request->emergency_phone ?? null,
-                        'address'      => $request->emergency_address ?? null,
-                    ]);
-                }
-
             } else {
                 $validated = $request->validate([
                     'first_name'     => 'required|string|max:255',
-                    'last_name'      => 'required|string|max:255',
                     'middle_name'    => 'nullable|string|max:255',
-                    'email'          => 'required|string|email|max:255|unique:users',
+                    'last_name'      => 'required|string|max:255',
+                    'email'          => 'required|string|email|max:255|unique:users,email',
                     'password'       => 'required|string|min:8|confirmed',
                     'role'           => 'required|string|in:admin,staff',
                     'profession'     => 'nullable|string|max:255',
                     'license_type'   => 'nullable|string|max:255',
                     'specialization' => 'nullable|string|max:255',
+                    'gender'         => 'nullable|string|max:50',
+                    'date_of_birth'  => 'nullable|date',
+                    'phone_number'   => 'nullable|string|max:20',
+                    'address'        => 'nullable|string|max:255',
                 ]);
 
-                User::create([
-                    'first_name'     => ucwords(trim($validated['first_name'])),
-                    'last_name'      => ucwords(trim($validated['last_name'])),
-                    'email'          => strtolower(trim($validated['email'])),
-                    'password'       => Hash::make($validated['password']),
-                    'role'           => $validated['role'],
-                    'profession'     => ucwords(trim($validated['profession'] ?? '')),
-                    'license_type'   => $validated['license_type'] ?? null,
-                    'specialization' => ucwords(trim($validated['specialization'] ?? '')),
-                ]);
-            }
-
-        });
-
-        return redirect()->route('admin.users.index')
-                         ->with('success', 'User created successfully.');
-    }
-
-    /**
-     * Show the form for editing the specified user.
-     */
-    public function edit(User $user)
-    {
-        return view('admin.users.edit', compact('user'));
-    }
-
-    /**
-     * Update the specified user in storage.
-     */
-    public function update(Request $request, User $user)
-    {
-        DB::transaction(function() use ($request, $user) {
-
-            if ($user->role === 'patient') {
-                $validated = $request->validate([
-                    'first_name'         => 'required|string|max:255',
-                    'middle_name'        => 'nullable|string|max:255',
-                    'last_name'          => 'required|string|max:255',
-                    'school_id'          => 'required|string',
-                    'contact_number'     => 'nullable|string|max:20',
-                    'address'            => 'nullable|string|max:255',
-                    'course'             => 'nullable|string|max:255',
-                    'grade_level'        => 'nullable|string|max:255',
-                    'emergency_name'     => 'nullable|string|max:255',
-                    'emergency_relation' => 'nullable|string|max:255',
-                    'emergency_phone'    => 'nullable|string|max:20',
-                    'emergency_address'  => 'nullable|string|max:255',
-                ]);
-
-                // Update user basic info
-                $user->update([
+                $user = User::create([
                     'first_name'  => ucwords(trim($validated['first_name'])),
-                    'middle_name' => isset($validated['middle_name']) ? ucwords(trim($validated['middle_name'])) : null,
+                    'middle_name' => $validated['middle_name'] ?? null,
                     'last_name'   => ucwords(trim($validated['last_name'])),
+                    'email'       => strtolower(trim($validated['email'])),
+                    'password'    => Hash::make($validated['password']),
+                    'role'        => $validated['role'],
+                    'gender'      => $validated['gender'] ?? null,
+                    'date_of_birth'  => $validated['date_of_birth'] ?? null,
+                    'phone_number'   => $validated['phone_number'] ?? null,
+                    'address'        => $validated['address'] ?? null,
                 ]);
 
-                $personalInfo = $user->personalInformation;
-                if ($personalInfo) {
-                    $personalInfo->update([
-                        'school_id'      => $validated['school_id'],
-                        'contact_number' => $validated['contact_number'] ?? null,
-                        'address'        => $validated['address'] ?? null,
-                    ]);
-
-                    // Update or create course info
-                    $personalInfo->courseInformation()->updateOrCreate(
-                        ['personal_information_id' => $personalInfo->id],
-                        [
-                            'course'      => $validated['course'] ?? null,
-                            'grade_level' => $validated['grade_level'] ?? null,
-                        ]
-                    );
-
-                    // Update or create emergency contact
-                    $personalInfo->emergencyContacts()->updateOrCreate(
-                        ['personal_information_id' => $personalInfo->id],
-                        [
-                            'name'         => ucwords(trim($request->emergency_name ?? '')),
-                            'relationship' => ucwords(trim($request->emergency_relation ?? '')),
-                            'phone_number' => $request->emergency_phone ?? null,
-                            'address'      => $request->emergency_address ?? null,
-                        ]
-                    );
-                }
-
-            } else {
-                $validated = $request->validate([
-                    'first_name'     => 'required|string|max:255',
-                    'last_name'      => 'required|string|max:255',
-                    'email'          => 'required|string|email|max:255|unique:users,email,' . $user->id,
-                    'profession'     => 'nullable|string|max:255',
-                    'license_type'   => 'nullable|string|max:255',
-                    'specialization' => 'nullable|string|max:255',
-                ]);
-
-                $user->update([
-                    'first_name'     => ucwords(trim($validated['first_name'])),
-                    'middle_name'    => null,   
-                    'last_name'      => ucwords(trim($validated['last_name'])),
-                    'email'          => strtolower(trim($validated['email'])),
+                Credential::create([
+                    'staff_id'        => $user->user_id,
                     'profession'     => ucwords(trim($validated['profession'] ?? '')),
                     'license_type'   => $validated['license_type'] ?? null,
                     'specialization' => ucwords(trim($validated['specialization'] ?? '')),
                 ]);
             }
-
         });
 
-        return redirect()->route('admin.users.index')
-                         ->with('success', 'User updated successfully.');
-    }
-
-    /**
-     * Remove the specified user from storage.
-     */
-    public function destroy(User $user)
-    {
-        $user->delete();
-
-        return redirect()->route('admin.users.index')
-                         ->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
     /**
@@ -232,7 +137,71 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->load('personalInformation'); 
+        $user->load(['personalInformation', 'credential']);
         return view('admin.users.show', compact('user'));
+    }
+
+    /**
+     * Show the form for editing the specified user.
+     */
+    public function edit($user_id)
+    {
+        $user = User::with(['personalInformation', 'credential'])->findOrFail($user_id);
+        return view('admin.users.edit', compact('user'));
+    }
+
+    /**
+     * Update the specified user.
+     */
+    public function update(Request $request, $user_id)
+    {
+        $user = User::findOrFail($user_id);
+
+        $validated = $request->validate([
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'nullable|email|unique:users,email,' . $user_id . ',user_id',
+            'gender' => 'nullable|string',
+            'date_of_birth' => 'nullable|date',
+            'address' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+        ]);
+
+        $user->update($validated);
+
+        if ($user->role === 'patient') {
+            PersonalInformation::updateOrCreate(
+                ['user_id' => $user->user_id],
+                [
+                    'school_id' => $request->input('school_id'),
+                    'course' => $request->input('course'),
+                    'grade_level' => $request->input('grade_level'),
+                    'emer_con_name' => $request->input('emer_con_name'),
+                    'emer_con_rel' => $request->input('emer_con_rel'),
+                    'emer_con_phone' => $request->input('emer_con_phone'),
+                    'emer_con_address' => $request->input('emer_con_address'),
+                ]
+            );
+        } else {
+            Credential::updateOrCreate(
+                ['staff_id' => $user->user_id],
+                [
+                    'profession' => $request->input('profession'),
+                    'license_type' => $request->input('license_type'),
+                    'specialization' => $request->input('specialization'),
+                ]
+            );
+        }
+
+        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+    }
+
+    /**
+     * Remove the specified user.
+     */
+    public function destroy(User $user)
+    {
+        $user->delete();
+        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }
 }

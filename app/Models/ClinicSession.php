@@ -9,43 +9,23 @@ class ClinicSession extends Model
 {
     use HasFactory;
 
+    protected $table = 'clinic_sessions';
     protected $fillable = [
         'user_id',
         'admin_id',
         'session_date',
         'reason',
-        'remedy'
-        
+        'remedy',
     ];
 
-    /**
-     * Patient (student) of the session
-     */
+    // Relationships
     public function patient()
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 
-    /**
-     * Staff handling the session
-     */
     public function admin()
     {
         return $this->belongsTo(User::class, 'admin_id', 'user_id');
-    }
-
-    /**
-     * Medications prescribed in this session
-     */
-    public function medications()
-    {
-        return $this->hasMany(Medication::class, 'session_id', 'id');
-    }
-    /**
-     * The medical record this session is associated with.
-     */
-    public function medicalRecord()
-    {
-        return $this->belongsTo(MedicalRecord::class, 'medical_record_id');
     }
 }

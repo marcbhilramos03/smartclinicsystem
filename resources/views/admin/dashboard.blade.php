@@ -8,77 +8,55 @@
         <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
     </div>
 
-    <!-- Dashboard Cards -->
-    <div class="row">
-        <!-- Total Staff -->
+    <!-- Total Counts Cards -->
+    <div class="row mb-4">
+
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card bg-primary text-white shadow h-100">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Staff</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalStaff ?? 0 }}</div>
+                    <h5>Total Staff</h5>
+                    <h2>{{ $totalStaff ?? 0 }}</h2>
                 </div>
             </div>
         </div>
 
-        <!-- Total Patients -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-success shadow h-100 py-2">
+            <div class="card bg-success text-white shadow h-100">
                 <div class="card-body">
-                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Patients</div>
-                    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalPatients ?? 0 }}</div>
+                    <h5>Total Patients</h5>
+                    <h2>{{ $totalPatients ?? 0 }}</h2>
                 </div>
             </div>
         </div>
 
-        <!-- Total Users -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('admin.users.index') }}" class="text-decoration-none">
-                <div class="card border-left-info shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Users</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $totalUsers ?? 0 }}</div>
-                    </div>
+            <div class="card bg-info text-white shadow h-100">
+                <div class="card-body">
+                    <h5>Total Users</h5>
+                    <h2>{{ $totalUsers ?? 0 }}</h2>
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- Inventory Report -->
         <div class="col-xl-3 col-md-6 mb-4">
-            <a href="{{ route('admin.reports.inventory') }}" class="text-decoration-none">
-                <div class="card border-left-warning shadow h-100 py-2">
-                    <div class="card-body">
-                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Inventory Report</div>
-                        <div class="h5 mb-0 font-weight-bold text-gray-800">View</div>
-                    </div>
+            <div class="card bg-warning text-white shadow h-100">
+                <div class="card-body">
+                    <h5>Total Checkups</h5>
+                    <h2>{{ $totalCheckups ?? 0 }}</h2>
+                    <small>Vitals: {{ $vitalsCheckups ?? 0 }} | Dental: {{ $dentalCheckups ?? 0 }}</small>
                 </div>
-            </a>
+            </div>
         </div>
+
     </div>
 
-    <!-- Charts Row -->
-    <div class="row">
-        <!-- Patients Chart -->
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Patients Overview</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="patientsChart"></canvas>
-                </div>
-            </div>
+    <!-- Monthly Trends Chart -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-gray-800">Monthly Trends (Last 12 Months)</h6>
         </div>
-
-        <!-- Inventory Chart -->
-        <div class="col-xl-6 col-lg-6">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-info">Inventory Stock</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="inventoryChart"></canvas>
-                </div>
-            </div>
+        <div class="card-body">
+            <canvas id="monthlyChart" height="100"></canvas>
         </div>
     </div>
 
@@ -88,37 +66,47 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Patients Chart
-    const patientsCtx = document.getElementById('patientsChart').getContext('2d');
-    const patientsChart = new Chart(patientsCtx, {
-        type: 'bar',
+    const ctx = document.getElementById('monthlyChart').getContext('2d');
+    const monthlyChart = new Chart(ctx, {
+        type: 'line',
         data: {
-            labels: {!! json_encode($patientsLabels ?? []) !!},
-            datasets: [{
-                label: 'Number of Patients',
-                data: {!! json_encode($patientsData ?? []) !!},
-                backgroundColor: 'rgba(78, 115, 223, 0.6)',
-                borderColor: 'rgba(78, 115, 223, 1)',
-                borderWidth: 1
-            }]
+            labels: @json($months ?? []),
+            datasets: [
+                {
+                    label: 'New Patients',
+                    data: @json($patientsData ?? []),
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Vitals Checkups',
+                    data: @json($vitalsData ?? []),
+                    borderColor: '#1cc88a',
+                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'Dental Checkups',
+                    data: @json($dentalData ?? []),
+                    borderColor: '#36b9cc',
+                    backgroundColor: 'rgba(54, 185, 204, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
         },
-        options: { responsive: true }
-    });
-
-    // Inventory Chart
-    const inventoryCtx = document.getElementById('inventoryChart').getContext('2d');
-    const inventoryChart = new Chart(inventoryCtx, {
-        type: 'pie',
-        data: {
-            labels: {!! json_encode($inventoryLabels ?? []) !!},
-            datasets: [{
-                label: 'Inventory Stock',
-                data: {!! json_encode($inventoryData ?? []) !!},
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b'],
-                borderWidth: 1
-            }]
-        },
-        options: { responsive: true }
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' },
+            },
+            scales: {
+                y: { beginAtZero: true, stepSize: 1 }
+            }
+        }
     });
 </script>
 @endsection

@@ -6,19 +6,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        // Add column to dentals
+  
         Schema::table('dentals', function (Blueprint $table) {
             $table->unsignedBigInteger('checkup_patient_id')->after('id');
             $table->foreign('checkup_patient_id')->references('id')->on('checkup_patients')->onDelete('cascade');
         });
 
-        // Add column to vitals
         Schema::table('vitals', function (Blueprint $table) {
             $table->unsignedBigInteger('checkup_patient_id')->after('id');
             $table->foreign('checkup_patient_id')->references('id')->on('checkup_patients')->onDelete('cascade');
         });
     }
-
     public function down(): void
     {
         Schema::table('dentals', function (Blueprint $table) {

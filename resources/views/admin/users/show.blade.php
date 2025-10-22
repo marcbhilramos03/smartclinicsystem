@@ -3,144 +3,76 @@
 @section('page-title', 'User Details')
 
 @section('content')
-<div class="mb-4 d-flex justify-content-between align-items-center">
-    <h2 class="h4 text-gray-800">User Details</h2>
+<div class="container-fluid">
+    <h2 class="mb-4">User Details</h2>
 
-    @php
-        // Determine back button route dynamically
-        $backRoute = 'admin.dashboard';
-        $backParams = [];
+    <a href="{{ route('admin.users.index') }}" class="btn btn-secondary mb-3">← Back to Users</a>
 
-        if (request()->routeIs('admin.patients.*')) {
-            $backRoute = 'admin.patients.index';
-        } elseif (request()->routeIs('admin.users.*')) {
-            $backRoute = 'admin.users.index';
-        }
-    @endphp
+    {{-- BASIC INFORMATION --}}
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-primary text-white">
+            Basic Information
+        </div>
+        <div class="card-body">
+            <p><strong>Full Name:</strong> {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}</p>
+            <p><strong>Gender:</strong> {{ $user->gender ?? 'N/A' }}</p>
+            <p><strong>Birthdate:</strong>
+                {{ $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y') : 'N/A' }}
+            </p>
+            <p><strong>Contact Number:</strong> {{ $user->phone_number ?? 'N/A' }}</p>
+            <p><strong>Address:</strong> {{ $user->address ?? 'N/A' }}</p>
+        </div>
+    </div>
 
-    <a href="{{ route($backRoute, $backParams) }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Back
-    </a>
-</div>
-
-<div class="card shadow-sm border-0 rounded-3">
-    <div class="card-body p-4">
-
-        {{-- PATIENT DETAILS --}}
-        @if($user->role === 'patient')
-            @php
-                $info = $user->personalInformation;
-                $course = $info?->courseInformation;
-                $emergency = $info?->emergencyContacts?->first();
-            @endphp
-
-            <h5 class="mb-3 text-primary fw-bold">Personal Information</h5>
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <strong>First Name:</strong><br> {{ $user->first_name }}
-                </div>
-                <div class="col-md-4">
-                    <strong>Middle Name:</strong><br> {{ $user->middle_name ?? '-' }}
-                </div>
-                <div class="col-md-4">
-                    <strong>Last Name:</strong><br> {{ $user->last_name }}
-                </div>
-                @if($user->email)
-                    <div class="col-md-6">
-                        <strong>Email:</strong><br> {{ $user->email }}
-                    </div>
-                @endif
-                <div class="col-md-6">
-                    <strong>School ID:</strong><br> {{ $info->school_id ?? '-' }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Gender:</strong><br> {{ $info->gender ?? '-' }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Birthdate:</strong><br> {{ $info->birthdate ?? '-' }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Contact Number:</strong><br> {{ $info->contact_number ?? '-' }}
-                </div>
-                <div class="col-md-12">
-                    <strong>Address:</strong><br> {{ $info->address ?? '-' }}
-                </div>
+    {{-- PATIENT DETAILS --}}
+    @if($user->role === 'patient')
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                School & Emergency Contact
             </div>
+            <div class="card-body">
+                <p><strong>School ID:</strong> {{ optional($user->personalInformation)->school_id ?? 'N/A' }}</p>
+                <p><strong>Course:</strong> {{ optional($user->personalInformation)->course ?? 'N/A' }}</p>
+                <p><strong>Grade Level:</strong> {{ optional($user->personalInformation)->grade_level ?? 'N/A' }}</p>
 
-            @if($course)
                 <hr>
-                <h5 class="mb-3 text-primary fw-bold">Course Information</h5>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <strong>Course:</strong><br> {{ $course->course ?? '-' }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Year / Grade Level:</strong><br> 
-                        @if($course->education_level === 'College')
-                            {{ strtoupper($course->course) }}-{{ $course->year_level }}
-                        @elseif(in_array($course->education_level, ['High School', 'Senior High School', 'Grade School']))
-                            {{ $course->education_level }} - Grade {{ $course->grade_level }}
-                        @else
-                            {{ $course->grade_level ?? '-' }}
-                        @endif
-                    </div>
-                </div>
-            @endif
-
-            @if($emergency)
-                <hr>
-                <h5 class="mb-3 text-primary fw-bold">Emergency Contact</h5>
-                <div class="row g-3 mb-4">
-                    <div class="col-md-6">
-                        <strong>Name:</strong><br> {{ $emergency->name }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Relationship:</strong><br> {{ $emergency->relationship }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Phone:</strong><br> {{ $emergency->phone_number ?? '-' }}
-                    </div>
-                    <div class="col-md-6">
-                        <strong>Address:</strong><br> {{ $emergency->address ?? '-' }}
-                    </div>
-                </div>
-            @endif
-
-        {{-- STAFF / ADMIN DETAILS --}}
-        @else
-            <h5 class="mb-3 text-primary fw-bold">Basic Information</h5>
-            <div class="row g-3 mb-4">
-                <div class="col-md-4">
-                    <strong>First Name:</strong><br> {{ $user->first_name }}
-                </div>
-                <div class="col-md-4">
-                    <strong>Middle Name:</strong><br> {{ $user->middle_name ?? '-' }}
-                </div>
-                <div class="col-md-4">
-                    <strong>Last Name:</strong><br> {{ $user->last_name }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Email:</strong><br> {{ $user->email }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Role:</strong><br> {{ ucfirst($user->role) }}
-                </div>
+                <h5>Emergency Contact</h5>
+                <p><strong>Name:</strong> {{ optional($user->personalInformation)->emer_con_name ?? 'N/A' }}</p>
+                <p><strong>Relationship:</strong> {{ optional($user->personalInformation)->emer_con_rel ?? 'N/A' }}</p>
+                <p><strong>Phone:</strong> {{ optional($user->personalInformation)->emer_con_phone ?? 'N/A' }}</p>
+                <p><strong>Address:</strong> {{ optional($user->personalInformation)->emer_con_address ?? 'N/A' }}</p>
             </div>
+        </div>
+    @endif
 
-            <hr>
-            <h5 class="mb-3 text-primary fw-bold">Professional Information</h5>
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <strong>Profession:</strong><br> {{ $user->profession ?? '-' }}
-                </div>
-                <div class="col-md-6">
-                    <strong>License Type:</strong><br> {{ $user->license_type ?? '-' }}
-                </div>
-                <div class="col-md-6">
-                    <strong>Specialization:</strong><br> {{ $user->specialization ?? '-' }}
-                </div>
+    {{-- STAFF DETAILS --}}
+    @if($user->role === 'staff')
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-info text-white">
+                Staff Credentials
             </div>
-        @endif
+            <div class="card-body">
+                <p><strong>Profession:</strong> {{ optional($user->credential)->profession ?? 'N/A' }}</p>
+                <p><strong>License Type:</strong> {{ optional($user->credential)->license_type ?? 'N/A' }}</p>
+                <p><strong>Specialization:</strong> {{ optional($user->credential)->specialization ?? 'N/A' }}</p>
+            </div>
+        </div>
+    @endif
+
+    {{-- ADMIN DETAILS --}}
+    @if($user->role === 'admin')
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-dark text-white">
+                Administrator Information
+            </div>
+            <div class="card-body">
+                <p>This user has administrative privileges and can manage users, records, and other system data.</p>
+            </div>
+        </div>
+    @endif
+
+    <div class="d-flex justify-content-end">
+        <a href="{{ route('admin.users.edit', $user->user_id) }}" class="btn btn-primary">Edit User</a>
     </div>
 </div>
 @endsection

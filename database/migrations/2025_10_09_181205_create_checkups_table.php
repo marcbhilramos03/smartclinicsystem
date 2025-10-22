@@ -13,7 +13,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('admin_id');
             $table->unsignedBigInteger('staff_id'); // staff performing the checkup
-            $table->unsignedBigInteger('course_information_id'); // batch scheduling
+            $table->unsignedBigInteger('personal_information_id')->nullable(); // batch scheduling
+            $table->string('checkup_type')->default('vitals'); // vitals, dental, etc.
 
             $table->date('date');
             $table->text('notes')->nullable(); // general notes
@@ -21,7 +22,7 @@ return new class extends Migration
 
             $table->foreign('admin_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->foreign('course_information_id')->references('id')->on('course_information')->onDelete('cascade');
+            $table->foreign('personal_information_id')->references('id')->on('personal_information')->onDelete('cascade');
         });
 
         // Vitals table
@@ -44,23 +45,18 @@ return new class extends Migration
         Schema::create('dentals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('checkup_id');
-
             $table->string('dental_status')->nullable();
-            $table->integer('cavities')->nullable();
-            $table->integer('missing_teeth')->nullable();
-            $table->boolean('gum_disease')->default(false);
-            $table->boolean('oral_hygiene')->default(true);
-            $table->text('notes')->nullable();
-
+            $table->enum('needs_treatment', ['yes', 'no'])->default('no');
+            $table->string('treatment_type')->nullable();
+            $table->text('note')->nullable();
             $table->timestamps();
-
             $table->foreign('checkup_id')->references('id')->on('checkups')->onDelete('cascade');
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('dental');
+        Schema::dropIfExists('dentals');
         Schema::dropIfExists('vitals');
         Schema::dropIfExists('checkups');
     }

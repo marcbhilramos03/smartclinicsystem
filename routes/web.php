@@ -12,9 +12,13 @@ use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Patient\PatientController;
 use App\Http\Controllers\Patient\RecordsController;
 use App\Http\Controllers\Staff\StaffCheckupController;
+use App\Http\Controllers\Admin\ClinicSessionController;
 use App\Http\Controllers\Admin\PatientImportController;
 use App\Http\Controllers\Admin\PatientRecordController;
+use App\Http\Controllers\Admin\MedicalHistoryController;
+use App\Http\Controllers\Patient\PatientCheckupController;
 use App\Http\Controllers\Staff\StaffCheckupRecordController;
+use App\Http\Controllers\Patient\PatientMedicalRecordController;
 
 // -----------------------------
 // Default: Patient Login
@@ -65,35 +69,47 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
 
+
+    
     // Users CRUD
     Route::resource('users', UserController::class);
 
     // Patient Import
     Route::get('patients/import', [PatientImportController::class, 'showImportForm'])->name('patients.import-form');
     Route::post('patients/import', [PatientImportController::class, 'import'])->name('patients.import');
+    
+  
+    Route::resource('patients', PatientRecordController::class);
 
-    // Patients & Records
-    Route::get('patients', [PatientRecordController::class, 'index'])->name('patients.index');
-    Route::get('patients/{user}', [PatientRecordController::class, 'show'])->name('patients.show');
-    Route::get('patients/{user}/records/create', [PatientRecordController::class, 'createRecord'])->name('patients.records.create');
-    Route::post('patients/{user}/records', [PatientRecordController::class, 'storeRecord'])->name('patients.records.store');
+    // Nested routes for clinic sessions and medical histories
+    Route::prefix('patients/{patient}')->group(function () {
+        Route::get('clinic_sessions/create', [ClinicSessionController::class, 'create'])
+            ->name('patients.clinic_sessions.create');
+        Route::post('clinic_sessions', [ClinicSessionController::class, 'store'])
+            ->name('patients.clinic_sessions.store');
 
-    // Checkups CRUD
-    Route::resource('checkups', CheckupController::class);
+        Route::get('medical_histories/create', [MedicalHistoryController::class, 'create'])
+            ->name('patients.medical_histories.create');
+        Route::post('medical_histories', [MedicalHistoryController::class, 'store'])
+            ->name('patients.medical_histories.store');
+    });
 
-    // Inventory CRUD
-    Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
-    Route::get('/inventory/create', [InventoryController::class, 'create'])->name('inventory.create');
-    Route::post('/inventory', [InventoryController::class, 'store'])->name('inventory.store');
-    Route::get('/inventory/{inventory}/edit', [InventoryController::class, 'edit'])->name('inventory.edit');
-    Route::put('/inventory/{inventory}', [InventoryController::class, 'update'])->name('inventory.update');
-    Route::delete('/inventory/{inventory}', [InventoryController::class, 'destroy'])->name('inventory.destroy');
-    Route::get('/inventory/archived', [InventoryController::class, 'archived'])->name('inventory.archived');
+    // Optional: list all medical histories and clinic sessions globally
+    Route::resource('medical_histories', MedicalHistoryController::class)->only(['index', 'show']);
+    Route::resource('clinic_sessions', ClinicSessionController::class)->only(['index', 'show']);
+   
+    // Patient edit first (specific)
+    Route::get('checkups/patient/{id}/edit', [CheckupController::class, 'editPatientRecord'])->name('checkups.edit_patient');
+    Route::put('checkups/patient/{id}', [CheckupController::class, 'updatePatientRecord'])->name('checkups.update_patient');
 
-    // Reports
-    Route::get('/reports/inventory', [ReportsController::class, 'inventoryReport'])->name('reports.inventory');
-    Route::get('/reports/checkups', [ReportsController::class, 'checkupsReport'])->name('reports.checkups');
-    Route::get('/reports/patients', [ReportsController::class, 'patientReport'])->name('reports.patients');
+    // Checkups CRUD (general)
+    Route::get('checkups', [CheckupController::class, 'index'])->name('checkups.index');
+    Route::get('checkups/create', [CheckupController::class, 'create'])->name('checkups.create');
+    Route::post('checkups', [CheckupController::class, 'store'])->name('checkups.store');
+    Route::get('checkups/{checkup}', [CheckupController::class, 'show'])->name('checkups.show');
+    Route::delete('checkups/{checkup}', [CheckupController::class, 'destroy'])->name('checkups.destroy');
+
+ 
 });
 
 // -----------------------------
@@ -106,11 +122,11 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
     Route::get('/profile', [StaffController::class, 'profile'])->name('profile');
     Route::post('/profile', [StaffController::class, 'updateProfile'])->name('profile.update');
 
-    // Assigned Checkups
-    Route::resource('checkups', StaffCheckupController::class)->only(['index','show']);
+    // Staff Assigned Checkups
+    Route::resource('checkups', StaffCheckupController::class)->only(['index', 'show']);
 
     // View students per checkup
-    Route::get('checkups/{checkupId}/students', [StaffCheckupRecordController::class, 'students'])
+    Route::get('checkups/{checkupId}/students', [StaffCheckupController::class, 'students'])
         ->name('checkups.students');
 
     // Records (nested under checkup)
@@ -124,15 +140,21 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 });
 
 
-
 // -----------------------------
 // Patient Routes
 // -----------------------------
 Route::middleware(['auth', 'role:patient'])->prefix('patient')->name('patient.')->group(function () {
+    
+    // Dashboard
+    Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
     Route::get('/dashboard', [PatientController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [PatientController::class, 'profile'])->name('profile');
-    Route::post('/profile', [PatientController::class, 'updateProfile'])->name('profile.update');
 
-    Route::get('/medical-records', [RecordsController::class, 'index'])->name('medical_records.index');
-    Route::get('/medical-records/show/{type}/{id}', [RecordsController::class, 'show'])->name('medical_records.show');
+
+    Route::get('/checkups', [PatientCheckupController::class, 'index'])->name('checkups.index');
+    Route::get('/checkups/{checkup}', [PatientCheckupController::class, 'show'])->name('checkups.show');
+
+    // View all medical records
+    Route::get('/medical-records', [PatientMedicalRecordController::class, 'index'])->name('medical_records.index');
+    Route::get('/medical-records/{record}', [PatientMedicalRecordController::class, 'show'])->name('medical_records.show');
 });

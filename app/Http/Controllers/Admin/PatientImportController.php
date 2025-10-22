@@ -6,21 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\PersonalInformation;
-use App\Models\CourseInformation;
-use App\Models\EmergencyContact;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
 class PatientImportController extends Controller
 {
-    // Show import form
+    // Show the import form
     public function showImportForm()
     {
         return view('admin.users.import');
     }
 
-    // Handle file import
+    // Handle the Excel/CSV import
     public function import(Request $request)
     {
         $request->validate([
@@ -28,18 +26,20 @@ class PatientImportController extends Controller
         ]);
 
         $filePath = $request->file('file')->getRealPath();
-        $spreadsheet = IOFactory::load($filePath);
-        $sheet = $spreadsheet->getActiveSheet();
-        $rows = $sheet->toArray();
 
-        $added = 0;
-        $updated = 0;
-        $skipped = 0;
-
-        DB::beginTransaction();
         try {
+            $spreadsheet = IOFactory::load($filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            $added = 0;
+            $updated = 0;
+            $skipped = 0;
+
+            DB::beginTransaction();
+
             foreach ($rows as $index => $row) {
-                // Skip header
+                // Skip header row
                 if ($index === 0 && strtolower($row[0]) === 'school_id') continue;
 
                 $data = [
@@ -60,7 +60,7 @@ class PatientImportController extends Controller
                     'emergency_address' => $row[14] ?? null,
                 ];
 
-                // Validate key fields
+                // Validate essential fields
                 $validator = Validator::make($data, [
                     'school_id' => 'required',
                     'first_name' => 'required',
@@ -86,36 +86,25 @@ class PatientImportController extends Controller
                         'role' => 'patient',
                     ]);
 
-                    // Create personal info
-                    $personalInfo = PersonalInformation::create([
+                    // Create personal information
+                    PersonalInformation::create([
                         'user_id' => $user->user_id,
                         'school_id' => $data['school_id'],
                         'gender' => $data['gender'],
                         'birthdate' => $data['birthdate'],
                         'contact_number' => $data['contact_number'],
                         'address' => $data['address'],
-                    ]);
-
-                    // ✅ Create course info (for academic details)
-                    CourseInformation::create([
-                        'personal_information_id' => $personalInfo->id,
                         'course' => $data['course'],
                         'grade_level' => $data['grade_level'],
-                        'school_year' => $data['school_year'],
-                    ]);
-
-                    // ✅ Create emergency contact
-                    EmergencyContact::create([
-                        'personal_information_id' => $personalInfo->id,
-                        'name' => $data['emergency_name'],
-                        'relationship' => $data['emergency_relationship'],
-                        'phone_number' => $data['emergency_phone'],
-                        'address' => $data['emergency_address'],
+                        'emer_con_name' => $data['emergency_name'],
+                        'emer_con_rel' => $data['emergency_relationship'],
+                        'emer_con_phone' => $data['emergency_phone'],
+                        'emer_con_address' => $data['emergency_address'],
                     ]);
 
                     $added++;
                 } else {
-                    // Update existing user data
+                    // Update existing user
                     $user->update([
                         'first_name' => $data['first_name'],
                         'middle_name' => $data['middle_name'],
@@ -129,30 +118,16 @@ class PatientImportController extends Controller
                             'birthdate' => $data['birthdate'],
                             'contact_number' => $data['contact_number'],
                             'address' => $data['address'],
+                            'course' => $data['course'],
+                            'grade_level' => $data['grade_level'],
+                            'emer_con_name' => $data['emergency_name'],
+                            'emer_con_rel' => $data['emergency_relationship'],
+                            'emer_con_phone' => $data['emergency_phone'],
+                            'emer_con_address' => $data['emergency_address'],
                         ]);
-
-                        // Update or create course info
-                        CourseInformation::updateOrCreate(
-                            ['personal_information_id' => $personalInfo->id],
-                            [
-                                'course' => $data['course'],//department
-                                'grade_level' => $data['grade_level'],//e.g, BSIT-1
-                            ]
-                        );
-
-                        // Update or create emergency contact
-                        EmergencyContact::updateOrCreate(
-                            ['personal_information_id' => $personalInfo->id],
-                            [
-                                'name' => $data['emergency_name'],
-                                'relationship' => $data['emergency_relationship'],
-                                'phone_number' => $data['emergency_phone'],
-                                'address' => $data['emergency_address'],
-                            ]
-                        );
-
-                        $updated++;
                     }
+
+                    $updated++;
                 }
             }
 

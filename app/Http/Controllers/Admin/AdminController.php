@@ -2,43 +2,56 @@
 
 namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
+use App\Models\Checkup;           // <-- add this
+
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\User;
 
 class AdminController extends Controller
 {
-    // Constructor to add auth & role middleware (optional if already applied in routes)
-    // public function __construct()
-    // {
-    //     $this->middleware(['auth', 'role:admin']);
-    // }
-
-    // Admin profile page
-    public function profile()
-    {
-        $user = auth()->user();
-        return view('admin.profile', compact('user'));
-    }
-     public function dashboard()
+  public function dashboard()
 {
     $totalStaff = User::where('role', 'staff')->count();
     $totalPatients = User::where('role', 'patient')->count();
-    $totalUsers = User::count(); // total users including admin
+    $totalUsers = User::count();
 
-    // Example chart data
-    $patientsLabels = ['Jan', 'Feb', 'Mar', 'Apr'];
-    $patientsData = [10, 15, 12, 20];
+    $totalCheckups = Checkup::count();
+    $vitalsCheckups = Checkup::where('checkup_type', 'vitals')->count();
+    $dentalCheckups = Checkup::where('checkup_type', 'dental')->count();
 
-    $inventoryLabels = ['Medicine A', 'Medicine B', 'Medicine C'];
-    $inventoryData = [50, 30, 20];
+    $months = [];
+    $patientsData = [];
+    $vitalsData = [];
+    $dentalData = [];
+
+    for ($i = 1; $i <= 12; $i++) {
+        $months[] = date('M', mktime(0,0,0,$i,1));
+        $patientsData[] = User::where('role', 'patient')
+                               ->whereMonth('created_at', $i)
+                               ->count();
+        $vitalsData[] = Checkup::where('checkup_type', 'vitals')
+                               ->whereMonth('date', $i)
+                               ->count();
+        $dentalData[] = Checkup::where('checkup_type', 'dental')
+                               ->whereMonth('date', $i)
+                               ->count();
+    }
 
     return view('admin.dashboard', compact(
-        'totalStaff', 'totalPatients', 'totalUsers',
-        'patientsLabels', 'patientsData',
-        'inventoryLabels', 'inventoryData'
+        'totalStaff','totalPatients','totalUsers',
+        'totalCheckups','vitalsCheckups','dentalCheckups',
+        'months','patientsData','vitalsData','dentalData'
     ));
+}
 
+public function profile()
+    {
+        // Assuming you store admin in users table with role='admin'
+        $admin = Auth::user();
+        return view('admin.profile', compact('admin'));
     }
+
+
     public function updateProfile(Request $request)
     {
         $user = auth()->user();

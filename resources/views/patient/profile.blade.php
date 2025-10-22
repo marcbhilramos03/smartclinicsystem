@@ -1,77 +1,86 @@
-@extends('layouts.app')
+{{-- resources/views/patient/profile.blade.php --}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Profile</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    body {
+        background-color: #f0f4ff;
+        min-height: 100vh;
+    }
+    .profile-card {
+        max-width: 500px;
+        margin: 3rem auto;
+        background: #1e3a8a;
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 1rem 2rem rgba(0,0,0,0.25);
+    }
+    .profile-card img {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 3px solid white;
+        margin-bottom: 1rem;
+    }
+    .profile-card h1 {
+        font-size: 2rem;
+        margin-bottom: 0.3rem;
+    }
+    .profile-card p {
+        font-size: 5rem;
+        margin-bottom: 0.8rem;
+        opacity: 0.9;
+    }
+    .profile-info {
+        text-align: left;
+        margin-top: 1rem;
+        background: rgba(255,255,255,0.1);
+        padding: 1rem;
+        border-radius: 10px;
+    }
+    .profile-info dt {
+        font-weight: 600;
+    }
+    .profile-info dd {
+        margin-bottom: 0.5rem;
+    }
+</style>
+</head>
+<body>
 
-@section('content')
-<div class="container-fluid">
+<div class="profile-card">
+        <img class="img-profile rounded-circle" src="{{ asset('images/profile.png') }}" alt="Profile">
+    <h1>{{ auth()->user()->first_name }}  {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}</h1>
 
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Patient Profile</h1>
-        <a href="{{ route('patient.dashboard') }}" class="btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-arrow-left fa-sm text-white-50"></i> Back to Dashboard
-        </a>
-    </div>
+    <dl class="profile-info">
+    
+        <dd>{{ auth()->user()->phone_number ?? '-' }}</dd>
 
-    <div class="row">
+        <dt>Gender:</dt>
+        <dd>{{ ucfirst(auth()->user()->gender ?? '-') }}</dd>
 
-        <!-- Profile Card -->
-        <div class="col-lg-4">
-            <div class="card shadow mb-4">
-                <div class="card-body text-center">
-                    <img class="img-profile rounded-circle mb-3" src="{{ asset('img/user.png') }}" width="120" height="120">
-                    <h4 class="font-weight-bold">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }}</h4>
-                    <p class="text-muted">{{ auth()->user()->role }}</p>
-                    <!-- Edit Profile Button -->
-                    <button type="button" class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                        Edit Profile
-                    </button>
-                </div>
-            </div>
-        </div>
+        <dt>Date of Birth:</dt>
+        <dd>{{ auth()->user()->date_of_birth ? \Carbon\Carbon::parse(auth()->user()->date_of_birth)->format('M d, Y') : '-' }}</dd>
 
-    </div>
+        <dt>Address:</dt>
+        <dd>{{ auth()->user()->address ?? '-' }}</dd>
+    </dl>
+    
+<form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button type="submit" class="btn btn-light btn-xl logout-btn">
+        Logout
+    </button>
+</form>
 </div>
 
-<!-- Edit Profile Modal -->
-<div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <form method="POST" action="{{ route('admin.profile.update') }}">
-          @csrf
-          @method('PUT')
-
-          <div class="modal-header">
-              <h5 class="modal-title" id="editProfileModalLabel">Edit Profile</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-
-          <div class="modal-body">
-              <div class="row">
-                  <div class="col-md-6 mb-3">
-                      <label for="first_name">First Name</label>
-                      <input type="text" name="first_name" class="form-control" value="{{ auth()->user()->first_name }}">
-                  </div>
-                  <div class="col-md-6 mb-3">
-                      <label for="middle_name">Middle Name</label>
-                      <input type="text" name="middle_name" class="form-control" value="{{ auth()->user()->middle_name }}">
-                  </div>
-              </div>
-
-              <div class="row">
-                  <div class="col-md-6 mb-3">
-                      <label for="last_name">Last Name</label>
-                      <input type="text" name="last_name" class="form-control" value="{{ auth()->user()->last_name }}">
-                  </div>
-                  <div class="col-md-6 mb-3">
-                      <label for="email">Email</label>
-                      <input type="email" name="email" class="form-control" value="{{ auth()->user()->email }}">
-                  </div>
-              </div>
-          <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-              <button type="submit" class="btn btn-primary">Update Profile</button>
-          </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endsection
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

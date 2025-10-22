@@ -16,9 +16,10 @@ return new class extends Migration
         $table->string('first_name');
         $table->string('middle_name')->nullable();
         $table->string('last_name');
-        $table->string('profession')->nullable(); // doctor, nurse, null for students
-        $table->string('license_type')->nullable(); // for staff/doctors
-        $table->string('specialization')->nullable(); // for doctors
+        $table->date('date_of_birth')->nullable();
+        $table->enum('gender', ['male', 'female'])->nullable();
+        $table->string('address')->nullable();
+        $table->string('phone_number')->nullable(); 
         $table->enum('role', ['admin', 'staff', 'patient'])->default('patient');
         $table->string('email')->nullable()->unique(); // for staff/admin
         $table->string('password')->nullable(); // null for students

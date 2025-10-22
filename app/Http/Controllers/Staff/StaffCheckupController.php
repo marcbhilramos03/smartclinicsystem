@@ -5,45 +5,40 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Checkup;
-use App\Models\CheckupPatient;
-use App\Models\PersonalInformation;
-use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class StaffCheckupController extends Controller
 {
-    // List all checkups assigned to the logged-in staff
+    // List all checkups assigned to this staff
     public function index()
     {
-        $staffId = auth()->user()->user_id;
-
-        $checkups = Checkup::with('course', 'staff')
-            ->where('staff_id', $staffId)
+        $checkups = Checkup::where('staff_id', Auth::user()->user_id)
+            ->with('patients')
             ->orderBy('date', 'desc')
-            ->get();
+            ->paginate(10);
 
         return view('staff.checkups.index', compact('checkups'));
     }
-public function show(Request $request, $checkupId)
+
+    // Show students for a particular checkup
+public function students($checkupId)
 {
-    // Fetch the checkup along with its course
-    $checkup = Checkup::with(['staff', 'admin', 'course'])->findOrFail($checkupId);
+    // Fetch the checkup along with assigned patients
+    $checkup = \App\Models\Checkup::with('patients.personalInformation')
+                ->findOrFail($checkupId);
 
-    // Get the course ID of this checkup
-    $courseId = $checkup->course?->id;
-
-    // Fetch only students with the same course
-    $students = User::where('role', 'patient')
-        ->whereHas('personalInformation.course', function ($q) use ($courseId) {
-            if ($courseId) {
-                $q->where('id', $courseId);
-            }
-        })
-        ->with('personalInformation.course')
-        ->get();
-
-    return view('staff.checkups.show', compact('checkup', 'students'));
+    // Return a view to list students
+    return view('staff.checkups.students', compact('checkup'));
 }
+public function show($checkupId)
+{
+    // Fetch checkup with its assigned students
+    $checkup = Checkup::with(['patients.personalInformation', 'staff'])
+                      ->findOrFail($checkupId);
 
+    // Return a view to show the checkup details and students
+    return view('staff.checkups.show', compact('checkup'));
+}
 
 
 

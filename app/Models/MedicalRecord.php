@@ -2,55 +2,38 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+
 class MedicalRecord extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'user_id',
+        'patient_id',
+        'staff_id',
+        'admin_id',
         'checkup_id',
         'vitals_id',
-        'dental_id',
-        'clinic_session_id',
-        'medical_history_id',
+        'dentals_id',
+        'recordable_id',
+        'recordable_type',
     ];
 
-    // The student who owns this record
-    public function user()
+    public function recordable()
     {
-        return $this->belongsTo(User::class, 'user_id', 'user_id');
+        return $this->morphTo();
     }
 
-    // Each record may have one clinic session
-    public function clinicSession()
+    public function patient()
     {
-        return $this->belongsTo(ClinicSession::class, 'clinic_session_id');
+        return $this->belongsTo(User::class, 'patient_id');
     }
 
-    // Each record may have one checkup
-    public function checkup()
+    public function staff()
     {
-        return $this->belongsTo(Checkup::class, 'checkup_id');
+        return $this->belongsTo(User::class, 'staff_id');
     }
 
-    // Each record may have one vitals
-    public function vitals()
+    public function admin()
     {
-        return $this->belongsTo(Vitals::class, 'vitals_id');
-    }
-
-    // Each record may have one dental
-    public function dental()
-    {
-        return $this->belongsTo(Dental::class, 'dental_id');
-    }
-
-    // Each record may have one medical history
-    public function medicalHistory()
-    {
-        return $this->belongsTo(MedicalHistory::class, 'medical_history_id');
+        return $this->belongsTo(User::class, 'admin_id');
     }
 }
-

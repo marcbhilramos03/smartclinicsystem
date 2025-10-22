@@ -2,59 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Checkup extends Model
-{
-    use HasFactory;
-    protected $casts = [
-        'date' => 'date', // now $checkup->date is a Carbon instance
-    ];
-    protected $fillable = [
-        'admin_id',
-        'staff_id',
-        'course_information_id',
-        'checkup_type',
-        'date',
-        'notes',
-    ];
+class Checkup extends Model {
+protected $fillable = [
+    'admin_id',
+    'staff_id',
+    'checkup_type',
+    'date',
+    'notes',
+    'personal_information_id', // add this!
+];
 
-    public function admin()
-    {
-        return $this->belongsTo(User::class, 'admin_id', 'user_id');
-    }
-
-    public function staff()
-    {
+    public function staff() {
         return $this->belongsTo(User::class, 'staff_id', 'user_id');
     }
 
-    public function course()
-    {
-        return $this->belongsTo(CourseInformation::class, 'course_information_id');
+    public function admin() {
+        return $this->belongsTo(User::class, 'admin_id', 'user_id');
     }
 
-   public function vitals()
-{
-    return $this->hasMany(Vital::class, 'checkup_id');
-}
-
-public function dentals()
-{
-    return $this->hasMany(Dental::class, 'checkup_id');
-}
-
-public function checkupPatients()
-{
-    return $this->hasMany(CheckupPatient::class, 'checkup_id');
-}
-
-public function students()
-{
+    
+public function patients() {
     return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id')
+                ->withPivot('id')   // include pivot id
                 ->withTimestamps();
 }
 
+public function vitals() {
+    return $this->hasMany(Vitals::class);
+}
+
+public function dentals() {
+    return $this->hasMany(Dental::class);
+}
 
 }

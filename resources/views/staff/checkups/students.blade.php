@@ -1,59 +1,59 @@
 @extends('layouts.app')
 
-@section('page-title', 'Students List')
-
 @section('content')
-<div class="container mt-4">
-    {{-- Header --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 fw-bold text-primary">
-            Students under {{ $checkup->checkup_type }} Checkup
-        </h1>
-        <a href="{{ route('staff.checkups.index') }}" class="btn btn-secondary">← Back to Checkups</a>
+<div class="container">
+
+    <!-- Page Heading -->
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h2 class="h3 mb-0 text-gray-800">Students in Checkup: {{ $checkup->checkup_type }} - {{ $checkup->date }}</h2>
+        <a href="{{ route('staff.checkups.index') }}" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Back to Checkups
+        </a>
     </div>
 
-    {{-- Student Table --}}
-    <div class="card shadow-sm rounded-4">
-        <div class="card-body">
-            @if ($students->isEmpty())
-                <p class="text-muted text-center mb-0">No students found for this course.</p>
-            @else
-                <table class="table table-hover align-middle">
-                    <thead class="table-primary">
+    <!-- Success Message -->
+    @if(session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- Students Table -->
+    <div class="card shadow mb-4">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <thead class="table-light">
                         <tr>
-                            <th>#</th>
-                            <th>Full Name</th>
+                            <th>Student</th>
                             <th>Course</th>
-                            <th>Year Level</th>
-                            <th>Actions</th>
+                            <th>Grade</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($students as $index => $student)
-                            <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>
-                                    {{ $student->first_name ?? 'N/A' }} {{ $student->last_name ?? '' }}
-                                </td>
-                                <td>
-                                    {{-- Safely access nested relations using optional() --}}
-                                    {{ optional(optional($student->personalInformation)->course)->course ?? 'N/A' }}
-                                </td>
-                                <td>
-                                    {{ optional(optional($student->personalInformation)->course)->grade_level ?? 'N/A' }}
-                                </td>
-                                <td>
-                                    <a href="{{ route('staff.checkup_records.create', ['checkupId' => $checkup->id, 'studentId' => $student->user_id]) }}" 
-                                       class="btn btn-sm btn-primary">
-                                        Add Record
-                                    </a>
-                                </td>
-                            </tr>
+                        @foreach($checkup->patients as $student)
+                        <tr>
+                            <td>{{ $student->first_name }} {{ $student->last_name }}</td>
+                            <td>{{ $student->personalInformation->course ?? 'N/A' }}</td>
+                            <td>{{ $student->personalInformation->grade_level ?? 'N/A' }}</td>
+                            <td>
+                                <a href="{{ route('staff.checkup_records.create', [$checkup->id, $student->user_id]) }}" class="btn btn-primary btn-sm">
+                                    Add/Edit Record
+                                </a>
+                            </td>
+                        </tr>
                         @endforeach
+                        @if($checkup->patients->isEmpty())
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">No students assigned to this checkup.</td>
+                        </tr>
+                        @endif
                     </tbody>
                 </table>
-            @endif
+            </div>
         </div>
     </div>
+
 </div>
 @endsection

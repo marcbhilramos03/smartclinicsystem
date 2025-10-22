@@ -13,11 +13,13 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users','user_id')->onDelete('cascade');
             // Student/patient personal info
             $table->string('school_id')->unique();
-            $table->string('gender')->nullable();
-            $table->date('birthdate')->nullable();
-            $table->string('contact_number')->nullable();
-            $table->string('address')->nullable();
-
+            $table->string('course')->nullable();
+            $table->string('grade_level');
+            $table->string('emer_con_name')->nullable();
+            $table->string('emer_con_rel')->nullable();
+            $table->string('emer_con_phone')->nullable();
+            $table->string('emer_con_address')->nullable();
+      
             $table->timestamps();
         });
     }

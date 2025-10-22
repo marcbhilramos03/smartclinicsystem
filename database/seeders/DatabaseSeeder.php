@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         // Call your main UserSeeder
         $this->call(UserSeeder::class);
-        $this->call(InventorySeeder::class);    
+        // $this->call(InventorySeeder::class);    
         // Add a test user
         User::factory()->create([
             'first_name' => 'Test',
@@ -23,6 +23,11 @@ class DatabaseSeeder extends Seeder
             'role' => 'admin', // choose 'admin', 'staff', or 'patient/student'
             'email' => 'test@example.com',
             'password' => bcrypt('password'),
+            'gender' => 'male',
+            'birthdate' => '1990-01-01',
+            'phone_number' => '1234567890',
+            'address' => '123 Test St, Test City',
+        
         ]);
     }
 }

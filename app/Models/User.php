@@ -2,95 +2,70 @@
 
 namespace App\Models;
 
-use App\Models\CheckupPatient;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use Notifiable, HasFactory;
 
     protected $primaryKey = 'user_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
 
     protected $fillable = [
-        'first_name',
-        'middle_name',
-        'last_name',
-        'profession',
-        'license_type',
-        'specialization',
-        'role',
-        'email',
-        'password',
+        'first_name', 'middle_name', 'last_name', 'email', 'password',
+        'gender', 'address', 'phone_number', 'date_of_birth', 'role',
     ];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
 
-    // protected function casts(): array
-    // {
-    //     return [
-    //         'email_verified_at' => 'datetime',
-    //         'password' => 'hashed',
-    //     ];
-    // }
-
-    /* -------------------- Role Helpers -------------------- */
-
-    public function isAdmin()  { return $this->role === 'admin'; } // Nurse
-    public function isStaff()  { return $this->role === 'staff'; } // Checkup staff
-    public function isPatient(){ return $this->role === 'patient'; }
-
-    /* -------------------- Relationships -------------------- */
-
-    // 🧍 Patient relationships
-    public function medicalRecords()
+    public function credential()
     {
-        return $this->hasMany(MedicalRecord::class, 'user_id', 'user_id');
+        // one user (staff) has one credential record
+        return $this->hasOne(Credential::class, 'staff_id', 'user_id');
+    }
+     public function personalInformation()
+    {
+        return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
     }
 
-    public function medicalHistories()
-    {
-        return $this->hasMany(MedicalHistory::class, 'user_id', 'user_id');
-    }
-
+    /**
+     * Clinic Sessions
+     */
     public function clinicSessions()
     {
         return $this->hasMany(ClinicSession::class, 'user_id', 'user_id');
     }
 
-    // 🩺 Admin (nurse) handles clinic sessions & medical histories
-    public function handledClinicSessions()
+    /**
+     * Medical Histories
+     */
+    public function medicalHistories()
     {
-        return $this->hasMany(ClinicSession::class, 'admin_id', 'user_id');
+        return $this->hasMany(MedicalHistory::class, 'user_id', 'user_id');
     }
 
-    public function handledHistories()
-    {
-        return $this->hasMany(MedicalHistory::class, 'admin_id', 'user_id');
-    }
+    /**
+     * Checkups (through checkup patients)
+     */
+public function patients()
+{
+    return $this->belongsToMany(
+        User::class,           // Related model
+        'checkup_patients',     // Pivot table
+        'checkup_id',          // Foreign key on pivot table pointing to this model (Checkup)
+        'patient_id'           // Foreign key on pivot table pointing to related model (User)
+    )->withTimestamps();
+}
 
-    public function performedCheckups()
-    {
-        return $this->hasMany(Checkup::class, 'staff_id', 'user_id');
-    }
 
-    public function personalInformation()
-    {
-        return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
-    }
-    public function checkups()
-    {
-    return $this->belongsToMany(Checkup::class, 'checkup_patients', 'patient_id', 'checkup_id')
-    ->withTimestamps();
+    // In User.php (Patient)
+public function medicalRecords()
+{
+    return $this->hasMany(MedicalRecord::class, 'patient_id', 'user_id'); // or 'user_id' if that's PK
+}
 
-    }
-    public function patient()
-    {
-    return $this->hasOne(CheckupPatient::class, 'patient_id'); 
-    // 'student_id' is the foreign key in checkup_patients table
-    }
 
 }

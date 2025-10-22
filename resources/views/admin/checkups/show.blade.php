@@ -1,77 +1,65 @@
 @extends('layouts.app')
 
-@section('page-title', 'Checkup Details')
-
 @section('content')
-<div class="container mt-4">
+<div class="container-fluid mt-4">
 
-    {{-- Header --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 fw-bold text-primary">
-            Checkup Details
-        </h1>
-
-        <a href="{{ route('admin.checkups.index') }}" class="btn btn-secondary btn-sm">
-            ← Back to Checkups
-        </a>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Checkup Details</h2>
+        <a href="{{ route('admin.checkups.index') }}" class="btn btn-secondary btn-sm">Back</a>
     </div>
 
-    {{-- Checkup Info Card --}}
-    <div class="card mb-4 shadow-sm">
+    <div class="card mb-4">
         <div class="card-body">
-            <h5 class="card-title">Checkup Information</h5>
-            <hr>
-            <p><strong>Staff Assigned:</strong> {{ $checkup->staff->first_name ?? '' }} {{ $checkup->staff->last_name ?? '' }}</p>
-            <p><strong>Course:</strong> {{ $checkup->course->course ?? 'N/A' }}</p>
-            <p><strong>Type:</strong> {{ ucfirst($checkup->checkup_type) }}</p>
-            <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</p>
-            <p><strong>Notes:</strong> {{ $checkup->notes ?? 'No notes provided.' }}</p>
+            <div class="row">
+                <div class="col-md-3"><strong>Date:</strong> {{ $checkup->date }}</div>
+                <div class="col-md-3"><strong>Staff:</strong> {{ $checkup->staff->first_name }} {{ $checkup->staff->last_name }}</div>
+                <div class="col-md-3"><strong>Type:</strong> {{ ucfirst($checkup->checkup_type) }}</div>
+                <div class="col-md-3"><strong>Notes:</strong> {{ $checkup->notes ?? '-' }}</div>
+            </div>
         </div>
     </div>
 
-    {{-- Students List --}}
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h5 class="card-title">Students for this Checkup</h5>
-            <hr>
+    <h4 class="mb-3">Assigned Students</h4>
 
-            @if($checkup->students->isEmpty())
-                <p class="text-muted">No students assigned to this checkup yet.</p>
-            @else
-                <div class="table-responsive">
-                    <table class="table table-bordered align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th>#</th>
-                                <th>Student Name</th>
-                                <th>Course & Year</th>
-                                <th>Patient Record</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($checkup->students as $index => $student)
-                                <tr>
-                                    <td>{{ $index + 1 }}</td>
-                                    <td>{{ $student->first_name }} {{ $student->last_name }}</td>
-                                    <td>{{ $student->course->course?? 'N/A' }}</td>
-                                    <td>
-                                        @if($student->patient)
-                                            ✅ Record Exists
-                                        @else
-                                            ❌ No Record
-                                        @endif
-                                    </td>
-                                    <td>
-        
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        </div>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-dark text-center">
+                <tr>
+                    <th>Student</th>
+                    <th>Course</th>
+                    <th>Grade</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($checkup->patients as $student)
+                <tr class="text-center">
+                    <td class="text-start">{{ $student->first_name }} {{ $student->last_name }}</td>
+                    <td>{{ $student->personalInformation->course ?? 'N/A' }}</td>
+                    <td>{{ $student->personalInformation->grade_level ?? 'N/A' }}</td>
+                    <td>
+                        @php
+                            // Example status logic; replace with real status if available
+                            $status = $student->pivot->status ?? 'Pending';
+                        @endphp
+                        <span class="badge 
+                            @if($status == 'Completed') bg-success
+                            @elseif($status == 'Pending') bg-warning
+                            @elseif($status == 'In Progress') bg-info
+                            @else bg-secondary @endif">
+                            {{ $status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ route('admin.checkups.edit_patient', $student->pivot->id) }}" class="btn btn-primary btn-sm">
+                            Fill Record
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 
 </div>

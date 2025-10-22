@@ -10,28 +10,17 @@ class Dental extends Model
     use HasFactory;
 
     protected $fillable = [
-        'checkup_patient_id',
+        'checkup_patient_id', // REQUIRED
         'checkup_id',
-        'patient_id',
         'dental_status',
-        'cavities',
-        'missing_teeth',
-        'gum_disease',
-        'oral_hygiene',
-        'notes',
+        'needs_treatment',
+        'treatment_type',
+        'note',
     ];
 
+    // Relation to Checkup
     public function checkup()
     {
-        return $this->belongsTo(Checkup::class);
-    }
-
-    public function patient()
-    {
-        return $this->belongsTo(User::class, 'patient_id', 'user_id');
-    }
-    public function checkupPatient()
-    {
-    return $this->belongsTo(CheckupPatient::class, 'checkup_patient_id');
+        return $this->belongsTo(Checkup::class, 'checkup_id');
     }
 }
