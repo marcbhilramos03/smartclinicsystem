@@ -6,20 +6,27 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\PersonalInformation;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Illuminate\Support\Facades\Validator;
+use App\Models\MedicalHistory;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class PatientImportController extends Controller
 {
     // Show the import form
-    public function showImportForm()
+    // Show the patient import form
+    public function showPatientImportForm()
     {
-        return view('admin.users.import');
+        return view('imports.import_patient'); // updated path
+    }
+   // Show medical history import form
+    public function showMedicalHistoryImportForm()
+    {
+        return view('imports.import_medical_history'); // updated path
     }
 
-    // Handle the Excel/CSV import
-    public function import(Request $request)
+    // Import patients/students
+    public function importPatients(Request $request)
     {
         $request->validate([
             'file' => 'required|mimes:xlsx,csv',
@@ -39,8 +46,8 @@ class PatientImportController extends Controller
             DB::beginTransaction();
 
             foreach ($rows as $index => $row) {
-                // Skip header row
-                if ($index === 0 && strtolower($row[0]) === 'school_id') continue;
+                // Skip header row if present
+                if ($index === 0 && strtolower(trim($row[0])) === 'school_id') continue;
 
                 $data = [
                     'school_id' => $row[0] ?? null,
@@ -132,7 +139,97 @@ class PatientImportController extends Controller
             }
 
             DB::commit();
-            return back()->with('success', "✅ Import complete! Added: $added | Updated: $updated | Skipped: $skipped");
+            return back()->with('success', "✅ Patient Import Complete! Added: $added | Updated: $updated | Skipped: $skipped");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Import failed: ' . $e->getMessage());
+        }
+    }
+
+    // Import medical history
+    public function importMedicalHistory(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv',
+        ]);
+
+        $filePath = $request->file('file')->getRealPath();
+
+        try {
+            $spreadsheet = IOFactory::load($filePath);
+            $sheet = $spreadsheet->getActiveSheet();
+            $rows = $sheet->toArray();
+
+            $added = 0;
+            $skipped = 0;
+            $duplicates = 0;
+
+            DB::beginTransaction();
+
+            foreach ($rows as $index => $row) {
+                if ($index === 0 && strtolower(trim($row[0])) === 'school_id') continue;
+
+                $data = [
+                    'school_id' => $row[0] ?? null,
+                    'history_type' => $row[1] ?? null,
+                    'description' => $row[2] ?? null,
+                    'date_recorded' => $row[3] ?? null,
+                    'notes' => $row[4] ?? null,
+                ];
+
+                $validator = Validator::make($data, [
+                    'school_id' => 'required',
+                    'history_type' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    $skipped++;
+                    continue;
+                }
+
+                $user = User::whereHas('personalInformation', function ($q) use ($data) {
+                    $q->where('school_id', $data['school_id']);
+                })->first();
+
+                if (!$user) {
+                    $skipped++;
+                    continue;
+                }
+
+                $dateRecorded = $data['date_recorded'] ?: now()->format('Y-m-d');
+
+                $existing = MedicalHistory::where('user_id', $user->user_id)
+                    ->where('history_type', $data['history_type'])
+                    ->whereDate('date_recorded', $dateRecorded)
+                    ->first();
+
+                if ($existing) {
+                    if ($existing->description !== $data['description'] || $existing->notes !== $data['notes']) {
+                        $existing->update([
+                            'description' => $data['description'],
+                            'notes' => $data['notes'],
+                        ]);
+                    }
+                    $duplicates++;
+                    continue;
+                }
+
+                MedicalHistory::create([
+                    'user_id' => $user->user_id,
+                    'admin_id' => auth()->id() ?? null,
+                    'history_type' => $data['history_type'],
+                    'description' => $data['description'],
+                    'date_recorded' => $dateRecorded,
+                    'notes' => $data['notes'],
+                ]);
+
+                $added++;
+            }
+
+            DB::commit();
+            return back()->with('success', "✅ Medical History Import Complete! Added: $added | Updated: $duplicates | Skipped: $skipped");
+
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Import failed: ' . $e->getMessage());

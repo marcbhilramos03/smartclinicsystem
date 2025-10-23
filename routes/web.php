@@ -20,10 +20,16 @@ use App\Http\Controllers\Patient\PatientCheckupController;
 use App\Http\Controllers\Staff\StaffCheckupRecordController;
 use App\Http\Controllers\Patient\PatientMedicalRecordController;
 
+
+
+// Homepage
+Route::get('/', function () {
+    return view('homepage');
+})->name('homepage');
 // -----------------------------
 // Default: Patient Login
 // -----------------------------
-Route::get('/', [LoginController::class, 'showPatientLoginForm'])->name('patient.login.form');
+// Route::get('/', [LoginController::class, 'showPatientLoginForm'])->name('patient.login.form');
 Route::get('/patient-login', [LoginController::class, 'showPatientLoginForm'])->name('patient.login.form');
 Route::post('/patient-login', [LoginController::class, 'patientLogin'])->name('patient.login');
 
@@ -44,11 +50,16 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/dashboard', function () {
     $user = auth()->user();
     if (!$user) return redirect('/');
+
     switch ($user->role) {
-        case 'admin': return view('admin.dashboard');
-        case 'staff': return view('staff.dashboard');
-        case 'patient': return view('patient.dashboard');
-        default: abort(403, 'Unauthorized');
+        case 'admin':
+            return redirect()->route('admin.dashboard'); // ✅ Calls controller
+        case 'staff':
+            return redirect()->route('staff.dashboard');
+        case 'patient':
+            return redirect()->route('patient.dashboard');
+        default:
+            abort(403, 'Unauthorized');
     }
 })->middleware('auth');
 
@@ -68,20 +79,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/profile', [AdminController::class, 'profile'])->name('profile');
     Route::post('/profile', [AdminController::class, 'updateProfile'])->name('profile.update');
-
+    Route::get('/dashboard-stats', [AdminController::class, 'getStats'])->name('stats');
+    Route::get('/dashboard-chart', [AdminController::class, 'getChartData'])->name('chart');
 
     
     // Users CRUD
     Route::resource('users', UserController::class);
-
-    // Patient Import
-    Route::get('patients/import', [PatientImportController::class, 'showImportForm'])->name('patients.import-form');
-    Route::post('patients/import', [PatientImportController::class, 'import'])->name('patients.import');
-    
-  
     Route::resource('patients', PatientRecordController::class);
 
+    
+    Route::get('/imports/patients', [PatientImportController::class, 'showPatientImportForm'])->name('imports.patients.form');
+    Route::post('/imports/patients', [PatientImportController::class, 'importPatients'])->name('imports.patients.submit');
+
+    Route::get('/imports/medical-histories', [PatientImportController::class, 'showMedicalHistoryImportForm'])->name('imports.medical_histories.form');
+    Route::post('/imports/medical-histories', [PatientImportController::class, 'importMedicalHistories'])->name('imports.medical_histories.submit');
+   
+   
     // Nested routes for clinic sessions and medical histories
+
     Route::prefix('patients/{patient}')->group(function () {
         Route::get('clinic_sessions/create', [ClinicSessionController::class, 'create'])
             ->name('patients.clinic_sessions.create');

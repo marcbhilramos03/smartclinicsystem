@@ -3,18 +3,15 @@
 @section('content')
 <div class="container">
     <h2>Patient Logbook: {{ $patient->first_name }} {{ $patient->last_name }}</h2>
-<div class="mb-3">
-    <a href="{{ route('admin.patients.clinic_sessions.create', $patient->user_id) }}" class="btn btn-primary">
-        Regular Visit
-    </a>
-    <a href="{{ route('admin.patients.medical_histories.create', $patient->user_id) }}" class="btn btn-success">
-        Add Medical History
-    </a>
-</div>
+
+    <div class="mb-3">
+        <a href="{{ route('admin.patients.clinic_sessions.create', $patient->user_id) }}" class="btn btn-primary">Regular Visit</a>
+        <a href="{{ route('admin.patients.medical_histories.create', $patient->user_id) }}" class="btn btn-success">Add Medical History</a>
+    </div>
 
     <h4>Personal Information</h4>
     <ul>
-        <li>Gender: {{ $patient->personalInformation->gender ?? '-' }}</li>
+        <li>Gender: {{ $patient->gender ?? '-' }}</li>
         <li>Birth Date: {{ $patient->personalInformation->date_of_birth ?? '-' }}</li>
         <li>Course: {{ $patient->personalInformation->course ?? '-' }}</li>
         <li>Grade Level: {{ $patient->personalInformation->grade_level ?? '-' }}</li>
@@ -23,15 +20,9 @@
     </ul>
 
     <hr>
-
-    <h4>Medical Record</h4>
-    @php
-        $records = $patient->medicalRecords ?? collect();
-        $records = $records->sortByDesc('created_at');
-    @endphp
-
-    @if($records->isEmpty())
-        <p>No medical records found for this patient.</p>
+    <h4>Medical Histories</h4>
+    @if($patient->medicalHistories->isEmpty())
+        <p>No medical histories found.</p>
     @else
         <table class="table table-bordered">
             <thead>
@@ -43,69 +34,88 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($records as $record)
+                @foreach($patient->medicalHistories->sortByDesc('created_at') as $history)
                 <tr>
-                    <td>{{ optional($record->created_at)->format('Y-m-d H:i') ?? '-' }}</td>
+                    <td>{{ $history->created_at?->format('F d, Y h:i a') ?? '-' }}</td>
+                    <td>Medical History</td>
                     <td>
-                        @switch($record->recordable_type)
-                            @case(App\Models\MedicalHistory::class)
-                                Medical History
-                                @break
-                            @case(App\Models\ClinicSession::class)
-                                Clinic Session
-                                @break
-                            @case(App\Models\Checkup::class)
-                                Checkup ({{ $record->recordable->checkup_type ?? '-' }})
-                                @break
-                            @case(App\Models\Vitals::class)
-                                Vitals
-                                @break
-                            @case(App\Models\Dental::class)
-                                Dental
-                                @break
-                            @default
-                                -
-                        @endswitch
+                        Type: {{ $history->history_type ?? '-' }} <br>
+                        Details: {{ $history->description ?? '-' }}
                     </td>
-                    <td>
-                        @php $rec = $record->recordable; @endphp
-                        @switch($record->recordable_type)
-                            @case(App\Models\MedicalHistory::class)
-                                Type: {{ $rec->history_type ?? '-' }} <br>
-                                Details: {{ $rec->description ?? '-' }} <br>
+                    <td>{{ $history->admin->first_name ?? '-' }} {{ $history->admin->last_name ?? '-' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 
-                                @break
-                            @case(App\Models\ClinicSession::class)
-                                Reason: {{ $rec->reason ?? '-' }} <br>
-                                Remedy: {{ $rec->remedy ?? '-' }}
-                                @break
-                            @case(App\Models\Checkup::class)
-                                Type: {{ $rec->checkup_type ?? '-' }} <br>
-                                Notes: {{ $rec->notes ?? '-' }}
-                                @break
-                            @case(App\Models\Vitals::class)
-                                Height: {{ $rec->height ?? '-' }} cm <br>
-                                Weight: {{ $rec->weight ?? '-' }} kg <br>
-                                BP: {{ $rec->blood_pressure ?? '-' }} <br>
-                                Pulse: {{ $rec->pulse_rate ?? '-' }} <br>
-                                Temp: {{ $rec->temperature ?? '-' }} °C <br>
-                                Resp Rate: {{ $rec->respiratory_rate ?? '-' }} <br>
-                                BMI: {{ $rec->bmi ?? '-' }}
-                                @break
-                            @case(App\Models\Dental::class)
-                                Status: {{ $rec->dental_status ?? '-' }} <br>
-                                Needs Treatment: {{ $rec->needs_treatment ?? '-' }} <br>
-                                Treatment: {{ $rec->treatment_type ?? '-' }} <br>
-                                Notes: {{ $rec->note ?? '-' }}
-                                @break
-                            @default
-                                -
-                        @endswitch
-                    </td>
+    <hr>
+    <h4>Clinic Visits</h4>
+    @if($patient->clinicSessions->isEmpty())
+        <p>No clinic visits found.</p>
+    @else
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Reason</th>
+                    <th>Remedy</th>
+                    <th>Incharge</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($patient->clinicSessions->sortByDesc('created_at') as $clinic)
+                <tr>
+                    <td>{{ $clinic->created_at?->format('F d, Y h:i a') ?? '-' }}</td>
+                    <td>{{ $clinic->reason ?? '-' }}</td>
+                    <td>{{ $clinic->remedy ?? '-' }}</td>
+                    <td>{{ $clinic->admin->first_name ?? '-' }} {{ $clinic->admin->last_name ?? '-' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    <hr>
+    <h4>Checkups (Vitals & Dental)</h4>
+    @if($patient->checkups->isEmpty())
+        <p>No checkups found.</p>
+    @else
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Notes</th>
+                    <th>Vitals / Dental Details</th>
+                    <th>Incharge</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($patient->checkups->sortByDesc('date') as $checkup)
+                <tr>
+                    <td>{{ $checkup->date?->format('F d, Y h:i a') ?? '-' }}</td>
+                    <td>{{ $checkup->checkup_type ?? '-' }}</td>
+                    <td>{{ $checkup->notes ?? '-' }}</td>
                     <td>
-                         {{ $record->admin->first_name ?? '-' }} {{ $record->admin->credential->license_type ?? '-' }} <br>
+                        @if($checkup->vital)
+                        Height: {{ $checkup->vital->height ?? '-' }} cm<br>
+                        Weight: {{ $checkup->vital->weight ?? '-' }} kg<br>
+                        BP: {{ $checkup->vital->blood_pressure ?? '-' }}<br>
+                        Pulse: {{ $checkup->vital->pulse_rate ?? '-' }}<br>
+                        Temp: {{ $checkup->vital->temperature ?? '-' }} °C<br>
+                        Resp Rate: {{ $checkup->vital->respiratory_rate ?? '-' }}<br>
+                        BMI: {{ $checkup->vital->bmi ?? '-' }}<br>
+                        @endif
+
+                        @if($checkup->dental)
+                        Status: {{ $checkup->dental->dental_status ?? '-' }}<br>
+                        Needs Treatment: {{ $checkup->dental->needs_treatment ?? '-' }}<br>
+                        Treatment: {{ $checkup->dental->treatment_type ?? '-' }}<br>
+                        Notes: {{ $checkup->dental->note ?? '-' }}
+                        @endif
                     </td>
-                   
+                    <td>{{ $checkup->staff->first_name ?? '-' }} {{ $checkup->staff->last_name ?? '-' }}</td>
                 </tr>
                 @endforeach
             </tbody>

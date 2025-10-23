@@ -7,7 +7,31 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
     </div>
+<div class="row">
 
+    <!-- Import Patients Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-primary">
+            <div class="card-body">
+                <h5 class="card-title">Import Patients</h5>
+                <p class="card-text">Upload patient data via CSV file.</p>
+                <a href="{{ route('admin.imports.patients.form') }}" class="btn btn-primary">Go to Import</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Medical Histories Card -->
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-success">
+            <div class="card-body">
+                <h5 class="card-title">Import Medical Histories</h5>
+                <p class="card-text">Upload medical history data via CSV file.</p>
+                <a href="{{ route('admin.imports.medical_histories.form') }}" class="btn btn-success">Go to Import</a>
+            </div>
+        </div>
+    </div>
+
+</div>
     <!-- Total Counts Cards -->
     <div class="row mb-4">
 
@@ -66,8 +90,9 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    // --- Chart Initialization ---
     const ctx = document.getElementById('monthlyChart').getContext('2d');
-    const monthlyChart = new Chart(ctx, {
+    let monthlyChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: @json($months ?? []),
@@ -108,5 +133,42 @@
             }
         }
     });
+
+    // --- Update Stats Function ---
+    function updateStats() {
+        fetch("{{ route('admin.stats') }}")
+            .then(res => res.json())
+            .then(data => {
+                document.querySelector('.bg-primary h2').textContent = data.totalStaff;
+                document.querySelector('.bg-success h2').textContent = data.totalPatients;
+                document.querySelector('.bg-info h2').textContent = data.totalUsers;
+                document.querySelector('.bg-warning h2').textContent = data.totalCheckups;
+                document.querySelector('.bg-warning small').textContent = 
+                    `Vitals: ${data.vitalsCheckups} | Dental: ${data.dentalCheckups}`;
+            })
+            .catch(err => console.error('Error updating stats:', err));
+    }
+
+    // --- Update Chart Function ---
+    function updateChart() {
+        fetch("{{ route('admin.chart') }}")
+            .then(res => res.json())
+            .then(data => {
+                monthlyChart.data.labels = data.months;
+                monthlyChart.data.datasets[0].data = data.patientsData;
+                monthlyChart.data.datasets[1].data = data.vitalsData;
+                monthlyChart.data.datasets[2].data = data.dentalData;
+                monthlyChart.update();
+            })
+            .catch(err => console.error('Error updating chart:', err));
+    }
+
+    // --- Auto refresh every 10 seconds ---
+    setInterval(() => {
+        updateStats();
+        updateChart();
+    }, 10000);
 </script>
+
+
 @endsection

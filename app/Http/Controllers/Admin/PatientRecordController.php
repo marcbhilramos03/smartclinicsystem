@@ -26,17 +26,18 @@ class PatientRecordController extends Controller
         return view('admin.patients.index', compact('patients', 'search'));
     }
 
-public function show(User $patient)
-{
-    // Eager load relations
-    $patient->load([
-        'personalInformation',
-        'medicalRecords.recordable',
-        'medicalRecords.admin',
-        'medicalRecords.staff',
-    ]);
+    public function show(User $patient)
+    {
+        // Eager load all relations
+        $patient->load([
+            'personalInformation',
+            'medicalHistories.admin',
+            'clinicSessions.admin',
+            'checkups.staff',
+            'vitals',
+            'dentals',
+        ]);
 
-    return view('admin.patients.show', compact('patient'));
-}
-
+        return view('admin.patients.show', compact('patient'));
+    }
 }

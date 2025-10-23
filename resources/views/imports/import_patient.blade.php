@@ -11,7 +11,7 @@
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <form action="{{ route('admin.patients.import') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ route('admin.imports.patients.submit') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="file" class="form-label">Upload Excel/CSV</label>
