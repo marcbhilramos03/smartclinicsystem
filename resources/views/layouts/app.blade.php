@@ -16,11 +16,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
 
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
-
     <style>
         html, body { height: 100%; }
         #wrapper { display: flex; min-height: 100vh; overflow: hidden; }
@@ -47,23 +42,16 @@
 
 <body id="page-top">
 <div id="wrapper">
-    
-    @if(auth()->user()->role !== 'patient')
-        <!-- Sidebar -->
+
+    {{-- ✅ Only Admin Sidebar --}}
+    @if(auth()->user()->role === 'admin')
         @php
-            $user = Auth::user();
-            $sidebarLinks = match($user->role) {
-                'admin' => [
-                    ['route'=>'admin.dashboard','icon'=>'fa-tachometer-alt','label'=>'Dashboard'],
-                    ['route'=>'admin.users.index','icon'=>'fa-users','label'=>'Manage Users'],
-                    ['route'=>'admin.patients.index','icon'=>'fa-file-medical','label'=>'Patients'],
-                    ['route'=>'admin.checkups.index','icon'=>'fa-notes-medical','label'=>'Checkups'],
-                ],
-                'staff' => [
-                    ['route'=>'staff.checkups.index','icon'=>'fa-notes-medical','label'=>'Checkups'],
-                ],
-                default => []
-            };
+            $sidebarLinks = [
+                ['route'=>'admin.dashboard','icon'=>'fa-tachometer-alt','label'=>'Dashboard'],
+                ['route'=>'admin.users.index','icon'=>'fa-users','label'=>'Manage Users'],
+                ['route'=>'admin.patients.index','icon'=>'fa-file-medical','label'=>'Patients'],
+                ['route'=>'admin.checkups.index','icon'=>'fa-notes-medical','label'=>'Checkups'],
+            ];
         @endphp
 
         <ul class="navbar-nav sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -72,7 +60,7 @@
                 <div class="sidebar-brand-text mx-3">SMARTCLINIC</div>
             </a>
             <hr class="sidebar-divider my-0">
-<br> <br> <br> 
+            <br><br><br>
 
             @foreach($sidebarLinks as $link)
                 <li class="nav-item">
@@ -91,16 +79,14 @@
     @endif
 
     <!-- Content Wrapper -->
-    <div id="content-wrapper">
+    <div id="content-wrapper" @if(auth()->user()->role !== 'admin') style="margin-left:0;width:100%;" @endif>
         <!-- Topbar -->
         <nav class="navbar navbar-expand topbar mb-4 shadow">
-            @if(auth()->user()->role !== 'patient')
+            @if(auth()->user()->role === 'admin')
                 <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle me-3 text-white">
                     <i class="fa fa-bars"></i>
                 </button>
-            @endif
 
-            @if(auth()->user()->role !== 'patient')
                 <form action="{{ route('search.patients') }}" method="GET" class="d-none d-sm-inline-block form-inline me-auto ms-md-3 my-2 my-md-0 navbar-search" style="max-width: 900px;">
                     <div class="input-group">
                         <input type="text" name="search" class="form-control small" placeholder="Search patients..." aria-label="Search" aria-describedby="basic-addon2">
@@ -162,4 +148,3 @@
 
 </body>
 </html>
-    
