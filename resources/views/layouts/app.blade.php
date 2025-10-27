@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -13,29 +12,66 @@
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
     <link href="{{ asset('vendor/css/sb-admin-2.min.css') }}" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,300,400,700" rel="stylesheet">
-    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('images/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('images/favicon-16x16.png') }}">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('/favicon-16x16.png') }}">
 
     <style>
-        html, body { height: 100%; }
-        #wrapper { display: flex; min-height: 100vh; overflow: hidden; }
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        #wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
 
         /* Sidebar */
         .sidebar {
             background-color: #1c0568;
             width: 220px;
             position: fixed;
-            top: 0; left: 0;
-            height: 100%;
+            top: 0;
+            left: 0;
+            height: 100vh;
             overflow-y: auto;
             z-index: 1030;
         }
-        .sidebar .nav-link { color: #adb5bd; padding: 0.75rem 1rem; }
-        .sidebar .nav-link.active { background-color: #495057; color: #fff; font-weight: bold; }
-        .sidebar .nav-link i { margin-right: 0.5rem; }
 
-        /* Content wrapper */
-        #content-wrapper { margin-left: 220px; width: calc(100% - 220px); display: flex; flex-direction: column; min-height: 100vh; }
+        .sidebar .nav-link {
+            color: #adb5bd;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem; /* Adjust sidebar text size */
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #495057;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 0.5rem;
+            font-size: 1.5em; /* Adjust icon size */
+        }
+
+        #content-wrapper {
+            margin-left: 220px;
+            width: calc(100% - 220px);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrapper .container-fluid {
+            padding: 1.5rem;
+            background-color: #f8f9fc;
+            flex: 1 0 auto; /* allow container to grow with content */
+        }
 
         nav.topbar {
             background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
@@ -47,15 +83,25 @@
             z-index: 1020;
         }
 
-        .content-wrapper .container-fluid {
-            padding: 1.5rem;
-            background-color: #f8f9fc;
-            flex-grow: 1;
-        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+            }
 
-        @media (max-width:768px){
-            .sidebar { width: 100%; position: relative; }
-            #content-wrapper { margin-left: 0; width: 100%; }
+            #content-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .sidebar .nav-link {
+                font-size: 0.85rem; /* smaller text on mobile */
+            }
+
+            .sidebar .nav-link i {
+                font-size: 1rem; /* smaller icons on mobile */
+            }
         }
     </style>
 </head>
@@ -63,7 +109,7 @@
 <body id="page-top">
 <div id="wrapper">
 
-    {{-- ✅ Show sidebar only if NOT on profile page --}}
+    {{-- Show sidebar only if NOT on profile page --}}
     @if(auth()->user()->role === 'admin' && !request()->routeIs(auth()->user()->role . '.profile'))
         @php
             $sidebarLinks = [
@@ -99,12 +145,9 @@
     @endif
 
     <!-- Content Wrapper -->
-    <div id="content-wrapper"
-         @if(auth()->user()->role !== 'admin' || request()->routeIs(auth()->user()->role . '.profile'))
-            style="margin-left:0;width:100%;"
-         @endif>
+    <div id="content-wrapper" @if(auth()->user()->role !== 'admin' || request()->routeIs(auth()->user()->role . '.profile')) style="margin-left:0;width:100%;" @endif>
 
-        {{-- ✅ Hide topbar on profile page --}}
+        {{-- Hide topbar on profile page --}}
         @unless(request()->routeIs(auth()->user()->role . '.profile'))
             <nav class="navbar navbar-expand topbar mb-4 shadow">
                 @if(auth()->user()->role === 'admin')
@@ -172,25 +215,18 @@
 
 <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
-
 <!-- Logout Modal -->
 <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-danger shadow-lg">
-      <!-- Modal Header -->
       <div class="modal-header bg-danger text-white d-flex align-items-center">
         <i class="fas fa-exclamation-triangle fa-2x me-2"></i>
         <h5 class="modal-title fw-bold" id="logoutModalLabel">Confirm Logout</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-
-      <!-- Modal Body -->
       <div class="modal-body text-center fs-6">
-        <p class="mb-0">Are you sure you want to <strong>logout</strong> from your account?
-        </p>
+        <p class="mb-0">Are you sure you want to <strong>logout</strong> from your account?</p>
       </div>
-
-      <!-- Modal Footer -->
       <div class="modal-footer justify-content-center">
         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">
           <i class="fas fa-times me-1"></i> Cancel
@@ -206,7 +242,6 @@
   </div>
 </div>
 
-
 <!-- Scripts -->
 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>
@@ -214,7 +249,7 @@
 <script src="{{ asset('vendor/js/sb-admin-2.min.js') }}"></script>
 
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
-            @yield('scripts')
+@yield('scripts')
 
 </body>
 </html>

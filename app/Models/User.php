@@ -30,6 +30,11 @@ class User extends Authenticatable
     {
         return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
     }
+    // app/Models/User.php
+    public function credential()
+    {
+        return $this->hasOne(Credential::class, 'staff_id', 'user_id');
+    }
 
     // Admin tables
     public function medicalHistories()
@@ -41,41 +46,40 @@ class User extends Authenticatable
     {
         return $this->hasMany(ClinicSession::class, 'user_id', 'user_id');
     }
+public function checkupPatients()
+{
+    return $this->hasMany(CheckupPatient::class, 'patient_id', 'user_id');
+}
 
-    // Staff tables (via checkups)
-    public function checkups()
-    {
-        return $this->hasManyThrough(
-            Checkup::class,
-            PersonalInformation::class,
-            'user_id',               // FK on personal_information
-            'personal_information_id', // FK on checkups
-            'user_id',               // Local key on users
-            'id'                     // Local key on personal_information
-        );
-    }
+public function checkups()
+{
+    return $this->belongsToMany(Checkup::class, 'checkup_patients', 'patient_id', 'checkup_id')
+                ->withPivot('id') // so you can access checkup_patient.id easily
+                ->withTimestamps();
+}
 
-    public function vitals()
-    {
-        return $this->hasManyThrough(
-            Vitals::class,
-            Checkup::class,
-            'personal_information_id', // FK on checkups
-            'checkup_id',              // FK on vitals
-            'user_id',                 // Local key on users
-            'id'                       // Local key on checkups
-        );
-    }
+public function vitals()
+{
+    return $this->hasManyThrough(
+        Vitals::class,
+        CheckupPatient::class,
+        'patient_id',          // FK on checkup_patients table
+        'checkup_patient_id',  // FK on vitals table
+        'user_id',             // local key on users
+        'id'                   // local key on checkup_patients
+    );
+}
 
-    public function dentals()
-    {
-        return $this->hasManyThrough(
-            Dental::class,
-            Checkup::class,
-            'personal_information_id', // FK on checkups
-            'checkup_id',              // FK on dentals
-            'user_id',                 // Local key on users
-            'id'                       // Local key on checkups
-        );
-    }
+public function dentals()
+{
+    return $this->hasManyThrough(
+        Dental::class,
+        CheckupPatient::class,
+        'patient_id',          // FK on checkup_patients table
+        'checkup_patient_id',  // FK on dentals table
+        'user_id',             // local key on users
+        'id'                   // local key on checkup_patients
+    );
+}
+
 }

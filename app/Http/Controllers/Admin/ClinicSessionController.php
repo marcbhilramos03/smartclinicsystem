@@ -19,7 +19,7 @@ class ClinicSessionController extends Controller
 public function store(Request $request, User $patient)
 {
     $validated = $request->validate([
-        'session_date' => 'required|date',
+        'session_date' => 'required|datetime',
         'reason'       => 'required|string|max:255',
         'remedy'       => 'nullable|string|max:500',
     ]);
@@ -44,33 +44,4 @@ public function store(Request $request, User $patient)
         return redirect()->route('admin.patients.show', $patient)
                          ->with('success', 'Clinic session added successfully.');
     }
-
-    // // List all sessions for a patient
-    // public function index(User $patient)
-    // {
-    //     $sessions = ClinicSession::where('user_id', $patient->id)->get();
-    //     return view('admin.clinic_sessions.index', compact('sessions', 'patient'));
-    // }
-
-    // // Show a single clinic session
-    // public function show(User $patient, ClinicSession $clinicSession)
-    // {
-    //     if ($clinicSession->user_id !== $patient->id) {
-    //         abort(404);
-    //     }
-    //     return view('admin.clinic_sessions.show', compact('clinicSession', 'patient'));
-    // }
-
-    // // Delete a clinic session
-    // public function destroy(User $patient, ClinicSession $clinicSession)
-    // {
-    //     if ($clinicSession->user_id !== $patient->id) {
-    //         abort(404);
-    //     }
-
-    //     $clinicSession->delete();
-
-    //     return redirect()->route('admin.patients.show', $patient)
-    //                      ->with('success', 'Clinic session deleted successfully.');
-    // }
 }

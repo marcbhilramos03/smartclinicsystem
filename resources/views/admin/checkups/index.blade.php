@@ -14,67 +14,91 @@
 
     @if($checkups->count())
         <div class="table-responsive">
-            <table class="table table-bordered table-striped">
-                <thead class="thead-light">
+            <table class="table table-bordered table-striped align-middle">
+                <thead class="table-dark text-center">
                     <tr>
                         <th>Date</th>
                         <th>Checkup Type</th>
                         <th>Course</th>
+                        <th>Total Students</th>
                         <th>Performed By</th>
                         <th>Scheduled By</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="text-center">
                     @foreach($checkups as $checkup)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</td>
                             <td>{{ ucfirst($checkup->checkup_type) }}</td>
+
+                            {{-- Display assigned courses/patients --}}
                             <td>
                                 @if($checkup->patients->isNotEmpty())
                                     @foreach($checkup->patients as $patient)
-                                        {{ $patient->personalInformation?->first_name ?? '' }}
-                                        {{ $patient->personalInformation?->last_name ?? '' }}
-                                        ({{ $patient->personalInformation?->course ?? '' }})<br>
+                                        {{ $patient->personalInformation?->course ?? 'N/A' }}<br>
                                     @endforeach
                                 @else
                                     -
                                 @endif
                             </td>
-                            <td>{{ $checkup->staff?->first_name ?? '-' }} {{ $checkup->staff?->last_name ?? '-' }} {{ $checkup->staff?->credential->license_type ?? '-' }}</td>
-                            <td>{{ $checkup->admin?->first_name ?? '-' }} {{ $checkup->admin?->last_name ?? '-' }} {{ $checkup->admin?->credential->license_type ?? '-' }}</td>
+
+                            {{-- ✅ Show total patient count --}}
                             <td>
-                                <!-- View Button -->
+                                <span class="badge bg-primary">
+                                    {{ $checkup->patients->count() }}
+                                </span>
+                            </td>
+
+                            {{-- Performed by --}}
+                            <td>
+                                {{ $checkup->staff?->first_name ?? '-' }}
+                                {{ $checkup->staff?->last_name ?? '-' }}
+                                <small class="text-muted">
+                                    {{ $checkup->staff?->credential->license_type ?? '' }}
+                                </small>
+                            </td>
+
+                            {{-- Scheduled by --}}
+                            <td>
+                                {{ $checkup->admin?->first_name ?? '-' }}
+                                {{ $checkup->admin?->last_name ?? '-' }}
+                                <small class="text-muted">
+                                    {{ $checkup->admin?->credential->license_type ?? '' }}
+                                </small>
+                            </td>
+
+                            {{-- Actions --}}
+                            <td>
                                 <a href="{{ route('admin.checkups.show', $checkup->id) }}" class="btn btn-info btn-sm">View</a>
 
-                                <!-- Delete Button triggers modal -->
                                 <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $checkup->id }}">
                                     Delete
                                 </button>
 
-                              <div class="modal fade" id="deleteModal{{ $checkup->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $checkup->id }}" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-danger">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="deleteModalLabel{{ $checkup->id }}">Confirm Delete</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        Are you sure you want to delete this checkup on <strong>{{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</strong>?
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <form action="{{ route('admin.checkups.destroy', $checkup->id) }}" method="POST" style="display:inline-block;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger">Delete</button>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-
+                                <!-- Delete Modal -->
+                                <div class="modal fade" id="deleteModal{{ $checkup->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $checkup->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content border-danger">
+                                            <div class="modal-header bg-danger text-white">
+                                                <h5 class="modal-title" id="deleteModalLabel{{ $checkup->id }}">Confirm Delete</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                Are you sure you want to delete this checkup on
+                                                <strong>{{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</strong>?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <form action="{{ route('admin.checkups.destroy', $checkup->id) }}" method="POST" style="display:inline-block;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     @endforeach
@@ -82,7 +106,7 @@
             </table>
         </div>
 
-        <!-- Pagination links -->
+        {{-- Pagination --}}
         <div class="mt-3">
             {{ $checkups->links() }}
         </div>
@@ -90,5 +114,4 @@
         <p>No checkups found.</p>
     @endif
 </div>
-
 @endsection

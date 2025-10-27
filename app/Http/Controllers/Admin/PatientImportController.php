@@ -55,8 +55,8 @@ class PatientImportController extends Controller
                     'middle_name' => $row[2] ?? null,
                     'last_name' => $row[3] ?? null,
                     'gender' => $row[4] ?? null,
-                    'birthdate' => $row[5] ?? null,
-                    'contact_number' => $row[6] ?? null,
+                    'date_of_birth' => $row[5] ?? null,
+                    'phone_number' => $row[6] ?? null,
                     'address' => $row[7] ?? null,
                     'course' => $row[8] ?? null,
                     'grade_level' => $row[9] ?? null,
@@ -91,16 +91,16 @@ class PatientImportController extends Controller
                         'middle_name' => $data['middle_name'],
                         'last_name' => $data['last_name'],
                         'role' => 'patient',
+                        'gender' => $data['gender'],
+                        'date_of_birth' => $data['date_of_birth'],
+                        'phone_number' => $data['phone_number'],
+                        'address' => $data['address'],
                     ]);
 
                     // Create personal information
                     PersonalInformation::create([
                         'user_id' => $user->user_id,
                         'school_id' => $data['school_id'],
-                        'gender' => $data['gender'],
-                        'birthdate' => $data['birthdate'],
-                        'contact_number' => $data['contact_number'],
-                        'address' => $data['address'],
                         'course' => $data['course'],
                         'grade_level' => $data['grade_level'],
                         'emer_con_name' => $data['emergency_name'],
@@ -116,15 +116,15 @@ class PatientImportController extends Controller
                         'first_name' => $data['first_name'],
                         'middle_name' => $data['middle_name'],
                         'last_name' => $data['last_name'],
+                        'gender' => $data['gender'],
+                        'date_of birth' => $data['date_of_birth'],
+                        'phone_number' => $data['phone_number'],
+                        'address' => $data['address'],
                     ]);
 
                     $personalInfo = $user->personalInformation;
                     if ($personalInfo) {
                         $personalInfo->update([
-                            'gender' => $data['gender'],
-                            'birthdate' => $data['birthdate'],
-                            'contact_number' => $data['contact_number'],
-                            'address' => $data['address'],
                             'course' => $data['course'],
                             'grade_level' => $data['grade_level'],
                             'emer_con_name' => $data['emergency_name'],

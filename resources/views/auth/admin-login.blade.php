@@ -144,8 +144,8 @@
 <div class="login-wrapper">
     <div class="login-card">
         {{-- <img src="{{ asset('images/logo.png') }}" alt="SMARTCLINIC Logo" width="90" class="mb-4"> --}}
-        <h1 class="login-title">Doctor or Nurse</h1>
-        <p class="login-subtitle">Enter your email and password to access the dashboard</p>
+        <h1 class="login-title">Welcome Doctor/Nurse</h1>
+        <p class="login-subtitle">Enter your email and password to access your account</p>
 
         <form method="POST" action="{{ route('login-admin') }}">
             @csrf

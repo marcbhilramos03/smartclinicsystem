@@ -9,20 +9,30 @@
     <a href="{{ route('admin.users.index') }}" class="btn btn-secondary mb-3">← Back to Users</a>
 
     {{-- BASIC INFORMATION --}}
-    <div class="card mb-4 shadow-sm">
-        <div class="card-header bg-primary text-white">
-            Basic Information
-        </div>
-        <div class="card-body">
-            <p><strong>Full Name:</strong> {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}</p>
+<div class="card mb-4 shadow-sm">
+    <div class="card-header bg-primary text-white">
+        Basic Information
+    </div>
+
+    <div class="card-body">
+        <p><strong>Full Name:</strong> {{ $user->first_name }} {{ $user->middle_name }} {{ $user->last_name }}</p>
+
+        @if ($user->role === 'staff')
+            <p><strong>Address:</strong> {{ $user->address ?? 'N/A' }}</p>
+            <p><strong>Gender:</strong> {{ $user->gender ?? 'N/A' }}</p>
+            <p><strong>Email:</strong> {{ $user->email ?? 'N/A' }}</p>
+            <p><strong>Contact Number:</strong> {{ $user->phone_number ?? 'N/A' }}</p>
+        @else
             <p><strong>Gender:</strong> {{ $user->gender ?? 'N/A' }}</p>
             <p><strong>Birthdate:</strong>
                 {{ $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('F j, Y') : 'N/A' }}
             </p>
             <p><strong>Contact Number:</strong> {{ $user->phone_number ?? 'N/A' }}</p>
             <p><strong>Address:</strong> {{ $user->address ?? 'N/A' }}</p>
-        </div>
+        @endif
     </div>
+</div>
+
 
     {{-- PATIENT DETAILS --}}
     @if($user->role === 'patient')

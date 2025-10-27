@@ -4,22 +4,47 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CheckupPatient extends Model {
-    protected $table = 'checkup_patients'; // Ensure table matches migration
+class CheckupPatient extends Model
+{
+    protected $table = 'checkup_patients';
 
-    public function vitals() {
+    protected $fillable = [
+        'checkup_id',
+        'patient_id',
+        'status',
+    ];
+
+    // Relationships
+    public function vitals()
+    {
         return $this->hasMany(Vitals::class, 'checkup_patient_id');
     }
 
-    public function dentals() {
+    public function dentals()
+    {
         return $this->hasMany(Dental::class, 'checkup_patient_id');
     }
 
-    public function patient() {
+    public function patient()
+    {
         return $this->belongsTo(User::class, 'patient_id', 'user_id');
     }
 
-    public function checkup() {
+    public function checkup()
+    {
         return $this->belongsTo(Checkup::class, 'checkup_id');
+    }
+
+    // Helper methods
+    public function markAsCompleted()
+    {
+        $this->status = 'completed';
+        $this->save();
+    }
+
+    public function markAsPending()
+    {
+        $this->status = 'pending';
+        $this->save();
     }
 }

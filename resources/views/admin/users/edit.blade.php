@@ -55,21 +55,21 @@
                     <label class="form-label">Gender</label>
                     <select name="gender" class="form-select">
                         <option value="">Select</option>
-                        <option value="Male" {{ old('gender', $user->gender) == 'Male' ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ old('gender', $user->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                        <option value="Male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>Female</option>
                     </select>
                 </div>
 
                 <div class="col-md-3">
                     <label class="form-label">Birthdate</label>
-                    <input type="date" name="birthdate" class="form-control" 
-                        value="{{ old('birthdate', $user->birthdate) }}">
+                    <input type="date" name="date_of_birth" class="form-control" 
+                        value="{{ old('date_of_birth', $user->date_of_birth) }}">
                 </div>
 
                 <div class="col-md-4">
                     <label class="form-label">Contact Number</label>
-                    <input type="text" name="contact_number" class="form-control" 
-                        value="{{ old('contact_number', $user->contact_number) }}">
+                    <input type="text" name="phone_number" class="form-control" 
+                        value="{{ old('phone_number', $user->phone_number) }}">
                 </div>
 
                 <div class="col-md-8">

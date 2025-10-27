@@ -143,7 +143,7 @@
     <div class="login-border">
         <div class="login-card">
             {{-- <img src="{{ asset('images/logo.png') }}" alt="SMARTCLINIC Logo" width="90" class="mb-4"> --}}
-            <h1>Welcome Back!</h1>
+            <h1>Welcome Student!</h1>
             <p>Enter your School ID to access your account</p>
 
             <form method="POST" action="{{ route('patient.login') }}">

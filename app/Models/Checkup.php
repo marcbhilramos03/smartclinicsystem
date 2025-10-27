@@ -24,17 +24,19 @@ protected $fillable = [
 
     
 public function patients() {
-    return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id')
-                ->withPivot('id')   // include pivot id
-                ->withTimestamps();
+    return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id');
 }
 
 public function vitals() {
-    return $this->hasMany(Vitals::class);
+    return $this->hasMany(Vitals::class, 'checkup_id');
 }
 
 public function dentals() {
-    return $this->hasMany(Dental::class);
+    return $this->hasMany(Dental::class, 'checkup_id');
+}
+public function checkupPatients()
+{
+    return $this->hasMany(CheckupPatient::class, 'checkup_id');
 }
 
 }

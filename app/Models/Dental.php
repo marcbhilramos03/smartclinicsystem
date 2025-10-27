@@ -22,5 +22,9 @@ class Dental extends Model
     public function checkup()
     {
         return $this->belongsTo(Checkup::class, 'checkup_id');
+    }    
+    public function checkupPatient()
+    {
+        return $this->belongsTo(CheckupPatient::class, 'checkup_patient_id');
     }
 }

@@ -23,7 +23,7 @@
 
     <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-5">
-        <h2 class="fw-bold text-dark">{{ $patient->first_name }} {{ $patient->last_name }} - Medical Records</h2>
+        <h2 class="fw-bold text-dark"> My Medical Records</h2>
         <a href="{{ route('patient.dashboard') }}" class="btn btn-outline-secondary">&larr; Back to Dashboard</a>
     </div>
 
@@ -60,7 +60,7 @@
             </div>
             <div class="modal-body">
 
-                @if($checkups->count())
+                @if($checkups)
 
                 <!-- Vitals Table -->
                 <h6 class="fw-bold mb-2">Vitals Records</h6>

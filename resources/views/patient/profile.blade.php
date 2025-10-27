@@ -1,86 +1,71 @@
-{{-- resources/views/patient/profile.blade.php --}}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Patient Profile</title>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-<style>
-    body {
-        background-color: #f0f4ff;
-        min-height: 100vh;
-    }
-    .profile-card {
-        max-width: 500px;
-        margin: 3rem auto;
-        background: #1e3a8a;
-        color: white;
-        border-radius: 15px;
-        padding: 2rem;
-        text-align: center;
-        box-shadow: 0 1rem 2rem rgba(0,0,0,0.25);
-    }
-    .profile-card img {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 3px solid white;
-        margin-bottom: 1rem;
-    }
-    .profile-card h1 {
-        font-size: 2rem;
-        margin-bottom: 0.3rem;
-    }
-    .profile-card p {
-        font-size: 5rem;
-        margin-bottom: 0.8rem;
-        opacity: 0.9;
-    }
-    .profile-info {
-        text-align: left;
-        margin-top: 1rem;
-        background: rgba(255,255,255,0.1);
-        padding: 1rem;
-        border-radius: 10px;
-    }
-    .profile-info dt {
-        font-weight: 600;
-    }
-    .profile-info dd {
-        margin-bottom: 0.5rem;
-    }
-</style>
-</head>
-<body>
+@extends('layouts.app')
 
-<div class="profile-card">
-        <img class="img-profile rounded-circle" src="{{ asset('images/profile.png') }}" alt="Profile">
-    <h1>{{ auth()->user()->first_name }}  {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}</h1>
+@section('content')
+<div class="bg-light min-vh-100 p-4">
 
-    <dl class="profile-info">
-    
-        <dd>{{ auth()->user()->phone_number ?? '-' }}</dd>
+    <div class="d-sm-flex align-items-center justify-content-between mb-3">
+        <a href="{{ route('patient.dashboard') }}" class="btn btn-lg btn-primary shadow-sm">
+            <i class="fas fa-arrow-left fa-sm text-white"></i> Dashboard
+        </a>
+    </div>
 
-        <dt>Gender:</dt>
-        <dd>{{ ucfirst(auth()->user()->gender ?? '-') }}</dd>
+    <div class="row">
+        <!-- Left Column: Patient Info -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card shadow border-dark">
+                <div class="card-header py-3 bg-dark text-white">
+                    <h5 class="m-0 font-weight-bold">Your Details</h5>
+                </div>
+                <div class="card-body text-center text-dark">
+                    <img class="img-profile rounded-circle mb-4 border border-dark p-2 shadow-sm" 
+                         src="{{ asset('images/profile.png') }}" 
+                         width="150" height="150" alt="Profile Image">
 
-        <dt>Date of Birth:</dt>
-        <dd>{{ auth()->user()->date_of_birth ? \Carbon\Carbon::parse(auth()->user()->date_of_birth)->format('M d, Y') : '-' }}</dd>
+                    <h3 class="font-weight-bold mb-1 text-black">
+                        {{ auth()->user()->first_name }} {{ auth()->user()->middle_name }} {{ auth()->user()->last_name }}
+                    </h3>
+                    <p class="text-primary font-weight-bold lead mb-4">Patient</p>
 
-        <dt>Address:</dt>
-        <dd>{{ auth()->user()->address ?? '-' }}</dd>
-    </dl>
-    
-<form method="POST" action="{{ route('logout') }}">
-    @csrf
-    <button type="submit" class="btn btn-light btn-xl logout-btn">
-        Logout
-    </button>
-</form>
-</div>
+                    <ul class="list-group list-group-flush text-left mb-4">
+                        <li class="list-group-item d-flex justify-content-between align-items-center h5 text-dark">
+                            <strong class="text-secondary">Gender:</strong>
+                            <span class="text-black">{{ ucfirst(auth()->user()->gender ?? 'N/A') }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center h5 text-dark">
+                            <strong class="text-secondary">Date of Birth:</strong>
+                            <span class="text-black">
+                                {{ auth()->user()->date_of_birth ? \Carbon\Carbon::parse(auth()->user()->date_of_birth)->format('M d, Y') : 'N/A' }}
+                            </span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center h5 text-dark">
+                            <strong class="text-secondary">Address:</strong>
+                            <span class="text-black">{{ auth()->user()->address ?? 'N/A' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center h5 text-dark">
+                            <strong class="text-secondary">Contact:</strong>
+                            <span class="text-black">{{ auth()->user()->phone_number ?? 'N/A' }}</span>
+                        </li>
+                    </ul>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+                    <button type="button" class="btn btn-dark btn-lg mt-3 w-100 shadow" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+                        <i class="fas fa-user-edit fa-lg me-2"></i> Edit Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Security / Logout -->
+        <div class="col-lg-8 col-md-6 mb-4">
+            <div class="card shadow border-dark">
+                <div class="card-header py-3 bg-dark text-white">
+                    <h5 class="m-0 font-weight-bold">School and Emergency Details</h5>
+                </div>
+                <div class="card-body text-dark">
+                    <p class="lead text-dark">
+                        Manage your personal information and ensure your account stays secure. You can log out safely or update your details anytime.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection

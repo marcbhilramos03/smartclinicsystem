@@ -92,7 +92,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/imports/patients', [PatientImportController::class, 'importPatients'])->name('imports.patients.submit');
 
     Route::get('/imports/medical-histories', [PatientImportController::class, 'showMedicalHistoryImportForm'])->name('imports.medical_histories.form');
-    Route::post('/imports/medical-histories', [PatientImportController::class, 'importMedicalHistories'])->name('imports.medical_histories.submit');
+    Route::post('/imports/medical-histories', [PatientImportController::class, 'importMedicalHistory'])->name('imports.medical_histories.submit');
    
    
     // Nested routes for clinic sessions and medical histories

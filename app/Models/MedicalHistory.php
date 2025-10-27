@@ -15,7 +15,7 @@ class MedicalHistory extends Model
         'history_type',
         'description',
         'date_recorded',
-        'notes',
+        
     ];
 
     public function patient()
