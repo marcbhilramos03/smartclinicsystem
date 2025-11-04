@@ -26,6 +26,10 @@ use App\Http\Controllers\Patient\PatientMedicalRecordController;
 Route::get('/', function () {
     return view('homepage');
 })->name('homepage');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/change-password', [LoginController::class, 'updatePassword'])->name('password.update');
+});
 // -----------------------------
 // Default: Patient Login
 // -----------------------------
@@ -87,7 +91,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('users', UserController::class);
     Route::resource('patients', PatientRecordController::class);
 
-    
+    Route::get('/users/by_course/{course}', [UserController::class, 'patientsByCourse'])
+        ->name('users.by_course');
+
     Route::get('/imports/patients', [PatientImportController::class, 'showPatientImportForm'])->name('imports.patients.form');
     Route::post('/imports/patients', [PatientImportController::class, 'importPatients'])->name('imports.patients.submit');
 

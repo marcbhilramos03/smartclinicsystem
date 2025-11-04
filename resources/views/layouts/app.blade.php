@@ -17,93 +17,158 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('/favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('/favicon-16x16.png') }}">
+<style>
+  html, body {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    font-size: 110%;
+}
 
-    <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-        }
+/* Base text scaling */
+body, p, a, li, span {
+    font-size: 1.1rem;
+}
 
-        #wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
+h1 { font-size: 2.75rem; }
+h2 { font-size: 2.25rem; }
+h3 { font-size: 1.9rem; }
+h4 { font-size: 1.5rem; }
+h5, h6 { font-size: 1.25rem; }
 
-        /* Sidebar */
-        .sidebar {
-            background-color: #1c0568;
-            width: 220px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1030;
-        }
+#wrapper {
+    display: flex;
+    min-height: 100vh;
+}
 
-        .sidebar .nav-link {
-            color: #adb5bd;
-            padding: 0.75rem 1rem;
-            font-size: 0.9rem; /* Adjust sidebar text size */
-        }
+/* --- Sidebar --- */
+.sidebar {
+    background-color: #1c0568;
+    width: 240px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    transition: transform 0.3s ease-in-out;
+    z-index: 1030;
+}
 
-        .sidebar .nav-link.active {
-            background-color: #495057;
-            color: #fff;
-            font-weight: bold;
-        }
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 0.9rem 1.1rem;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+}
 
-        .sidebar .nav-link i {
-            margin-right: 0.5rem;
-            font-size: 1.5em; /* Adjust icon size */
-        }
+.sidebar .nav-link i {
+    margin-right: 0.6rem;
+    font-size: 1.3rem;
+}
 
-        #content-wrapper {
-            margin-left: 220px;
-            width: calc(100% - 220px);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+.sidebar .nav-link.active {
+    background-color: #495057;
+    color: #fff;
+    font-weight: bold;
+}
 
-        .content-wrapper .container-fluid {
-            padding: 1.5rem;
-            background-color: #f8f9fc;
-            flex: 1 0 auto; /* allow container to grow with content */
-        }
+/* --- When collapsed --- */
+.sidebar.collapsed {
+    transform: translateX(-100%);
+}
 
-        nav.topbar {
-            background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
-            color: #fff !important;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            padding: 0.75rem 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 1020;
-        }
+/* --- Content wrapper adjusts when sidebar hidden --- */
+#content-wrapper {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    transition: all 0.3s ease-in-out;
+}
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: relative;
-            }
+#content-wrapper.full-width {
+    margin-left: 0;
+    width: 100%;
+}
 
-            #content-wrapper {
-                margin-left: 0;
-                width: 100%;
-            }
+/* --- Sidebar toggle button (mobile) --- */
+#sidebarToggleTop {
+    background: none;
+    border: none;
+    font-size: 1.7rem;
+    color: white;
+    cursor: pointer;
+    display: none;
+}
 
-            .sidebar .nav-link {
-                font-size: 0.85rem; /* smaller text on mobile */
-            }
+/* --- Topbar --- */
+nav.topbar {
+    background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 1rem 1.25rem;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    font-size: 1.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-            .sidebar .nav-link i {
-                font-size: 1rem; /* smaller icons on mobile */
-            }
-        }
-    </style>
+/* --- Optional overlay for mobile sidebar --- */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1029;
+    display: none;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 992px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    #content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    #sidebarToggleTop {
+        display: inline-block;
+    }
+}
+
+/* --- Extra scaling for smaller screens --- */
+@media (max-width: 768px) {
+    html {
+        font-size: 95%;
+    }
+
+    .sidebar {
+        width: 220px;
+    }
+
+    .sidebar .nav-link {
+        font-size: 0.95rem;
+    }
+
+    .sidebar .nav-link i {
+        font-size: 1.2em;
+    }
+}
+
+</style>
+
 </head>
 
 <body id="page-top">
@@ -136,11 +201,6 @@
                     </a>
                 </li>
             @endforeach
-
-            <hr class="sidebar-divider d-none d-md-block">
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
         </ul>
     @endif
 
@@ -161,7 +221,9 @@
                         <div class="input-group">
                             <input type="text" name="search" class="form-control small"
                                    placeholder="Search patients..." aria-label="Search"
-                                   aria-describedby="basic-addon2">
+                                   aria-describedby="basic-addon2"
+                                          style="text-transform: uppercase;"
+>
                             <button class="btn btn-primary" type="submit">
                                 <i class="fas fa-search fa-sm"></i> Search
                             </button>
@@ -250,6 +312,25 @@
 
 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
 @yield('scripts')
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const toggleBtn = document.querySelector('#sidebarToggleTop');
+
+    toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('active');
+        overlay.classList.toggle('active');
+    });
+
+    overlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        overlay.classList.remove('active');
+    });
+});
+</script>
+
 
 </body>
 </html>

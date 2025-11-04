@@ -84,10 +84,16 @@
         border-radius: 14px;
         padding: 1rem 1.2rem;
         border: 1px solid #cdd8e4;
-        font-size: 1.1rem;
+        font-size: 1.5rem;
         width: 100%;
+        height: 60%;
         transition: all 0.3s ease;
+        text-transform: uppercase;
     }
+    .form-control::placeholder {
+    color: #09090a;
+    font-size: 1.05rem;
+}
 
     .form-control:focus {
         border-color: #00b4d8;
@@ -156,7 +162,6 @@
                 @endif
 
                 <div class="mb-4 text-start">
-                    <label class="form-label fw-semibold fs-5">School ID</label>
                     <input type="text" 
                            name="school_id" 
                            placeholder="Enter your School ID"

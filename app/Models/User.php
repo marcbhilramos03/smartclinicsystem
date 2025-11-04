@@ -81,5 +81,18 @@ public function dentals()
         'id'                   // local key on checkup_patients
     );
 }
+public function getFormattedDobAttribute() {
+    return $this->date_of_birth ? \Carbon\Carbon::parse($this->date_of_birth)->format('F j, Y') : 'N/A';
+}
+public function latestClinicSession()
+{
+    return $this->hasOne(ClinicSession::class, 'user_id', 'user_id')
+                ->latest('session_date');
+}
+public function getSchoolIdAttribute()
+{
+    return $this->personalInformation->school_id ?? null;
+}
+
 
 }

@@ -19,7 +19,7 @@ class ClinicSessionController extends Controller
 public function store(Request $request, User $patient)
 {
     $validated = $request->validate([
-        'session_date' => 'required|datetime',
+        'session_date' => 'required|date',
         'reason'       => 'required|string|max:255',
         'remedy'       => 'nullable|string|max:500',
     ]);

@@ -254,9 +254,9 @@
                     </div>
                 </div>
 
-            </div> {{-- scrollable-content --}}
-        </div> {{-- col-lg-8 --}}
-    </div> {{-- row --}}
+            </div> 
+        </div> 
+    </div> 
 </div>
 
 @endsection

@@ -45,25 +45,26 @@
                         value="{{ old('last_name', $user->last_name) }}" required>
                 </div>
 
-                <div class="col-md-6">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" class="form-control" 
-                        value="{{ old('email', $user->email) }}" required>
-                </div>
+                @if($user->role !== 'patient')
+                    <div class="col-md-6">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-control" 
+                            value="{{ old('email', $user->email) }}" required>
+                    </div>
+                @endif
 
-                <div class="col-md-3">
-                    <label class="form-label">Gender</label>
-                    <select name="gender" class="form-select">
-                        <option value="">Select</option>
-                        <option value="Male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>Male</option>
-                        <option value="Female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>Female</option>
-                    </select>
-                </div>
-
+              <div class="col-md-3">
+                <label class="form-label">Gender</label>
+                <select name="gender" class="form-select">
+                    <option value="">Select</option>
+                    <option value="Male" {{ old('gender', $user->gender) === 'Male' ? 'selected' : '' }}>Male</option>
+                    <option value="Female" {{ old('gender', $user->gender) === 'Female' ? 'selected' : '' }}>Female</option>
+                </select>
+            </div>
                 <div class="col-md-3">
                     <label class="form-label">Birthdate</label>
                     <input type="date" name="date_of_birth" class="form-control" 
-                        value="{{ old('date_of_birth', $user->date_of_birth) }}">
+                        value="{{ old('date_of_birth', $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('Y-m-d') : '') }}">
                 </div>
 
                 <div class="col-md-4">

@@ -28,4 +28,5 @@ class ClinicSession extends Model
     {
         return $this->belongsTo(User::class, 'admin_id', 'user_id');
     }
+    
 }

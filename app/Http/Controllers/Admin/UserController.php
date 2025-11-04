@@ -12,11 +12,6 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    use \Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-
-    /**
-     * Display a listing of patients and staff.
-     */
     public function index(Request $request)
     {
         $perPage = 10;
@@ -31,20 +26,21 @@ class UserController extends Controller
             ->orderBy('last_name')
             ->paginate($perPage, ['*'], 'staff_page');
 
-        return view('admin.users.index', compact('patients', 'staff'));
+        $courses = PersonalInformation::select('course', DB::raw('COUNT(*) as total_students'))
+            ->whereNotNull('course')          
+            ->groupBy('course')
+            ->orderBy('course')
+            ->get();
+
+        return view('admin.users.index', compact('patients', 'staff', 'courses'));
     }
 
-    /**
-     * Show the form for creating a new user.
-     */
     public function create()
     {
+        
         return view('admin.users.create');
     }
 
-    /**
-     * Store a newly created user.
-     */
     public function store(Request $request)
     {
         DB::transaction(function () use ($request) {
@@ -67,17 +63,23 @@ class UserController extends Controller
                     'emer_con_address'  => 'nullable|string|max:255',
                 ]);
 
+                // Capitalize names & gender
+                $first_name = ucwords(trim($validated['first_name']));
+                $middle_name = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
+                $last_name = ucwords(trim($validated['last_name']));
+                $gender = !empty($validated['gender']) ? ucfirst(strtolower($validated['gender'])) : null;
+
                 $user = User::create([
-                    'first_name'     => ucwords(trim($validated['first_name'])),
-                    'middle_name'    => $validated['middle_name'] ?? null,
-                    'last_name'      => ucwords(trim($validated['last_name'])),
-                    'role'           => 'patient',
-                    'email'          => null,
-                    'password'       => Hash::make('password123'),
-                    'gender'         => $validated['gender'] ?? null,
-                    'date_of_birth'  => $validated['date_of_birth'] ?? null,
-                    'phone_number'   => $validated['phone_number'] ?? null,
-                    'address'        => $validated['address'] ?? null,
+                    'first_name'    => $first_name,
+                    'middle_name'   => $middle_name,
+                    'last_name'     => $last_name,
+                    'role'          => 'patient',
+                    'email'         => null,
+                    'password'      => Hash::make('password123'),
+                    'gender'        => $gender,
+                    'date_of_birth' => $validated['date_of_birth'] ?? null,
+                    'phone_number'  => $validated['phone_number'] ?? null,
+                    'address'       => $validated['address'] ?? null,
                 ]);
 
                 PersonalInformation::create([
@@ -107,17 +109,23 @@ class UserController extends Controller
                     'address'        => 'nullable|string|max:255',
                 ]);
 
+                // Capitalize names & gender
+                $first_name = ucwords(trim($validated['first_name']));
+                $middle_name = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
+                $last_name = ucwords(trim($validated['last_name']));
+                $gender = !empty($validated['gender']) ? ucfirst(strtolower($validated['gender'])) : null;
+
                 $user = User::create([
-                    'first_name'  => ucwords(trim($validated['first_name'])),
-                    'middle_name' => $validated['middle_name'] ?? null,
-                    'last_name'   => ucwords(trim($validated['last_name'])),
-                    'email'       => strtolower(trim($validated['email'])),
-                    'password'    => Hash::make($validated['password']),
-                    'role'        => $validated['role'],
-                    'gender'      => $validated['gender'] ?? null,
-                    'date_of_birth'  => $validated['date_of_birth'] ?? null,
-                    'phone_number'   => $validated['phone_number'] ?? null,
-                    'address'        => $validated['address'] ?? null,
+                    'first_name'    => $first_name,
+                    'middle_name'   => $middle_name,
+                    'last_name'     => $last_name,
+                    'email'         => strtolower(trim($validated['email'])),
+                    'password'      => Hash::make($validated['password']),
+                    'role'          => $validated['role'],
+                    'gender'        => $gender,
+                    'date_of_birth' => $validated['date_of_birth'] ?? null,
+                    'phone_number'  => $validated['phone_number'] ?? null,
+                    'address'       => $validated['address'] ?? null,
                 ]);
 
                 Credential::create([
@@ -132,40 +140,40 @@ class UserController extends Controller
         return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
     }
 
-    /**
-     * Display the specified user.
-     */
     public function show(User $user)
     {
         $user->load(['personalInformation', 'credential']);
         return view('admin.users.show', compact('user'));
     }
 
-    /**
-     * Show the form for editing the specified user.
-     */
     public function edit($user_id)
     {
         $user = User::with(['personalInformation', 'credential'])->findOrFail($user_id);
         return view('admin.users.edit', compact('user'));
     }
 
-    /**
-     * Update the specified user.
-     */
     public function update(Request $request, $user_id)
     {
         $user = User::findOrFail($user_id);
 
         $validated = $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'nullable|email|unique:users,email,' . $user_id . ',user_id',
-            'gender' => 'nullable|string',
-            'date_of_birth' => 'nullable|date',
-            'address' => 'nullable|string',
-            'phone_number' => 'nullable|string',
+            'first_name'     => 'required|string|max:255',
+            'middle_name'    => 'nullable|string|max:255',
+            'last_name'      => 'required|string|max:255',
+            'email'          => 'nullable|email|unique:users,email,' . $user_id . ',user_id',
+            'gender'         => 'nullable|string|max:50',
+            'date_of_birth'  => 'nullable|date',
+            'address'        => 'nullable|string|max:255',
+            'phone_number'   => 'nullable|string|max:20',
         ]);
+
+        // Capitalize names & gender
+        $validated['first_name'] = ucwords(trim($validated['first_name']));
+        $validated['middle_name'] = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
+        $validated['last_name'] = ucwords(trim($validated['last_name']));
+        if (!empty($validated['gender'])) {
+            $validated['gender'] = ucfirst(strtolower($validated['gender']));
+        }
 
         $user->update($validated);
 
@@ -186,22 +194,32 @@ class UserController extends Controller
             Credential::updateOrCreate(
                 ['staff_id' => $user->user_id],
                 [
-                    'profession' => $request->input('profession'),
+                    'profession' => ucwords(trim($request->input('profession') ?? '')),
                     'license_type' => $request->input('license_type'),
-                    'specialization' => $request->input('specialization'),
+                    'specialization' => ucwords(trim($request->input('specialization') ?? '')),
                 ]
             );
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'Updated successfully.');
     }
 
-    /**
-     * Remove the specified user.
-     */
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
+        return redirect()->route('admin.users.index')->with('success', 'Deleted successfully.');
+    }
+
+    public function patientsByCourse($course)
+    {
+        $patients = User::where('role', 'patient')
+            ->whereHas('personalInformation', function ($query) use ($course) {
+                $query->where('course', $course);
+            })
+            ->with('personalInformation')
+            ->orderBy('last_name')
+            ->get();
+
+        return view('admin.users.by_course', compact('patients', 'course'));
     }
 }

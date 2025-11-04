@@ -75,29 +75,29 @@
         color: #444;
         margin-bottom: 2.5rem;
     }
+.form-control {
+    border-radius: 14px;
+    padding: 1.25rem 1.3rem; /* increased height */
+    border: 1px solid #94a3b8;
+    background: rgba(255, 255, 255, 0.85);
+    font-size: 1.15rem; /* slightly larger text */
+    color: #333;
+    width: 100%;
+    height: 60px; /* fixed taller height */
+    transition: all 0.3s ease;
+}
 
-    /* Input Fields */
-    .form-control {
-        border-radius: 14px;
-        padding: 1rem 1.2rem;
-        border: 1px solid #94a3b8;
-        background: rgba(255, 255, 255, 0.8);
-        font-size: 1.1rem;
-        color: #333;
-        width: 100%;
-        transition: all 0.3s ease;
-    }
+.form-control::placeholder {
+    color: #09090a;
+    font-size: 1.05rem;
+}
 
-    .form-control::placeholder {
-        color: #6c757d;
-    }
-
-    .form-control:focus {
-        border-color: #00b4d8;
-        box-shadow: 0 0 0 0.25rem rgba(0,180,216,0.3);
-        background: rgba(255, 255, 255, 0.95);
-    }
-
+.form-control:focus {
+    border-color: #00b4d8;
+    box-shadow: 0 0 0 0.25rem rgba(0,180,216,0.3);
+    background: rgba(255, 255, 255, 0.95);
+    height: 60px; /* keeps consistent height when focused */
+}
     /* Button */
     .btn-primary {
         background: linear-gradient(135deg, #4e73df, #00b4d8);
@@ -144,7 +144,7 @@
 <div class="login-wrapper">
     <div class="login-card">
         {{-- <img src="{{ asset('images/logo.png') }}" alt="SMARTCLINIC Logo" width="90" class="mb-4"> --}}
-        <h1 class="login-title">Welcome Doctor/Nurse</h1>
+        <h1 class="login-title">Welcome</h1>
         <p class="login-subtitle">Enter your email and password to access your account</p>
 
         <form method="POST" action="{{ route('login-admin') }}">
@@ -167,7 +167,6 @@
                     <div class="text-danger small">{{ $message }}</div>
                 @enderror
             </div>
-<br>
             <div class="mb-4 text-start">
                 <input type="password"
                        name="password"
