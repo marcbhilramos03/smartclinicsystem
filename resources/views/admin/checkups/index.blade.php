@@ -32,18 +32,10 @@
                             <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</td>
                             <td>{{ ucfirst($checkup->checkup_type) }}</td>
 
-                            {{-- Display assigned courses/patients --}}
-                            <td>
-                                @if($checkup->patients->isNotEmpty())
-                                    @foreach($checkup->patients as $patient)
-                                        {{ $patient->personalInformation?->course ?? 'N/A' }}<br>
-                                    @endforeach
-                                @else
-                                    -
-                                @endif
+                           <td>
+                                {{ $checkup->patients->first()?->personalInformation?->course ?? '-' }}
                             </td>
 
-                            {{-- ✅ Show total patient count --}}
                             <td>
                                 <span class="badge bg-primary">
                                     {{ $checkup->patients->count() }}
