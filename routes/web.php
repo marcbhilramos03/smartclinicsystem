@@ -130,7 +130,20 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('checkups/{checkup}', [CheckupController::class, 'show'])->name('checkups.show');
     Route::delete('checkups/{checkup}', [CheckupController::class, 'destroy'])->name('checkups.destroy');
 
- 
+    
+    // Show all clinic sessions
+    Route::get('/patients/{patient}/clinic-sessions', [PatientRecordController::class, 'allClinicSessions'])
+        ->name('patients.all_clinic_sessions');
+
+    // Show all medical histories
+    Route::get('/patients/{patient}/medical-histories', [PatientRecordController::class, 'allMedicalHistories'])
+        ->name('patients.all_medical_histories');
+
+    Route::get('/patients/{patient}/vitals', [PatientRecordController::class, 'allVitals'])->name('patients.all_vitals');
+
+    // All Dentals
+    Route::get('/patients/{patient}/dentals', [PatientRecordController::class, 'allDentals'])->name('patients.all_dentals');
+
 });
 
 // -----------------------------

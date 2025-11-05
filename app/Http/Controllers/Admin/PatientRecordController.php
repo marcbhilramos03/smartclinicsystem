@@ -39,18 +39,77 @@ class PatientRecordController extends Controller
         return view('admin.patients.index', compact('patients', 'search'));
     }
 
-    public function show(User $patient)
-    {
-        $patient->load([
-            'personalInformation',
-            'medicalHistories.admin',
-            'clinicSessions.admin',
-            'checkups.staff',
-            'checkups.checkupPatients.vitals',   // load vitals through checkupPatients
-            'checkups.checkupPatients.dentals',  // load dental through checkupPatients
-            'checkups.checkupPatients.patient',  // load patient info for each checkupPatient
-        ]);
+   public function show(User $patient)
+{
+    // Load main patient info
+    $patient->load('personalInformation');
 
-        return view('admin.patients.show', compact('patient'));
-    }
+    // Paginate clinic sessions
+    $clinicSessions = $patient->clinicSessions()
+        ->with('admin')
+        ->orderBy('session_date', 'desc')
+        ->paginate(5, ['*'], 'clinic_page'); // unique page name for separate pagination
+
+    // Paginate checkups
+    $checkups = $patient->checkups()
+        ->with([
+            'staff',
+            'checkupPatients.vitals',
+            'checkupPatients.dentals',
+            'checkupPatients.patient'
+        ])
+        ->orderBy('created_at', 'desc')
+        ->paginate(5, ['*'], 'checkup_page'); // unique page name
+
+    // Paginate medical histories
+    $medicalHistories = $patient->medicalHistories()
+        ->with('admin')
+        ->orderBy('created_at', 'desc')
+        ->paginate(5, ['*'], 'history_page'); // unique page name
+
+    return view('admin.patients.show', compact(
+        'patient',
+        'clinicSessions',
+        'checkups',
+        'medicalHistories'
+    ));
+}
+// Clinic Sessions
+public function allClinicSessions(User $patient)
+{
+    $clinicSessions = $patient->clinicSessions()->latest()->get();
+    return view('admin.patients.all_clinic_sessions', compact('patient', 'clinicSessions'));
+}
+
+// Medical Histories
+public function allMedicalHistories(User $patient)
+{
+    $medicalHistories = $patient->medicalHistories()->latest()->get();
+    return view('admin.patients.all_medical_histories', compact('patient', 'medicalHistories'));
+}
+public function allVitals(User $patient)
+{
+    // Fetch all vitals related to this patient
+    $vitals = $patient->vitals()
+        ->with(['checkupPatient.checkup.staff'])
+        ->latest()
+        ->get();
+
+    return view('admin.patients.all_vitals', compact('patient', 'vitals'));
+}
+
+public function allDentals(User $patient)
+{
+    // Fetch all dental records related to this patient
+    $dentals = $patient->dentals()
+        ->with(['checkupPatient.checkup.staff'])
+        ->latest()
+        ->get();
+
+    return view('admin.patients.all_dentals', compact('patient', 'dentals'));
+}
+
+
+
+
 }

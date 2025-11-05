@@ -5,27 +5,23 @@
 @section('content')
 <style>
     /* Course Card Styles */
-    .course-card {
-        color: #fff;
-        border-radius: 15px;
-        transition: transform 0.3s, box-shadow 0.3s;
-        padding: 25px 15px;
-        min-height: 180px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-    .course-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-    }
+.course-card {
+    color: #080808; /* Text color */
+    text-shadow: 1px 1px 2px rgb(255, 255, 255); /* Optional shadow for better readability */
+    border-radius: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    padding: 25px 15px;
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: 'Segoe UI', sans-serif;
+}
 
     .course-title {
-        font-size: 1.5rem;
+        font-size: 30px;
         font-weight: 700;
         margin-bottom: 10px;
     }
@@ -33,10 +29,14 @@
     .course-students {
         font-size: 1rem;
         margin-bottom: 15px;
+         background: rgba(255, 255, 255, 0.9);
+        color: #333;
+        font-weight: 600;
+        border-radius: 5px;
     }
 
     .course-btn {
-        background: rgba(255, 255, 255, 0.9);
+        background: rgba(108, 207, 237, 0.9);
         color: #333;
         font-weight: 600;
         border-radius: 8px;
@@ -49,30 +49,39 @@
         background: rgba(255, 255, 255, 1);
         transform: translateY(-2px);
     }
+
+    h2{
+        color: black;
+    }
+  
 </style>
 
 @php
-    // Define a color palette
-    $colors = [
-        'linear-gradient(135deg, #6a11cb, #2575fc)',
-        'linear-gradient(135deg, #ff416c, #ff4b2b)',
-        'linear-gradient(135deg, #11998e, #38ef7d)',
-        'linear-gradient(135deg, #f7971e, #ffd200)',
-        'linear-gradient(135deg, #e44d26, #f16529)',
-        'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
-        'linear-gradient(135deg, #ff7e5f, #feb47b)',
-        'linear-gradient(135deg, #43cea2, #185a9d)'
-    ];
+// Define color palette
+$colors = [
+    'linear-gradient(135deg, #6a11cb, #2575fc)',
+    'linear-gradient(135deg, #ff416c, #ff4b2b)',
+    'linear-gradient(135deg, #11998e, #38ef7d)',
+    'linear-gradient(135deg, #f7971e, #ffd200)',
+    'linear-gradient(135deg, #e44d26, #f16529)',
+    'linear-gradient(135deg, #0f2027, #203a43, #2c5364)',
+    'linear-gradient(135deg, #ff7e5f, #feb47b)',
+    'linear-gradient(135deg, #43cea2, #185a9d)'
+];
 
-    // Function to get a consistent color for each course
-    function getCourseColor($courseName, $colors) {
-        $index = abs(crc32($courseName)) % count($colors);
-        return $colors[$index];
-    }
+// Counter for course cards
+$formIndex = 0;
+
+// Function to get a color for each form
+function getFormColor($colors, &$formIndex) {
+    $color = $colors[$formIndex % count($colors)];
+    $formIndex++;
+    return $color;
+}
 @endphp
 
 <div class="container-fluid py-4">
-    <h2 class="mb-4 text-dark">Users Management</h2>
+    <h2 class="mb-4">Users Management</h2>
 
     {{-- SUCCESS MESSAGE --}}
     @if(session('success'))
@@ -98,8 +107,8 @@
         </li>
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="staff-tab" data-bs-toggle="tab" data-bs-target="#staff" type="button" role="tab">
-            Doctors/Nurses 
-           </button>
+                Doctors/Nurses
+            </button>
         </li>
     </ul>
 
@@ -112,12 +121,12 @@
             <div class="row">
                 @forelse ($courses as $course)
                     @php
-                        $bgColor = getCourseColor($course->course ?? 'No Course', $colors);
+                        $bgColor = getFormColor($colors, $formIndex);
                     @endphp
                     <div class="col-md-4 mb-4">
                         <div class="course-card" style="background: {{ $bgColor }}">
                             <h4 class="course-title">{{ $course->course ?? 'No Course Listed' }}</h4>
-                            <p class="course-students">Total Students: {{ $course->total_students }}</p>
+                            <p class="course-students">Total Students:  {{ $course->total_students }} </p>
                             <a href="{{ route('admin.users.by_course', $course->course) }}" class="course-btn">
                                 View Students
                             </a>
@@ -135,7 +144,7 @@
         <div class="tab-pane fade" id="staff" role="tabpanel" aria-labelledby="staff-tab">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
-                    <h4 class="mb-3 text-dark">Staff and Admin Users</h4>
+                    <h4 class="mb-3 text-dark">Doctors and Nurses</h4>
                     <div class="table-responsive">
                         <table class="table table-hover align-middle">
                             <thead class="table-dark">

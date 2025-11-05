@@ -1,48 +1,48 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container py-4">
-    <h2 class="mb-4 text-center" style="font-size: 2.5rem;">Latest Visits</h2>
+<div class="container-fluid px-2">
+    <h2 class="mb-4" style="font-size: 2.5rem; font-weight: 700; color: #222;">Latest Visits</h2>
 
     @if($patients->count())
-        <div class="row g-4">
+        <div class="row g-3">
             @foreach($patients as $patient)
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card patient-card shadow-sm border-0">
 
                         {{-- Card body --}}
-                        <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                        <div class="card-body d-flex flex-column flex-md-row justify-content-start align-items-start">
 
                             {{-- Patient Info --}}
                             <div class="patient-info me-md-3">
-                                <h5 class="card-title mb-2" style="font-size: 1.1rem; font-weight: 700;">
+                                <h5 class="card-title mb-2">
                                     {{ $patient->full_name ?? $patient->first_name . ' ' . $patient->last_name }}
                                 </h5>
 
                                 {{-- School ID Badge --}}
-                                <p class="mb-2" style="font-size: 0.95rem;">
-                                    <i class="fas fa-id-card me-1"></i>
+                                <p class="mb-2">
+                                    <i class="fas fa-id-card"></i>
                                     @if($patient->school_id)
-                                        <span class="badge school-id" style="font-size: 1rem;">{{ $patient->school_id }}</span>
+                                        <span class="badge school-id">{{ $patient->school_id }}</span>
                                     @else
-                                        <span class="badge school-id-missing" style="font-size: 1rem;">No School ID</span>
+                                        <span class="badge school-id-missing">No School ID</span>
                                     @endif
                                 </p>
 
                                 {{-- Latest Clinic Session --}}
                                 @if($patient->latestClinicSession)
-                                    <span class="badge last-visit mb-0" style="font-size: 1rem;">
+                                    <span class="badge last-visit mb-0">
                                         Last Visit: {{ \Carbon\Carbon::parse($patient->latestClinicSession->session_date)->format('M d, Y') }}
                                     </span>
                                 @else
-                                    <p class="text-muted mb-0" style="font-size: 0.85rem;">No clinic sessions recorded.</p>
+                                    <p class="text-muted mb-0">No clinic sessions recorded.</p>
                                 @endif
                             </div>
 
                             {{-- Action Button --}}
-                            <div class="patient-action mt-3 mt-md-0">
-                                <a href="{{ route('admin.patients.show', $patient->user_id) }}" class="btn btn-info btn-sm shadow-sm" style="font-size: 0.9rem;">
-                                    <i class="fas fa-eye me-1"></i> View Details
+                            <div class="patient-action mt-4 ms-auto">
+                                <a href="{{ route('admin.patients.show', $patient->user_id) }}" class="btn btn-info btn-sm shadow-sm patient-btn">
+                                    <i class="fas fa-eye me-2"></i> Details
                                 </a>
                             </div>
 
@@ -53,45 +53,47 @@
         </div>
 
         {{-- Pagination --}}
-        <div class="mt-4 d-flex justify-content-center">
+        <div class="mt-4 d-flex justify-content-start">
             {{ $patients->links() }}
         </div>
     @else
-        <div class="alert alert-warning text-center" style="font-size: 1rem;">No patients found.</div>
+        <div class="alert alert-warning text-center">No patients found.</div>
     @endif
 </div>
 
-{{-- Internal CSS --}}
 <style>
 .patient-card {
-    background: linear-gradient(145deg, #ffffff, #f3f6f9);
+    background: linear-gradient(145deg, #ffffff, #e8f0fe);
     border-radius: 16px;
-    padding: 1.2rem;
+    padding: 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.patient-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
 }
 
 .patient-info h5 {
     color: #1a1a1a;
+    font-size: 1.15rem;
+    font-weight: 700;
 }
 
 .patient-info p {
     color: #555;
+    margin-bottom: 0.4rem;
 }
 
 .patient-info .badge {
-    padding: 0.25em 0.5em;
+    padding: 0.3em 0.7em;
     border-radius: 12px;
     display: inline-block;
-    margin-bottom: 0.3rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-right: 0.3rem;
+    
 }
 
 .badge.school-id {
-    color: #000000;
+    color: #000;
+    text-shadow: 0 0 1px rgba(0,0,0,0.3);
 }
 
 .badge.school-id-missing {
@@ -101,17 +103,24 @@
 }
 
 .badge.last-visit {
-    color: #010100;
+    color: #0b0b0b;
+    background-color: #ffc107;
 }
 
-.patient-action a {
+.patient-action .patient-btn {
+    font-size: 1.2rem; 
+    padding: 0.6rem 1rem;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    display: inline-block;
+    color: #000;
 }
 
-.patient-action a:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.15);
+.patient-action .patient-btn i {
+    font-size: 1.3rem;
+}
+
+.patient-action .patient-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
 }
 
 @media (max-width: 768px) {
@@ -121,7 +130,8 @@
     }
     .patient-action {
         width: 100%;
-        margin-top: 10px;
+        margin-top: 12px;
+        text-align: center;
     }
 }
 </style>
