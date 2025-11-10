@@ -5,7 +5,7 @@
 
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Admin Dashboard</h1>
+        <h1 class="h3 mb-0 text-gray-800">Clinic In-charge Dashboard</h1>
     </div>
 <div class="row">
 
@@ -14,7 +14,7 @@
         <div class="card shadow-sm border-primary">
             <div class="card-body">
                 <h5 class="card-title">Import Patients</h5>
-                <p class="card-text">Upload patient data via CSV file.</p>
+                <p class="card-text">Upload Stduents data via excel file.</p>
                 <a href="{{ route('admin.imports.patients.form') }}" class="btn btn-primary">Go to Import</a>
             </div>
         </div>
@@ -25,7 +25,7 @@
         <div class="card shadow-sm border-success">
             <div class="card-body">
                 <h5 class="card-title">Import Medical Histories</h5>
-                <p class="card-text">Upload medical history data via CSV file.</p>
+                <p class="card-text">Upload medical history data via excel file.</p>
                 <a href="{{ route('admin.imports.medical_histories.form') }}" class="btn btn-success">Go to Import</a>
             </div>
         </div>
@@ -38,7 +38,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card bg-primary text-white shadow h-100">
                 <div class="card-body">
-                    <h5>Total Staff</h5>
+                    <h5>Total Doctors</h5>
                     <h2>{{ $totalStaff ?? 0 }}</h2>
                 </div>
             </div>
@@ -47,7 +47,7 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card bg-success text-white shadow h-100">
                 <div class="card-body">
-                    <h5>Total Patients</h5>
+                    <h5>Total Students</h5>
                     <h2>{{ $totalPatients ?? 0 }}</h2>
                 </div>
             </div>

@@ -67,7 +67,7 @@
             @else
                 <div class="text-center text-muted py-4">
                     <i class="fas fa-info-circle me-1"></i> 
-                    No vitals found for this patient.
+                    No vitals found for this student.
                 </div>
             @endif
         </div>

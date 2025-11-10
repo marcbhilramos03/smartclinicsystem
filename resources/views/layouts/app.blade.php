@@ -18,14 +18,14 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('/favicon-16x16.png') }}">
 <style>
-  html, body {
+html, body {
     height: 100%;
     margin: 0;
     font-family: 'Poppins', sans-serif;
     font-size: 110%;
 }
 
-/* Base text scaling */
+/* Text scaling */
 body, p, a, li, span {
     font-size: 1.1rem;
 }
@@ -41,7 +41,7 @@ h5, h6 { font-size: 1.25rem; }
     min-height: 100vh;
 }
 
-/* --- Sidebar --- */
+/* --- Sidebar (desktop view) --- */
 .sidebar {
     background-color: #1c0568;
     width: 240px;
@@ -60,6 +60,7 @@ h5, h6 { font-size: 1.25rem; }
     font-size: 1rem;
     display: flex;
     align-items: center;
+    justify-content: flex-start;
 }
 
 .sidebar .nav-link i {
@@ -73,24 +74,32 @@ h5, h6 { font-size: 1.25rem; }
     font-weight: bold;
 }
 
-/* --- When collapsed --- */
-.sidebar.collapsed {
-    transform: translateX(-100%);
-}
-
-/* --- Content wrapper adjusts when sidebar hidden --- */
+/* --- Content Wrapper --- */
 #content-wrapper {
     margin-left: 240px;
     width: calc(100% - 240px);
     transition: all 0.3s ease-in-out;
+    padding-top: 80px; /* content below fixed navbar */
 }
 
-#content-wrapper.full-width {
-    margin-left: 0;
-    width: 100%;
+/* --- Topbar (fixed) --- */
+nav.topbar {
+    background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
+    color: #fff !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    padding: 1rem 1.25rem;
+    position: fixed;
+    top: 0;
+    left: 240px;
+    width: calc(100% - 240px);
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.3s ease-in-out;
 }
 
-/* --- Sidebar toggle button (mobile) --- */
+/* --- Sidebar Toggle --- */
 #sidebarToggleTop {
     background: none;
     border: none;
@@ -100,22 +109,7 @@ h5, h6 { font-size: 1.25rem; }
     display: none;
 }
 
-/* --- Topbar --- */
-nav.topbar {
-    background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
-    color: #fff !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    padding: 1rem 1.25rem;
-    position: sticky;
-    top: 0;
-    z-index: 1020;
-    font-size: 1.05rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* --- Optional overlay for mobile sidebar --- */
+/* --- Sidebar Overlay --- */
 .sidebar-overlay {
     position: fixed;
     inset: 0;
@@ -128,19 +122,17 @@ nav.topbar {
     display: block;
 }
 
-/* --- Responsive adjustments --- */
+/* --- Mobile Responsive --- */
 @media (max-width: 992px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.active {
-        transform: translateX(0);
+    nav.topbar {
+        left: 0;
+        width: 100%;
     }
 
     #content-wrapper {
         margin-left: 0;
         width: 100%;
+        padding-top: 80px;
     }
 
     #sidebarToggleTop {
@@ -148,24 +140,58 @@ nav.topbar {
     }
 }
 
-/* --- Extra scaling for smaller screens --- */
+/* --- Bottom Navbar on Mobile (≤768px) --- */
 @media (max-width: 768px) {
-    html {
-        font-size: 95%;
-    }
+    html { font-size: 95%; }
 
+    /* Hide left sidebar */
     .sidebar {
-        width: 220px;
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        left: 0;
+        width: 100%;
+        height: 65px;
+        background-color: #1c0568;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        overflow: hidden;
+        border-top: 3px solid #3e4c6d;
+        box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+        z-index: 1060;
     }
 
     .sidebar .nav-link {
-        font-size: 0.95rem;
+        flex-direction: column;
+        color: #adb5bd;
+        font-size: 0.85rem;
+        padding: 0;
     }
 
     .sidebar .nav-link i {
-        font-size: 1.2em;
+        margin: 0;
+        font-size: 1.4rem;
+    }
+
+    .sidebar .nav-link.active {
+        color: #ffffff;
+        background: none;
+    }
+
+    #content-wrapper {
+        margin: 0;
+        width: 100%;
+        padding-top: 80px;
+        padding-bottom: 70px; /* space for bottom navbar */
+    }
+
+    nav.topbar {
+        left: 0;
+        width: 100%;
     }
 }
+
 
 </style>
 
@@ -180,7 +206,7 @@ nav.topbar {
             $sidebarLinks = [
                 ['route'=>'admin.dashboard','icon'=>'fa-tachometer-alt','label'=>'Dashboard'],
                 ['route'=>'admin.users.index','icon'=>'fa-users','label'=>'Manage Users'],
-                ['route'=>'admin.patients.index','icon'=>'fa-file-medical','label'=>'Patients'],
+                ['route'=>'admin.patients.index','icon'=>'fa-file-medical','label'=>'Students'],
                 ['route'=>'admin.checkups.index','icon'=>'fa-notes-medical','label'=>'Checkups'],
             ];
         @endphp
@@ -206,7 +232,6 @@ nav.topbar {
 
     <!-- Content Wrapper -->
     <div id="content-wrapper" @if(auth()->user()->role !== 'admin' || request()->routeIs(auth()->user()->role . '.profile')) style="margin-left:0;width:100%;" @endif>
-
         {{-- Hide topbar on profile page --}}
         @unless(request()->routeIs(auth()->user()->role . '.profile'))
             <nav class="navbar navbar-expand topbar mb-4 shadow">
@@ -220,7 +245,7 @@ nav.topbar {
                           style="max-width: 900px;">
                         <div class="input-group">
                             <input type="text" name="search" class="form-control small"
-                                   placeholder="Search patients..." aria-label="Search"
+                                   placeholder="Search students..." aria-label="Search"
                                    aria-describedby="basic-addon2"
                                           style="text-transform: uppercase;"
 >

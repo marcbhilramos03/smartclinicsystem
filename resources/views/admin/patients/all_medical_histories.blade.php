@@ -58,7 +58,7 @@
             @else
                 <div class="text-center text-muted py-4">
                     <i class="fas fa-info-circle me-1"></i> 
-                    No medical histories found for this patient.
+                    No medical histories found for this student.
                 </div>
             @endif
         </div>

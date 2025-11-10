@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1 class="mb-4 text-dark fw-bold">Staff Dashboard</h1>
+    <h1 class="mb-4 text-dark fw-bold">Doctors Dashboard</h1>
 
     <div class="row g-4">
         <!-- My Checkups -->
@@ -25,7 +25,7 @@
                     <div class="card-body text-center py-5">
                         <i class="fas fa-file-medical fa-3x text-success mb-3"></i>
                         <h5 class="card-title text-dark fw-semibold">View Records</h5>
-                        <p class="text-muted small mb-0">Access medical records and treatments</p>
+                        <p class="text-muted small mb-0">Access medical records and diagnosis</p>
                     </div>
                 </div>
             </a>
@@ -37,8 +37,8 @@
                 <div class="card shadow-sm border-0 h-100 hover-card">
                     <div class="card-body text-center py-5">
                         <i class="fas fa-user-injured fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title text-dark fw-semibold">View Patients</h5>
-                        <p class="text-muted small mb-0">Browse the list of registered patients</p>
+                        <h5 class="card-title text-dark fw-semibold">View Students</h5>
+                        <p class="text-muted small mb-0">Browse the list of registered students</p>
                     </div>
                 </div>
             </a>

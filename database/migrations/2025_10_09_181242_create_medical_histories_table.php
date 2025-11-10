@@ -15,7 +15,7 @@ return new class extends Migration
     $table->id();
     $table->unsignedBigInteger('user_id');   // patient
     $table->unsignedBigInteger('admin_id');  // admin who recorded
-    $table->enum('history_type', ['allergy', 'illness', 'vaccination']);
+    $table->string('history_type');
     $table->text('description');
     $table->date('date_recorded')->nullable();
     $table->timestamps();

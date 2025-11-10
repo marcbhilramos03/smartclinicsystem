@@ -236,48 +236,7 @@
     {{-- RIGHT COLUMN: RECORDS --}}
     <div class="col-lg-8">
         <div class="scrollable-content">
-            {{-- CLINIC SESSIONS --}}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                    <h4 class="mb-0"><i class="fas fa-stethoscope"></i> Clinic Visits</h4>
-                    @if($clinicSessions->count())
-                        <a href="{{ route('admin.patients.all_clinic_sessions', $patient->user_id) }}" class="btn btn-sm btn-info">
-                            View All
-                        </a>
-                    @endif
-                </div>
-
-                <div class="card-body p-0">
-                    @if($clinicSessions->count())
-                        <div class="table-responsive">
-                            <table class="table table-striped table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>Reason</th>
-                                        <th>Remedy</th>
-                                        <th>Recorded By</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($clinicSessions as $clinic)
-                                        <tr>
-                                            <td>{{ $clinic->session_date ? \Carbon\Carbon::parse($clinic->session_date)->format('F d, Y') : '-' }}</td>
-                                            <td>{{ $clinic->reason ?? '-' }}</td>
-                                            <td>{{ $clinic->remedy ?? '-' }}</td>
-                                            <td>{{ $clinic->admin->first_name ?? '-' }} {{ $clinic->admin->last_name ?? '' }} {{ $clinic->admin->credential->license_type ?? '-' }}</td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="mt-2 px-3">{{ $clinicSessions->links('pagination::bootstrap-5') }}</div>
-                    @else
-                        <p class="text-muted p-3 mb-0">No clinic visits found.</p>
-                    @endif
-                </div>
-            </div>
-
+            
             {{-- MEDICAL HISTORIES --}}
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
@@ -320,7 +279,47 @@
                     @endif
                 </div>
             </div>
+            {{-- CLINIC SESSIONS --}}
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="fas fa-stethoscope"></i> Clinic Visits</h4>
+                    @if($clinicSessions->count())
+                        <a href="{{ route('admin.patients.all_clinic_sessions', $patient->user_id) }}" class="btn btn-sm btn-info">
+                            View All
+                        </a>
+                    @endif
+                </div>
 
+                <div class="card-body p-0">
+                    @if($clinicSessions->count())
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Reason</th>
+                                        <th>Remedy</th>
+                                        <th>Recorded By</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($clinicSessions as $clinic)
+                                        <tr>
+                                            <td>{{ $clinic->session_date ? \Carbon\Carbon::parse($clinic->session_date)->format('F d, Y') : '-' }}</td>
+                                            <td>{{ $clinic->reason ?? '-' }}</td>
+                                            <td>{{ $clinic->remedy ?? '-' }}</td>
+                                            <td>{{ $clinic->admin->first_name ?? '-' }} {{ $clinic->admin->last_name ?? '' }} {{ $clinic->admin->credential->license_type ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-2 px-3">{{ $clinicSessions->links('pagination::bootstrap-5') }}</div>
+                    @else
+                        <p class="text-muted p-3 mb-0">No clinic visits found.</p>
+                    @endif
+                </div>
+            </div>
             {{-- CHECKUPS --}}
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">

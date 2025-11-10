@@ -13,8 +13,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('admin_id');
             $table->unsignedBigInteger('staff_id'); // staff performing the checkup
-            $table->unsignedBigInteger('personal_information_id')->nullable(); // batch scheduling
-            $table->string('checkup_type')->default('vitals'); // vitals, dental, etc.
+            // $table->unsignedBigInteger('personal_information_id')->nullable(); // batch scheduling
+            $table->string('checkup_type'); 
 
             $table->date('date');
             $table->text('notes')->nullable(); // general notes
@@ -22,7 +22,7 @@ return new class extends Migration
 
             $table->foreign('admin_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
-            $table->foreign('personal_information_id')->references('id')->on('personal_information')->onDelete('cascade');
+            // $table->foreign('personal_information_id')->references('id')->on('personal_information')->onDelete('cascade');
         });
 
         // Vitals table
