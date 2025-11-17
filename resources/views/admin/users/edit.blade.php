@@ -3,8 +3,120 @@
 @section('page-title', 'Edit User')
 
 @section('content')
+
+<style>
+    body {
+        background: linear-gradient(135deg, #e9f3ff, #d4e4ff);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container-fluid {
+        max-width: 1400px;
+        background: #fff;
+        border-radius: 16px;
+        padding:;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        margin-top: 40px;
+        animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+        color: #000000;
+        font-weight: 7x00;
+        margin-bottom: 25px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.15);
+    }
+
+    .card-header {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .card-body {
+        background-color: #f8fbff;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
+    }
+
+    .btn {
+        border-radius: 10px;
+        padding: 12px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-success {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+    .btn-success:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5c636a;
+    }
+
+    .alert {
+        border-radius: 10px;
+    }
+
+    .alert-dark {
+        background-color: #e9f0ff;
+        border-left: 5px solid #0d6efd;
+        color: #0d6efd;
+    }
+
+    @media (max-width: 768px) {
+        .container-fluid {
+            padding: 25px 20px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
 <div class="container-fluid">
-    <h2 class="mb-4">Edit User</h2>
+    <h2>Edit User</h2>
 
     {{-- Display Validation Errors --}}
     @if ($errors->any())
@@ -20,7 +132,6 @@
     <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST">
         @csrf
         @method('PUT')
-
         {{-- BASIC INFORMATION --}}
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">
@@ -53,14 +164,15 @@
                     </div>
                 @endif
 
-              <div class="col-md-3">
-                <label class="form-label">Gender</label>
-                <select name="gender" class="form-select">
-                    <option value="">Select</option>
-                    <option value="Male" {{ old('gender', $user->gender) === 'Male' ? 'selected' : '' }}>Male</option>
-                    <option value="Female" {{ old('gender', $user->gender) === 'Female' ? 'selected' : '' }}>Female</option>
-                </select>
-            </div>
+                <div class="col-md-3">
+                    <label class="form-label">Gender</label>
+                    <select name="gender" class="form-select">
+                        <option value="">Select</option>
+                        <option value="Male" {{ old('gender', $user->gender) === 'Male' ? 'selected' : '' }}>Male</option>
+                        <option value="Female" {{ old('gender', $user->gender) === 'Female' ? 'selected' : '' }}>Female</option>
+                    </select>
+                </div>
+
                 <div class="col-md-3">
                     <label class="form-label">Birthdate</label>
                     <input type="date" name="date_of_birth" class="form-control" 
@@ -168,7 +280,7 @@
             </div>
         @endif
 
-        {{-- ADMIN INFO NOTICE --}}
+        {{-- ADMIN INFO --}}
         @if($user->role === 'admin')
             <div class="alert alert-dark">
                 This user is an <strong>Administrator</strong> and has full system privileges.
@@ -176,9 +288,13 @@
         @endif
 
         {{-- BUTTONS --}}
-        <div class="d-flex justify-content-between">
-            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Back</a>
-            <button type="submit" class="btn btn-success">Save Changes</button>
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
+                ✖ Cancel
+            </a>
+            <button type="submit" class="btn btn-success">
+                💾 Save Changes
+            </button>
         </div>
     </form>
 </div>

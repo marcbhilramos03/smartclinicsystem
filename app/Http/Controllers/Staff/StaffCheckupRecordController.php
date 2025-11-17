@@ -116,4 +116,44 @@ class StaffCheckupRecordController extends Controller
         return redirect()->route('staff.checkups.students', $checkupId)
                          ->with('success', 'Record saved successfully.');
     }
+    // View Records
+public function viewRecords(Request $request)
+{
+    $query = MedicalRecord::with(['patient', 'vitals', 'dentals', 'checkup'])
+        ->where('staff_id', Auth::user()->user_id)
+        ->orderBy('created_at', 'desc');
+
+    // Search by student name
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->whereHas('patient', function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+        });
+    }
+
+    $records = $query->paginate(10)->withQueryString(); // 10 per page
+
+    return view('staff.records.index', compact('records'));
+}
+
+// View Students
+public function viewStudents(Request $request)
+{
+    $query = CheckupPatient::with(['patient', 'checkup'])
+        ->whereHas('checkup', function($q) {
+            $q->where('staff_id', Auth::user()->user_id);
+        });
+
+    // Search by student name
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->whereHas('patient', function($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%");
+        });
+    }
+
+    $students = $query->orderBy('status', 'asc')->paginate(10)->withQueryString();
+
+    return view('staff.students.index', compact('students'));
+}
 }

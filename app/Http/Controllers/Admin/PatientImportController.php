@@ -11,6 +11,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+
 class PatientImportController extends Controller
 {
     // Show the import form
@@ -139,7 +143,7 @@ class PatientImportController extends Controller
             }
 
             DB::commit();
-            return back()->with('success', "✅ Patient Import Complete! Added: $added | Updated: $updated | Skipped: $skipped");
+            return back()->with('success', "✅ Students Import Complete! Added: $added | Updated: $updated | Skipped: $skipped");
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -235,4 +239,52 @@ class PatientImportController extends Controller
             return back()->with('error', 'Import failed: ' . $e->getMessage());
         }
     }
+        // Download patient import template
+    public function downloadPatientTemplate()
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray([
+            [
+                'school_id', 'first_name', 'middle_name', 'last_name', 'gender', 
+                'date_of_birth', 'phone_number', 'address', 'course', 'grade_level', 
+                'school_year', 'emergency_name', 'emergency_relationship', 'emergency_phone', 'emergency_address'
+            ]
+        ], NULL, 'A1');
+
+        $writer = new Xlsx($spreadsheet);
+
+        $filename = 'students_import_template.xlsx';
+
+        // Send file to browser
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+        $writer->save('php://output');
+        exit;
+    }
+
+    // Download medical history import template
+
+public function downloadMedicalHistoryTemplate()
+{
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Set header row
+    $sheet->setCellValue('A1', 'school_id');
+    $sheet->setCellValue('B1', 'history_type');
+    $sheet->setCellValue('C1', 'description');
+    $sheet->setCellValue('D1', 'date_recorded');
+    $sheet->setCellValue('E1', 'notes');
+
+    // Set headers for download
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="medical_history_template.xlsx"');
+    header('Cache-Control: max-age=0');
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
 }

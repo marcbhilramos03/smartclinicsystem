@@ -51,14 +51,15 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // -----------------------------
 // Dashboard Redirect
 // -----------------------------
+// -----------------------------
 Route::get('/dashboard', function () {
     $user = auth()->user();
     if (!$user) return redirect('/');
 
     switch ($user->role) {
         case 'admin':
-            return redirect()->route('admin.dashboard'); // ✅ Calls controller
-        case 'staff':
+            return redirect()->route('admin.dashboard');
+        case 'staff': // ✅ match the layout role name
             return redirect()->route('staff.dashboard');
         case 'patient':
             return redirect()->route('patient.dashboard');
@@ -99,7 +100,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/imports/medical-histories', [PatientImportController::class, 'showMedicalHistoryImportForm'])->name('imports.medical_histories.form');
     Route::post('/imports/medical-histories', [PatientImportController::class, 'importMedicalHistory'])->name('imports.medical_histories.submit');
-   
+   Route::get('/import/patient/template', [PatientImportController::class, 'downloadPatientTemplate'])->name('import.patient.template');
+Route::get('/import/medical-history/template', [PatientImportController::class, 'downloadMedicalHistoryTemplate'])->name('import.medical-history.template');
    
     // Nested routes for clinic sessions and medical histories
 
@@ -158,7 +160,8 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
 
     // Staff Assigned Checkups
     Route::resource('checkups', StaffCheckupController::class)->only(['index', 'show']);
-
+    Route::get('records', [StaffCheckupRecordController::class, 'viewRecords'])->name('records');
+    Route::get('students', [StaffCheckupRecordController::class, 'viewStudents'])->name('students');
     // View students per checkup
     Route::get('checkups/{checkupId}/students', [StaffCheckupController::class, 'students'])
         ->name('checkups.students');
@@ -171,6 +174,7 @@ Route::middleware(['auth', 'role:staff'])->prefix('staff')->name('staff.')->grou
         Route::put('{recordId}', [StaffCheckupRecordController::class, 'update'])->name('update');
         Route::delete('{recordId}', [StaffCheckupRecordController::class, 'destroy'])->name('destroy');
     });
+    
 });
 
 

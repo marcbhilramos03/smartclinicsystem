@@ -25,7 +25,7 @@
         border-radius: 16px;
         box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         padding: 40px 50px;
-        max-width: 700px;
+        max-width: 1300px;
         width: 100%;
         border-top: 8px solid #198754;
         animation: fadeIn 0.6s ease;

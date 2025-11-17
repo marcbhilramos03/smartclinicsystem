@@ -46,10 +46,6 @@
                             <span class="text-black">{{ auth()->user()->phone_number ?? 'N/A' }}</span>
                         </li>
                     </ul>
-
-                    <button type="button" class="btn btn-dark btn-lg mt-3 w-100 shadow" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-                        <i class="fas fa-user-edit fa-lg me-2"></i> Edit Profile
-                    </button>
                 </div>
             </div>
         </div>
@@ -68,4 +64,6 @@
             </div>
         </div>
     </div>
+</div>
+
 @endsection

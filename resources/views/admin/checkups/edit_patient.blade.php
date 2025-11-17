@@ -1,13 +1,113 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <a href="{{ route('admin.checkups.show', $checkupPatient->checkup->id) }}" class="btn btn-secondary mb-3">
-        Back to Checkup
-    </a>
 
-    <h2>Edit Patient Record: {{ $checkupPatient->patient->first_name }} {{ $checkupPatient->patient->last_name }}</h2>
-    <p><strong>Checkup Type:</strong> {{ ucfirst($checkupPatient->checkup->checkup_type) }}</p>
+<style>
+    body {
+        background: linear-gradient(135deg, #eaf3ff, #d6e5ff);
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .container {
+        max-width: 1300px;
+        margin-top: 40px;
+        background: #fff;
+        border-radius: 16px;
+        padding: 40px 50px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+        from {opacity: 0; transform: translateY(20px);}
+        to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+        color: #0d6efd;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    h4 {
+        color: #0d6efd;
+        font-weight: 600;
+    }
+
+    p {
+        font-size: 1rem;
+        color: #555;
+    }
+
+    .card {
+        border: 2px solid #0d6efd !important;
+        border-radius: 12px;
+        background-color: #f8fbff;
+    }
+
+    label.form-label {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 10px 15px;
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 5px rgba(13, 110, 253, 0.4);
+    }
+
+    .btn {
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 12px 25px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background-color: #0d6efd;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        transform: translateY(-1px);
+    }
+
+    .btn-outline-secondary {
+        border: 2px solid #6c757d;
+        color: #6c757d;
+        background: white;
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .alert-success, .alert-danger {
+        border-radius: 10px;
+        padding: 15px 20px;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 25px 20px;
+        }
+
+        h2 {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<div class="container">
 
     {{-- Alerts --}}
     @if(session('success'))
@@ -16,7 +116,7 @@
 
     @if($errors->any())
         <div class="alert alert-danger">
-            <ul>
+            <ul class="mb-0">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -24,7 +124,7 @@
         </div>
     @endif
 
-    {{-- ✅ Only one form --}}
+    {{-- ✅ Form --}}
     <form action="{{ route('admin.checkups.update_patient', $checkupPatient->id) }}" method="POST">
         @csrf
         @method('PUT')
@@ -110,13 +210,19 @@
             </div>
         @endif
 
-        <button type="submit" class="btn btn-success">
-            Save Record
-        </button>
+        {{-- ✅ Buttons --}}
+        <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
+            <button type="submit" class="btn btn-primary w-100">
+                💾 Save Record
+            </button>
+            <a href="{{ route('admin.checkups.show', $checkupPatient->checkup->id) }}" class="btn btn-outline-secondary w-100">
+                ✖ Cancel
+            </a>
+        </div>
     </form>
 </div>
 
-{{-- ✅ JavaScript to auto-calculate BMI --}}
+{{-- ✅ Auto-calculate BMI --}}
 @if($checkupPatient->checkup->checkup_type === 'vitals')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -142,4 +248,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
+
 @endsection

@@ -1,38 +1,141 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h2 class="mb-4">My Assigned Checkups</h2>
+
+<style>
+    body {
+        background: linear-gradient(135deg, #dff6ff, #cce7ff);
+        font-family: 'Segoe UI', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .checkup-container {
+        width: 100%;
+        padding: 30px 40px;
+        margin: 0;
+        background: #ffffff;
+        border-radius: 0;
+        border-top: 8px solid #0d6efd;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+        from {opacity:0; transform: translateY(10px);}
+        to {opacity:1; transform: translateY(0);}
+    }
+
+    h2 {
+        text-align: left;
+        font-weight: 700;
+        color: #0d6efd;
+        margin-bottom: 25px;
+    }
+
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+        border-radius: 12px;
+    }
+
+   table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    color: #000000; /* Black text for table */
+}
+
+thead {
+    background: #0d6efd;
+    color: #ffffff; /* Keep header text white */
+}
+
+ td {
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 20px;
+    border-bottom: 1px solid #eaeaea;
+    color: #000000; /* Ensure all table cells have black text */
+}
+th{
+    padding: 16px 18px;
+    text-align: left;
+    font-size: 18px;
+    border-bottom: 1px solid #eaeaea;
+    color: #ffffff; /* Ensure all table cells have black text */   
+}
+
+
+    tbody tr:hover {
+        background: #eef5ff;
+        transition: 0.2s ease;
+    }
+
+    .btn-view {
+        padding: 8px 18px;
+        border-radius: 8px;
+        background: #198754;
+        color: rgb(253, 253, 253);
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 18px;
+    }
+
+    @media (max-width: 768px) {
+        .checkup-container {
+            padding: 20px;
+        }
+        th, td {
+            font-size: 14px;
+        }
+        .btn-view {
+            padding: 6px 14px;
+        }
+    }
+</style>
+
+<div class="checkup-container">
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success text-center">{{ session('success') }}</div>
     @endif
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Checkup Type</th>
-                <th>Notes</th>
-                <th>Students</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($checkups as $checkup)
-            <tr>
-                <td>{{ $checkup->date }}</td>
-                <td>{{ ucfirst($checkup->checkup_type) }}</td>
-                <td>{{ $checkup->notes ?? '-' }}</td>
-                <td>
-                    <a href="{{ route('staff.checkups.students', $checkup->id) }}" class="btn btn-primary btn-sm">
-                        View Students
-                    </a>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    <h2>My Assigned Checkups</h2>
 
-    {{ $checkups->links() }}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Checkup Type</th>
+                    <th>Notes</th>
+                    <th>Students</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($checkups as $checkup)
+                <tr>
+                    <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F j, Y') }}</td>
+                    <td>{{ ucfirst($checkup->checkup_type) }}</td>
+                    <td>{{ $checkup->notes ?? '-' }}</td>
+                    <td>
+                        <a href="{{ route('staff.checkups.students', $checkup->id) }}" class="btn-view">
+                            View Students
+                        </a>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-3">
+        {{ $checkups->links() }}
+    </div>
+
 </div>
+
 @endsection

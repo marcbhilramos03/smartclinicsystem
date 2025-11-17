@@ -5,34 +5,37 @@
 @section('content')
 <style>
     /* Course Card Styles */
-.course-card {
-    color: #080808; /* Text color */
-    text-shadow: 1px 1px 2px rgb(255, 255, 255); /* Optional shadow for better readability */
-    border-radius: 15px;
-    transition: transform 0.3s, box-shadow 0.3s;
-    padding: 25px 15px;
-    min-height: 180px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    font-family: 'Segoe UI', sans-serif;
-}
+    .course-card {
+        color: #080808;
+        text-shadow: 1px 1px 2px rgb(255, 255, 255);
+        border-radius: 15px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        padding: 25px 15px;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        font-family: 'Segoe UI', sans-serif;
+    }
 
     .course-title {
         font-size: 30px;
         font-weight: 700;
         margin-bottom: 10px;
+        color: #fff;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
     .course-students {
         font-size: 1rem;
         margin-bottom: 15px;
-         background: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.9);
         color: #333;
         font-weight: 600;
         border-radius: 5px;
+        padding: 3px 8px;
     }
 
     .course-btn {
@@ -50,14 +53,13 @@
         transform: translateY(-2px);
     }
 
-    h2{
+    h2 {
         color: black;
     }
-  
 </style>
 
 @php
-// Define color palette
+// Color palette for course cards
 $colors = [
     'linear-gradient(135deg, #6a11cb, #2575fc)',
     'linear-gradient(135deg, #ff416c, #ff4b2b)',
@@ -69,10 +71,7 @@ $colors = [
     'linear-gradient(135deg, #43cea2, #185a9d)'
 ];
 
-// Counter for course cards
 $formIndex = 0;
-
-// Function to get a color for each form
 function getFormColor($colors, &$formIndex) {
     $color = $colors[$formIndex % count($colors)];
     $formIndex++;
@@ -83,7 +82,7 @@ function getFormColor($colors, &$formIndex) {
 <div class="container-fluid py-4">
     <h2 class="mb-4">Users Management</h2>
 
-    {{-- SUCCESS MESSAGE --}}
+    {{-- Success Message --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -91,14 +90,14 @@ function getFormColor($colors, &$formIndex) {
         </div>
     @endif
 
-    {{-- ADD USER BUTTON --}}
+    {{-- Add User Button --}}
     <div class="mb-3">
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-lg shadow-sm">
             <i class="fas fa-user-plus"></i> Add New User
         </a>
     </div>
 
-    {{-- NAV TABS --}}
+    {{-- Nav Tabs --}}
     <ul class="nav nav-tabs" id="userTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab">
@@ -112,10 +111,10 @@ function getFormColor($colors, &$formIndex) {
         </li>
     </ul>
 
-    {{-- TAB CONTENT --}}
+    {{-- Tab Content --}}
     <div class="tab-content mt-4" id="userTabsContent">
 
-        {{-- PATIENTS TAB --}}
+        {{-- Students Tab --}}
         <div class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
             <h4 class="mb-4 text-dark">Courses</h4>
             <div class="row">
@@ -126,7 +125,7 @@ function getFormColor($colors, &$formIndex) {
                     <div class="col-md-4 mb-4">
                         <div class="course-card" style="background: {{ $bgColor }}">
                             <h4 class="course-title">{{ $course->course ?? 'No Course Listed' }}</h4>
-                            <p class="course-students">Total Students:  {{ $course->total_students }} </p>
+                            <p class="course-students">Total Students: {{ $course->total_students }}</p>
                             <a href="{{ route('admin.users.by_course', $course->course) }}" class="course-btn">
                                 View Students
                             </a>
@@ -140,7 +139,7 @@ function getFormColor($colors, &$formIndex) {
             </div>
         </div>
 
-        {{-- STAFF TAB --}}
+        {{-- Staff Tab --}}
         <div class="tab-pane fade" id="staff" role="tabpanel" aria-labelledby="staff-tab">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -149,11 +148,11 @@ function getFormColor($colors, &$formIndex) {
                         <table class="table table-hover align-middle">
                             <thead class="table-dark">
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Profession</th>
-                                    <th>License</th>
-                                    <th>Actions</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Profession</th>
+                                    <th scope="col">License</th>
+                                    <th scope="col">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -170,13 +169,16 @@ function getFormColor($colors, &$formIndex) {
                                             <a href="{{ route('admin.users.edit', $s->user_id) }}" class="btn btn-warning btn-sm">
                                                 <i class="fas fa-edit"></i> Edit
                                             </a>
-                                            <form action="{{ route('admin.users.destroy', $s->user_id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this user?')" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-trash"></i> Delete
-                                                </button>
-                                            </form>
+                                            <button 
+                                                type="button" 
+                                                class="btn btn-danger btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#deleteUserModal" 
+                                                data-user-id="{{ $s->user_id }}" 
+                                                data-user-name="{{ $s->first_name }} {{ $s->last_name }}"
+                                            >
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 @empty
@@ -197,4 +199,46 @@ function getFormColor($colors, &$formIndex) {
 
     </div>
 </div>
+
+{{-- Delete Confirmation Modal --}}
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteUserModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirm Deletion</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this user<strong id="deleteUserName"></strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <form id="deleteUserForm" method="POST">
+          @csrf
+          @method('DELETE')
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"><i class="fas fa-times"></i> Cancel</button>
+          <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{-- Dynamic Delete Modal Script --}}
+@push('scripts')
+<script>
+var deleteUserModal = document.getElementById('deleteUserModal');
+deleteUserModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var userId = button.getAttribute('data-user-id');
+    var userName = button.getAttribute('data-user-name');
+
+    var userNameSpan = deleteUserModal.querySelector('#deleteUserName');
+    userNameSpan.textContent = userName;
+
+    var form = deleteUserModal.querySelector('#deleteUserForm');
+    form.action = '/admin/users/' + userId;
+});
+</script>
+@endpush
+
 @endsection

@@ -257,7 +257,6 @@
                                         <th>Date Recorded</th>
                                         <th>Type</th>
                                         <th>Description</th>
-                                        <th>Recorded By</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -266,8 +265,6 @@
                                             <td>{{ $history->date_recorded ? \Carbon\Carbon::parse($history->date_recorded)->format('F d, Y') : '(𝘯𝘰 𝘥𝘢𝘵𝘦)' }}</td>
                                             <td>{{ $history->history_type ?? '-' }}</td>
                                             <td>{{ $history->description ?? '-' }}</td>
-                                            <td>{{ $history->admin->first_name ?? '-' }} {{ $history->admin->last_name ?? '' }} {{ $history->admin->credential->license_type ?? '-' }}</td>
-                                         
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -327,10 +324,10 @@
                     @if($checkups->count())
                         <div class="d-flex gap-2 flex-wrap">
                             <a href="{{ route('admin.patients.all_vitals', $patient->user_id) }}" class="btn btn-sm btn-primary">
-                                <i class="fas fa-heartbeat"></i> View All Vitals
+                                <i class="fas fa-heartbeat"></i> View Vital Details
                             </a>
                             <a href="{{ route('admin.patients.all_dentals', $patient->user_id) }}" class="btn btn-sm btn-success">
-                                <i class="fas fa-tooth"></i> View All Dentals
+                                <i class="fas fa-tooth"></i> View Dentals Details
                             </a>
                         </div>
                     @endif
