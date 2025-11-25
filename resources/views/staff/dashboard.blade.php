@@ -1,58 +1,100 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <h1 class="mb-4 text-dark fw-bold">Doctors Dashboard</h1>
+<div class="container-fluid py-4">
 
-    <div class="row g-4">
-        <!-- My Checkups -->
-        <div class="col-md-4">
-            <a href="{{ route('staff.checkups.index') }}" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 hover-card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-notes-medical fa-3x text-primary mb-3"></i>
-                        <h5 class="card-title text-dark fw-semibold">My Checkups</h5>
-                        <p class="text-muted small mb-0">View and manage your assigned checkups</p>
-                    </div>
+    {{-- Page Heading --}}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Doctor's Dashboard</h1>
+        <span class="text-muted">Welcome, {{ auth()->user()->first_name }}</span>
+    </div>
+
+    {{-- Success message --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    {{-- Dashboard Cards --}}
+    <div class="row mb-4">
+
+        {{-- Total Patients --}}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-success text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5>Total Patients</h5>
+                    <h2 class="fw-bold">{{ $totalPatients ?? 0 }}</h2>
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- View Records -->
-        <div class="col-md-4">
-            <a href="" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 hover-card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-file-medical fa-3x text-success mb-3"></i>
-                        <h5 class="card-title text-dark fw-semibold">View Records</h5>
-                        <p class="text-muted small mb-0">Access medical records and diagnosis</p>
-                    </div>
+        {{-- Total Courses --}}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-info text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5>Total Courses</h5>
+                    <h2 class="fw-bold">{{ $totalCourses ?? 0 }}</h2>
                 </div>
-            </a>
+            </div>
         </div>
 
-        <!-- View Patients -->
-        <div class="col-md-4">
-            <a href="" class="text-decoration-none">
-                <div class="card shadow-sm border-0 h-100 hover-card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-user-injured fa-3x text-danger mb-3"></i>
-                        <h5 class="card-title text-dark fw-semibold">View Students</h5>
-                        <p class="text-muted small mb-0">Browse the list of registered students</p>
-                    </div>
+        {{-- Pending Checkups --}}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-warning text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5>Pending Checkups</h5>
+                    <h2 class="fw-bold">{{ $pendingCheckups ?? 0 }}</h2>
                 </div>
-            </a>
+            </div>
+        </div>
+
+        {{-- Completed Checkups --}}
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-primary text-white shadow h-100">
+                <div class="card-body text-center">
+                    <h5>Completed Checkups</h5>
+                    <h2 class="fw-bold">{{ $completedCheckups ?? 0 }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    {{-- Optional: Checkups by Course Table --}}
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Checkups by Course</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Course</th>
+                            <th>Pending Checkups</th>
+                            <th>Completed Checkups</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($coursesWithCheckups ?? [] as $course)
+                            <tr>
+                                <td>{{ $course->name }}</td>
+                                <td>{{ $course->pending_checkups }}</td>
+                                <td>{{ $course->completed_checkups }}</td>
+                            </tr>
+                        @endforeach
+                        @if(empty($coursesWithCheckups))
+                            <tr>
+                                <td colspan="3">No data available</td>
+                            </tr>
+                        @endif
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
-<style>
-    .hover-card {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0 15px rgba(0,0,0,0.15);
-    }
-</style>
+</div>
 @endsection

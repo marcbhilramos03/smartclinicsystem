@@ -76,12 +76,6 @@
 
 <div class="import-container">
     <h3 class="mb-4 text-dark"><i class="fas fa-file-import me-2"></i> Import Students</h3>
-
-    {{-- Dashboard Button --}}
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary btn-dashboard">
-        <i class="fas fa-tachometer-alt me-1"></i> Go to Dashboard
-    </a>
-
     {{-- Alert Messages --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -130,7 +124,7 @@
                         <li><strong>School ID:</strong> Unique student identifier</li>
                         <li><strong>First Name</strong>, <strong>Middle Name</strong>, <strong>Last Name</strong></li>
                         <li><strong>Gender</strong></li>
-                        <li><strong>Date of Birth:</strong> YYYY-MM-DD</li>
+                        <li><strong>Date of Birth:</strong> MM-DD-YYYY</li>
                         <li><strong>Phone Number</strong> & <strong>Address</strong></li>
                         <li><strong>Course</strong>, <strong>Grade Level</strong>, <strong>School Year</strong></li>
                         <li><strong>Emergency Contact Name, Relationship, Phone, Address</strong></li>

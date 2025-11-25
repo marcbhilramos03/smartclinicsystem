@@ -7,31 +7,30 @@
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Clinic In-charge Dashboard</h1>
     </div>
-<div class="row">
 
-    <!-- Import Patients Card -->
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-primary">
-            <div class="card-body">
-                <h5 class="card-title">Import Patients</h5>
-                <p class="card-text">Upload Stduents data via excel file.</p>
-                <a href="{{ route('admin.imports.patients.form') }}" class="btn btn-primary">Go to Import</a>
+    <!-- Import Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Import Patients</h5>
+                    <p class="card-text">Upload Students data via Excel file.</p>
+                    <a href="{{ route('admin.imports.patients.form') }}" class="btn btn-primary">Go to Import</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title">Import Medical Histories</h5>
+                    <p class="card-text">Upload medical history data via Excel file.</p>
+                    <a href="{{ route('admin.imports.medical_histories.form') }}" class="btn btn-success">Go to Import</a>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Import Medical Histories Card -->
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm border-success">
-            <div class="card-body">
-                <h5 class="card-title">Import Medical Histories</h5>
-                <p class="card-text">Upload medical history data via excel file.</p>
-                <a href="{{ route('admin.imports.medical_histories.form') }}" class="btn btn-success">Go to Import</a>
-            </div>
-        </div>
-    </div>
-
-</div>
     <!-- Total Counts Cards -->
     <div class="row mb-4">
 
@@ -65,9 +64,8 @@
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card bg-warning text-white shadow h-100">
                 <div class="card-body">
-                    <h5>Total Checkups</h5>
-                    <h2>{{ $totalCheckups ?? 0 }}</h2>
-                    <small>Vitals: {{ $vitalsCheckups ?? 0 }} | Dental: {{ $dentalCheckups ?? 0 }}</small>
+                    <h5>Total Clinic Visits</h5>
+                    <h2>{{ $totalClinicVisits ?? 0 }}</h2>
                 </div>
             </div>
         </div>
@@ -90,85 +88,75 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // --- Chart Initialization ---
-    const ctx = document.getElementById('monthlyChart').getContext('2d');
-    let monthlyChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: @json($months ?? []),
-            datasets: [
-                {
-                    label: 'New Patients',
-                    data: @json($patientsData ?? []),
-                    borderColor: '#4e73df',
-                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Vitals Checkups',
-                    data: @json($vitalsData ?? []),
-                    borderColor: '#1cc88a',
-                    backgroundColor: 'rgba(28, 200, 138, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                },
-                {
-                    label: 'Dental Checkups',
-                    data: @json($dentalData ?? []),
-                    borderColor: '#36b9cc',
-                    backgroundColor: 'rgba(54, 185, 204, 0.1)',
-                    tension: 0.3,
-                    fill: true
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: 'top' },
-            },
-            scales: {
-                y: { beginAtZero: true, stepSize: 1 }
-            }
-        }
-    });
+const ctx = document.getElementById('monthlyChart').getContext('2d');
 
-    // --- Update Stats Function ---
-    function updateStats() {
-        fetch("{{ route('admin.stats') }}")
-            .then(res => res.json())
-            .then(data => {
-                document.querySelector('.bg-primary h2').textContent = data.totalStaff;
-                document.querySelector('.bg-success h2').textContent = data.totalPatients;
-                document.querySelector('.bg-info h2').textContent = data.totalUsers;
-                document.querySelector('.bg-warning h2').textContent = data.totalCheckups;
-                document.querySelector('.bg-warning small').textContent = 
-                    `Vitals: ${data.vitalsCheckups} | Dental: ${data.dentalCheckups}`;
-            })
-            .catch(err => console.error('Error updating stats:', err));
+// Use raw JSON encoding to avoid Blade parsing issues
+const months = {!! json_encode($months ?? []) !!};
+const courseData = {!! json_encode($courseData ?? []) !!};
+
+// Convert courseData into Chart.js datasets
+const datasets = Object.keys(courseData).map((course,index)=>{
+    const colors = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#23a8f2','#a728f0'];
+    return {
+        label: course+' Visits',
+        data: courseData[course],
+        borderColor: colors[index%colors.length],
+        backgroundColor: colors[index%colors.length]+'33',
+        tension:0.3,
+        fill:true
+    };
+});
+
+let monthlyChart = new Chart(ctx,{
+    type:'line',
+    data:{ labels:months, datasets:datasets },
+    options:{ 
+        responsive:true, 
+        plugins:{ legend:{ position:'top' } }, 
+        scales:{ y:{ beginAtZero:true, stepSize:1 } } 
     }
+});
 
-    // --- Update Chart Function ---
-    function updateChart() {
-        fetch("{{ route('admin.chart') }}")
-            .then(res => res.json())
-            .then(data => {
-                monthlyChart.data.labels = data.months;
-                monthlyChart.data.datasets[0].data = data.patientsData;
-                monthlyChart.data.datasets[1].data = data.vitalsData;
-                monthlyChart.data.datasets[2].data = data.dentalData;
-                monthlyChart.update();
-            })
-            .catch(err => console.error('Error updating chart:', err));
-    }
+// --- Update Stats ---
+function updateStats(){
+    fetch("{{ route('admin.stats') }}")
+    .then(res=>res.json())
+    .then(data=>{
+        document.querySelector('.bg-primary h2').textContent = data.totalStaff;
+        document.querySelector('.bg-success h2').textContent = data.totalPatients;
+        document.querySelector('.bg-info h2').textContent = data.totalUsers;
+        document.querySelector('.bg-warning h2').textContent = data.totalClinicVisits;
+    })
+    .catch(err=>console.error('Error updating stats:',err));
+}
 
-    // --- Auto refresh every 10 seconds ---
-    setInterval(() => {
-        updateStats();
-        updateChart();
-    }, 10000);
+// --- Update Chart ---
+function updateChart(){
+    fetch("{{ route('admin.chart') }}")
+    .then(res=>res.json())
+    .then(data=>{
+        monthlyChart.data.labels = data.months;
+        const newDatasets = Object.keys(data.courseData).map((course,index)=>{
+            const colors = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#23a8f2','#a728f0'];
+            return {
+                label: course+' Visits',
+                data: data.courseData[course],
+                borderColor: colors[index%colors.length],
+                backgroundColor: colors[index%colors.length]+'33',
+                tension:0.3,
+                fill:true
+            };
+        });
+        monthlyChart.data.datasets = newDatasets;
+        monthlyChart.update();
+    })
+    .catch(err=>console.error('Error updating chart:',err));
+}
+
+// --- Auto-refresh every 10 seconds ---
+setInterval(()=>{
+    updateStats();
+    updateChart();
+},10000);
 </script>
-
-
 @endsection

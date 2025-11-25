@@ -14,27 +14,115 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
-        html, body { height: 100%; margin: 0; font-family: 'Poppins', sans-serif; font-size: 110%; }
-        body, p, a, li, span { font-size: 1.1rem; }
-        #wrapper { display: flex; min-height: 100vh; }
-        /* Sidebar */
-        .sidebar { background-color: #1c0568; width: 240px; position: fixed; top:0; left:0; height:100vh; overflow-y:auto; z-index:1030; }
-        .sidebar .nav-link { color:#adb5bd; padding:0.9rem 1.1rem; display:flex; align-items:center; }
-        .sidebar .nav-link i { margin-right:0.6rem; font-size:1.3rem; }
-        .sidebar .nav-link.active { background-color:#495057; color:#fff; font-weight:bold; }
-        /* Content */
-        #content-wrapper { margin-left:240px; width:calc(100% - 240px); transition:all 0.3s ease-in-out; padding-top:80px; }
-        /* Topbar */
-        nav.topbar { background:linear-gradient(90deg, #19273d 0%, #192030 100%) !important; color:#fff; box-shadow:0 2px 5px rgba(0,0,0,0.2); padding:1rem 1.25rem; position:fixed; top:0; left:240px; width:calc(100% - 240px); z-index:1050; display:flex; justify-content:space-between; align-items:center; }
-        #sidebarToggleTop { background:none; border:none; font-size:1.7rem; color:white; cursor:pointer; display:none; }
-        @media (max-width:992px) { nav.topbar{left:0;width:100%;} #content-wrapper{margin-left:0;width:100%;} #sidebarToggleTop{display:inline-block;} }
-        @media (max-width:768px) {
-            .sidebar { position:fixed; bottom:0; top:auto; left:0; width:100%; height:65px; display:flex; justify-content:space-around; align-items:center; border-top:3px solid #3e4c6d; box-shadow:0 -2px 5px rgba(0,0,0,0.3); z-index:1060; }
-            .sidebar .nav-link { flex-direction:column; font-size:0.85rem; padding:0; }
-            .sidebar .nav-link i { margin:0; font-size:1.4rem; }
-            .sidebar .nav-link.active { color:#fff; background:none; }
-            #content-wrapper { padding-bottom:70px; }
-        }
+      html, body { height: 100%; margin: 0; font-family: 'Poppins', sans-serif; font-size: 110%; }
+body, p, a, li, span { font-size: 1.1rem; }
+
+#wrapper { display: flex; min-height: 100vh; }
+
+/* SIDEBAR DESKTOP */
+.sidebar {
+    background-color: #1c0568;
+    width: 240px;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1030;
+    transition: all 0.3s ease-in-out;
+}
+
+.sidebar .nav-link {
+    color: #adb5bd;
+    padding: 0.9rem 1.1rem;
+    display: flex;
+    align-items: center;
+}
+.sidebar .nav-link i { margin-right: 0.6rem; font-size: 1.3rem; }
+.sidebar .nav-link.active { background-color: #495057; color: #fff; font-weight: bold; }
+
+/* CONTENT */
+#content-wrapper {
+    margin-left: 240px;
+    width: calc(100% - 240px);
+    transition: all 0.3s ease-in-out;
+    padding-top: 80px;
+}
+
+/* TOPBAR */
+nav.topbar {
+    background: linear-gradient(90deg, #19273d 0%, #192030 100%) !important;
+    color: #fff;
+    padding: 1rem 1.25rem;
+    position: fixed;
+    top: 0;
+    left: 240px;
+    width: calc(100% - 240px);
+    z-index: 1050;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#sidebarToggleTop {
+    background: none;
+    border: none;
+    font-size: 1.7rem;
+    color: white;
+    cursor: pointer;
+    display: none;
+}
+
+/* TABLET RESOLUTION */
+@media (max-width: 992px) {
+    nav.topbar { left: 0; width: 100%; }
+    #content-wrapper { margin-left: 0; width: 100%; }
+    #sidebarToggleTop { display: inline-block; }
+
+    /* Hide sidebar off-screen */
+    .sidebar {
+        transform: translateX(-100%);
+        width: 240px;
+        height: 100vh;
+        top: 0;
+    }
+
+    /* When opened */
+    .sidebar.open {
+        transform: translateX(0);
+    }
+}
+
+/* MOBILE: bottom navigation bar */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateY(0);
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        height: 65px;
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 3px solid #3e4c6d;
+    }
+
+    .sidebar .nav-link {
+        flex-direction: column;
+        font-size: 0.85rem;
+        padding: 0;
+    }
+
+    .sidebar .nav-link i { margin: 0; font-size: 1.4rem; }
+
+    .sidebar .nav-link.active {
+        background: none;
+        color: white;
+    }
+
+    #content-wrapper { padding-bottom: 70px; margin-left: 0 !important; width: 100% !important; }
+}
+
     </style>
 </head>
 <body id="page-top">
@@ -166,6 +254,38 @@
     </div>
   </div>
 </div>
+@if(session('showPatientNotFoundModal'))
+<div class="modal fade" id="searchErrorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Student Not Found</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                Student with ID 
+                <strong>{{ session('searchTerm') }}</strong> 
+                does not exist.
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+@if(session('showPatientNotFoundModal'))
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var modal = new bootstrap.Modal(document.getElementById('searchErrorModal'));
+        modal.show();
+    });
+    document.getElementById("sidebarToggleTop")?.addEventListener("click", function () {
+    document.querySelector(".sidebar")?.classList.toggle("open");
+});
+</script>
+@endif
+
 
 <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
 <script src="{{ asset('vendor/jquery-easing/jquery.easing.min.js') }}"></script>

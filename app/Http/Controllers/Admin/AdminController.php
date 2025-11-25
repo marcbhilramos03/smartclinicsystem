@@ -2,70 +2,69 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // ✅ You forgot this import
 use App\Models\User;
 use App\Models\Checkup;
+use Illuminate\Http\Request;
+use App\Models\ClinicSession;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth; // ✅ You forgot this import
 
 class AdminController extends Controller
 {
-    public function dashboard()
-    {
-        // ✅ Total counts
-        $totalStaff = User::where('role', 'staff')->count();
-        $totalPatients = User::where('role', 'patient')->count();
-        $totalUsers = User::count();
+  
+public function dashboard()
+{
+    // Totals
+    $totalStaff = User::where('role', 'staff')->count();
+    $totalPatients = User::where('role', 'patient')->count();
+    $totalUsers = User::count();
+    $totalClinicVisits = ClinicSession::count(); // total clinic visits
 
-        $totalCheckups = Checkup::count();
-        $vitalsCheckups = Checkup::where('checkup_type', 'vitals')->count();
-        $dentalCheckups = Checkup::where('checkup_type', 'dental')->count();
+    // Months
+    $months = [];
+    for ($i = 1; $i <= 12; $i++) {
+        $months[] = date('M', mktime(0, 0, 0, $i, 1));
+    }
 
-        // ✅ Monthly statistics for charts
-        $months = [];
-        $patientsData = [];
-        $vitalsData = [];
-        $dentalData = [];
+    // Courses
+    $courses = \DB::table('personal_information')
+        ->distinct()
+        ->pluck('course');
 
-        for ($i = 1; $i <= 12; $i++) {
-            $months[] = date('M', mktime(0, 0, 0, $i, 1));
-            $patientsData[] = User::where('role', 'patient')
-                ->whereMonth('created_at', $i)
+    // Monthly clinic visits per course
+    $courseData = [];
+    foreach ($courses as $course) {
+        $monthlyCounts = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $count = ClinicSession::join('personal_information', 'personal_information.user_id', '=', 'clinic_sessions.user_id')
+                ->where('personal_information.course', $course)
+                ->whereMonth('clinic_sessions.session_date', $m)
                 ->count();
-            $vitalsData[] = Checkup::where('checkup_type', 'vitals')
-                ->whereMonth('date', $i)
-                ->count();
-            $dentalData[] = Checkup::where('checkup_type', 'dental')
-                ->whereMonth('date', $i)
-                ->count();
+            $monthlyCounts[] = $count;
         }
-
-        return view('admin.dashboard', compact(
-            'totalStaff',
-            'totalPatients',
-            'totalUsers',
-            'totalCheckups',
-            'vitalsCheckups',
-            'dentalCheckups',
-            'months',
-            'patientsData',
-            'vitalsData',
-            'dentalData'
-        ));
+        $courseData[$course] = $monthlyCounts;
     }
 
-    // ✅ For AJAX realtime updates
-    public function getStats()
-    {
-        return response()->json([
-            'totalStaff' => User::where('role', 'staff')->count(),
-            'totalPatients' => User::where('role', 'patient')->count(),
-            'totalUsers' => User::count(),
-            'totalCheckups' => Checkup::count(),
-            'vitalsCheckups' => Checkup::where('checkup_type', 'vitals')->count(),
-            'dentalCheckups' => Checkup::where('checkup_type', 'dental')->count(),
-        ]);
-    }
+    return view('admin.dashboard', compact(
+        'totalStaff',
+        'totalPatients',
+        'totalUsers',
+        'totalClinicVisits',
+        'months',
+        'courses',
+        'courseData'
+    ));
+}
+public function getStats()
+{
+    return response()->json([
+        'totalStaff' => User::where('role', 'staff')->count(),
+        'totalPatients' => User::where('role', 'patient')->count(),
+        'totalUsers' => User::count(),
+        'totalClinicVisits' => ClinicSession::count(),
+    ]);
+}
+
 
     // ✅ Admin Profile Page
   public function profile()

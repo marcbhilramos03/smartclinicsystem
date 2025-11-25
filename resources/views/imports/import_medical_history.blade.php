@@ -76,12 +76,6 @@
 
 <div class="import-container">
     <h3 class="mb-4 text-dark"><i class="fas fa-file-import me-2"></i> Import Medical History</h3>
-
-    {{-- Dashboard Button --}}
-    <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary btn-dashboard">
-        <i class="fas fa-tachometer-alt me-1"></i> Go to Dashboard
-    </a>
-
     {{-- Alert Messages --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -127,7 +121,7 @@
                 <div class="card-body">
                     <p>To ensure proper import, please download our template file and fill in your data. Make sure to follow the column format.</p>
                     <ul>
-                        <li><strong>Date Recorded:</strong> YYYY-MM-DD</li>
+                        <li><strong>Date Recorded:</strong> MM-DD-YYYY</li>
                         <li><strong>Type:</strong> Type of medical history (e.g., Allergy, Surgery)</li>
                         <li><strong>Description:</strong> Brief description of the history</li>
                         <li><strong>Student School ID:</strong> The ID of the student</li>
