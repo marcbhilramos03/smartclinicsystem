@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\ClinicSession;
-use App\Models\MedicalRecord;
+use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Models\ClinicSession;
+use App\Models\MedicalRecord;
+use App\Http\Controllers\Controller;
 
 class ClinicSessionController extends Controller
 {
@@ -28,8 +29,8 @@ public function store(Request $request, User $patient)
     $session = ClinicSession::create([
         'user_id'      => $patient->user_id,          // ✅ must exist
         'admin_id'     => auth()->user()->user_id,   // current admin
-        'session_date' => $validated['session_date'],
-        'reason'       => $validated['reason'],
+        'session_date' => Carbon::parse($validated['session_date'])->format('Y-m-d'),
+         'reason'       => $validated['reason'],
         'remedy'       => $validated['remedy'] ,
     ]);
 

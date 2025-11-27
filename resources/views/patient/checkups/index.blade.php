@@ -12,7 +12,7 @@
                     </div>
                     <div class="card-body text-center">
                         <p><i class="bi bi-file-medical me-2"></i><strong>Type:</strong> {{ ucfirst($checkup->checkup_type) }}</p>
-                        <p><i class="bi bi-person-circle me-2"></i><strong>Staff:</strong> {{ $checkup->staff->first_name ?? 'N/A' }}</p>
+                        <p><i class="bi bi-person-circle me-2"></i><strong>Doctor:</strong> {{ $checkup->staff->first_name ?? 'N/A' }}</p>
                     </div>
                 </div>
             </div>
