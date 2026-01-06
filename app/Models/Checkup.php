@@ -24,7 +24,9 @@ protected $fillable = [
 
     
 public function patients() {
-    return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id');
+    return $this->belongsToMany(User::class, 'checkup_patients', 'checkup_id', 'patient_id')
+                ->with('personalInformation')
+                  ->withPivot('status'); 
 }
 
 public function vitals() {

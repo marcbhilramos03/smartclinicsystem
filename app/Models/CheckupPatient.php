@@ -16,14 +16,15 @@ class CheckupPatient extends Model
 
     // Relationships
     public function vitals()
-    {
-        return $this->hasMany(Vitals::class, 'checkup_patient_id');
-    }
+{
+    return $this->hasOne(Vitals::class, 'checkup_patient_id');
+}
 
-    public function dentals()
-    {
-        return $this->hasMany(Dental::class, 'checkup_patient_id');
-    }
+public function dentals()
+{
+    return $this->hasOne(Dental::class, 'checkup_patient_id');
+}
+
 
     public function patient()
     {
@@ -38,7 +39,7 @@ class CheckupPatient extends Model
     // Helper methods
     public function markAsCompleted()
     {
-        $this->status = 'completed';
+        $this->status = 'done';
         $this->save();
     }
 

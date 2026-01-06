@@ -26,7 +26,7 @@
                     <thead class="table-light">
                         <tr>
                             <th>Student</th>
-                            <th>Course</th>
+                            <th>Status</th>
                             <th>Grade</th>
                             <th>Action</th>
                         </tr>
@@ -37,6 +37,8 @@
                             <td>{{ $student->first_name }} {{ $student->last_name }}</td>
                             <td>{{ $student->personalInformation->course ?? 'N/A' }}</td>
                             <td>{{ $student->personalInformation->grade_level ?? 'N/A' }}</td>
+                            <td>{{ ucfirst($student->pivot->status ?? 'pending') }}</td> <!-- Status from pivot -->
+
                             <td>
                                 <a href="{{ route('staff.checkup_records.create', [$checkup->id, $student->user_id]) }}" class="btn btn-primary btn-sm">
                                     Add/Edit Record

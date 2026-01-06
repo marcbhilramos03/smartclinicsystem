@@ -106,12 +106,12 @@ class StaffCheckupRecordController extends Controller
                 ]
             );
         }
+ if ($checkupPatient->status === 'pending') {
+    $checkupPatient->status = 'completed'; 
+    $checkupPatient->save();
+}
 
-        // Mark checkup patient as Done
-        if ($checkupPatient->status === 'Pending') {
-            $checkupPatient->status = 'Done';
-            $checkupPatient->save();
-        }
+
 
         return redirect()->route('staff.checkups.students', $checkupId)
                          ->with('success', 'Record saved successfully.');
@@ -123,7 +123,7 @@ public function viewRecords(Request $request)
         ->where('staff_id', Auth::user()->user_id)
         ->orderBy('created_at', 'desc');
 
-    // Search by student name
+
     if ($request->filled('search')) {
         $search = $request->search;
         $query->whereHas('patient', function($q) use ($search) {
@@ -131,12 +131,12 @@ public function viewRecords(Request $request)
         });
     }
 
-    $records = $query->paginate(10)->withQueryString(); // 10 per page
+    $records = $query->paginate(10)->withQueryString(); 
 
     return view('staff.records.index', compact('records'));
 }
 
-// View Students
+
 public function viewStudents(Request $request)
 {
     $query = CheckupPatient::with(['patient', 'checkup'])
@@ -144,7 +144,7 @@ public function viewStudents(Request $request)
             $q->where('staff_id', Auth::user()->user_id);
         });
 
-    // Search by student name
+    
     if ($request->filled('search')) {
         $search = $request->search;
         $query->whereHas('patient', function($q) use ($search) {

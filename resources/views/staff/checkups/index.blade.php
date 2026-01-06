@@ -105,32 +105,42 @@ th{
 
     <h2>My Assigned Checkups</h2>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Checkup Type</th>
-                    <th>Notes</th>
-                    <th>Students</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($checkups as $checkup)
-                <tr>
-                    <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F j, Y') }}</td>
-                    <td>{{ ucfirst($checkup->checkup_type) }}</td>
-                    <td>{{ $checkup->notes ?? '-' }}</td>
-                    <td>
-                        <a href="{{ route('staff.checkups.students', $checkup->id) }}" class="btn-view">
-                            View Students
-                        </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
+  <div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Checkup Type</th>
+                <th>Notes</th>
+                <th>Courses</th>
+                <th>Students</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($checkups as $checkup)
+            <tr>
+                <td>{{ \Carbon\Carbon::parse($checkup->date)->format('F j, Y') }}</td>
+                <td>{{ ucfirst($checkup->checkup_type) }}</td>
+                <td>{{ $checkup->notes ?? '-' }}</td>
+                <td>
+                    @php
+                        $courses = $checkup->patients->map(function($student) {
+                            return $student->personalInformation->course ?? 'N/A';
+                        })->unique()->implode(', ');
+                    @endphp
+                    {{ $courses }}
+                </td>
+                <td>
+                    <a href="{{ route('staff.checkups.students', $checkup->id) }}" class="btn-view">
+                        View Students
+                    </a>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
 
     <div class="mt-3">
         {{ $checkups->links() }}

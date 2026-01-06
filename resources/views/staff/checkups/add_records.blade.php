@@ -120,14 +120,10 @@
 <div class="container">
     <div class="form-card">
         <h2>
-            Add/Edit Record: 
             {{ $checkupPatient->patient->first_name }} 
-            {{ $checkupPatient->patient->last_name }}
+            {{ $checkupPatient->patient->last_name }}'s
+            Records
         </h2>
-
-        <div class="section-title">
-            Checkup Type: {{ ucfirst($checkupPatient->checkup->checkup_type) }}
-        </div>
 
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -147,61 +143,62 @@
             @csrf
 
 
-            {{-- ⭐ VITALS FORM --}}
-            @if($checkupPatient->checkup->checkup_type === 'vitals')
-                <h4 class="section-title">Vitals Information</h4>
+{{-- ⭐ VITALS FORM --}}
+@if($checkupPatient->checkup->checkup_type === 'vitals')
+    <h4 class="section-title">Vitals Information</h4>
 
-                <label class="form-label">Height (cm)</label>
-                <input type="number" step="0.01" name="height" class="form-control"
-                    value="{{ old('height', optional($checkupPatient->vitals->first())->height) }}">
+    <label class="form-label">Height (cm)</label>
+    <input type="number" step="0.01" name="height" class="form-control"
+        value="{{ old('height', optional($checkupPatient->vitals)->height) }}">
 
-                <label class="form-label">Weight (kg)</label>
-                <input type="number" step="0.01" name="weight" class="form-control"
-                    value="{{ old('weight', optional($checkupPatient->vitals->first())->weight) }}">
+    <label class="form-label">Weight (kg)</label>
+    <input type="number" step="0.01" name="weight" class="form-control"
+        value="{{ old('weight', optional($checkupPatient->vitals)->weight) }}">
 
-                <label class="form-label">Blood Pressure</label>
-                <input type="text" name="blood_pressure" class="form-control"
-                    value="{{ old('blood_pressure', optional($checkupPatient->vitals->first())->blood_pressure) }}">
+    <label class="form-label">Blood Pressure</label>
+    <input type="text" name="blood_pressure" class="form-control"
+        value="{{ old('blood_pressure', optional($checkupPatient->vitals)->blood_pressure) }}">
 
-                <label class="form-label">Pulse Rate</label>
-                <input type="number" name="pulse_rate" class="form-control"
-                    value="{{ old('pulse_rate', optional($checkupPatient->vitals->first())->pulse_rate) }}">
+    <label class="form-label">Pulse Rate</label>
+    <input type="number" name="pulse_rate" class="form-control"
+        value="{{ old('pulse_rate', optional($checkupPatient->vitals)->pulse_rate) }}">
 
-                <label class="form-label">Temperature (°C)</label>
-                <input type="number" step="0.1" name="temperature" class="form-control"
-                    value="{{ old('temperature', optional($checkupPatient->vitals->first())->temperature) }}">
+    <label class="form-label">Temperature (°C)</label>
+    <input type="number" step="0.1" name="temperature" class="form-control"
+        value="{{ old('temperature', optional($checkupPatient->vitals)->temperature) }}">
 
-                <label class="form-label">Respiratory Rate</label>
-                <input type="number" step="0.1" name="respiratory_rate" class="form-control"
-                    value="{{ old('respiratory_rate', optional($checkupPatient->vitals->first())->respiratory_rate) }}">
+    <label class="form-label">Respiratory Rate</label>
+    <input type="number" step="0.1" name="respiratory_rate" class="form-control"
+        value="{{ old('respiratory_rate', optional($checkupPatient->vitals)->respiratory_rate) }}">
 
-                <label class="form-label">BMI</label>
-                <input type="number" step="0.01" name="bmi" class="form-control"
-                    value="{{ old('bmi', optional($checkupPatient->vitals->first())->bmi) }}">
-            @endif
+    <label class="form-label">BMI</label>
+    <input type="number" step="0.01" name="bmi" class="form-control"
+        value="{{ old('bmi', optional($checkupPatient->vitals)->bmi) }}">
+@endif
 
+{{-- ⭐ DENTAL FORM --}}
+@if($checkupPatient->checkup->checkup_type === 'dental')
+    <h4 class="section-title">Dental Information</h4>
 
-            {{-- ⭐ DENTAL FORM --}}
-            @if($checkupPatient->checkup->checkup_type === 'dental')
-                <h4 class="section-title">Dental Information</h4>
+    <label class="form-label">Dental Status</label>
+    <input type="text" name="dental_status" class="form-control"
+        value="{{ old('dental_status', optional($checkupPatient->dentals)->dental_status) }}">
 
-                <label class="form-label">Dental Status</label>
-                <input type="text" name="dental_status" class="form-control"
-                    value="{{ old('dental_status', optional($checkupPatient->dentals->first())->dental_status) }}">
+    <label class="form-label">Needs Treatment</label>
+    <select name="needs_treatment" class="form-control" required>
+        <option value="">-- Select --</option>
+        <option value="no" {{ optional($checkupPatient->dentals)->needs_treatment === 'no' ? 'selected' : '' }}>No</option>
+        <option value="yes" {{ optional($checkupPatient->dentals)->needs_treatment === 'yes' ? 'selected' : '' }}>Yes</option>
+    </select>
 
-                <label class="form-label">Needs Treatment</label>
-                <select name="needs_treatment" class="form-control">
-                    <option value="no" {{ optional($checkupPatient->dentals->first())->needs_treatment === 'no' ? 'selected' : '' }}>No</option>
-                    <option value="yes" {{ optional($checkupPatient->dentals->first())->needs_treatment === 'yes' ? 'selected' : '' }}>Yes</option>
-                </select>
+    <label class="form-label">Treatment Type</label>
+    <input type="text" name="treatment_type" class="form-control"
+        value="{{ old('treatment_type', optional($checkupPatient->dentals)->treatment_type) }}">
 
-                <label class="form-label">Treatment Type</label>
-                <input type="text" name="treatment_type" class="form-control"
-                    value="{{ old('treatment_type', optional($checkupPatient->dentals->first())->treatment_type) }}">
+    <label class="form-label">Notes</label>
+    <textarea name="note" class="form-control" rows="3">{{ old('note', optional($checkupPatient->dentals)->note) }}</textarea>
+@endif
 
-                <label class="form-label">Notes</label>
-                <textarea name="note" class="form-control" rows="3">{{ old('note', optional($checkupPatient->dentals->first())->note) }}</textarea>
-            @endif
 
 
             <div class="d-flex justify-content-between mt-4">
