@@ -109,7 +109,6 @@
 
 <div class="container">
 
-    {{-- Alerts --}}
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
@@ -124,12 +123,10 @@
         </div>
     @endif
 
-    {{-- ✅ Form --}}
     <form action="{{ route('admin.checkups.update_patient', $checkupPatient->id) }}" method="POST">
         @csrf
         @method('PUT')
 
-        {{-- ---------------- VITALS ---------------- --}}
         @if($checkupPatient->checkup->checkup_type === 'vitals')
             <div class="card mb-3 p-3">
                 <h4>Vitals</h4>
@@ -179,7 +176,6 @@
             </div>
         @endif
 
-        {{-- ---------------- DENTAL ---------------- --}}
         @if($checkupPatient->checkup->checkup_type === 'dental')
             <div class="card mb-3 p-3">
                 <h4>Dental</h4>
@@ -210,7 +206,6 @@
             </div>
         @endif
 
-        {{-- ✅ Buttons --}}
         <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
             <button type="submit" class="btn btn-primary w-100">
                 💾 Save Record
@@ -222,7 +217,6 @@
     </form>
 </div>
 
-{{-- ✅ Auto-calculate BMI --}}
 @if($checkupPatient->checkup->checkup_type === 'vitals')
 <script>
 document.addEventListener('DOMContentLoaded', function() {

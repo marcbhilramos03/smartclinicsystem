@@ -12,26 +12,19 @@ class PatientMedicalRecordController extends Controller
 {
     public function index()
     {
-        $patient = Auth::user(); // logged-in patient
+        $patient = Auth::user(); 
 
-        // -----------------------------
-        // 1. Fetch Checkups (with Vitals & Dentals)
-        // -----------------------------
         $checkups = CheckupPatient::with(['checkup.staff', 'vitals', 'dentals'])
             ->where('patient_id', $patient->user_id)
             ->orderByDesc('created_at')
             ->get();
 
-        // -----------------------------
-        // 2. Fetch Clinic Sessions
-        // -----------------------------
+     
         $clinicSessions = ClinicSession::where('user_id', $patient->user_id)
             ->orderByDesc('session_date')
             ->get();
 
-        // -----------------------------
-        // 3. Fetch Medical History
-        // -----------------------------
+    
         $medicalHistories = MedicalHistory::where('user_id', $patient->user_id)
             ->orderByDesc('date_recorded')
             ->get();

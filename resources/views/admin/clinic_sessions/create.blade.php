@@ -130,7 +130,6 @@
         <form action="{{ route('admin.patients.clinic_sessions.store', $patient) }}" method="POST">
             @csrf
 
-            {{-- Readonly formatted date --}}
             <div class="mb-3">
                 <label for="session_date" class="form-label">Date</label>
                 <input 

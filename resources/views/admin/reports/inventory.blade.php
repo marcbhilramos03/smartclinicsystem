@@ -3,12 +3,10 @@
 @section('content')
 <div class="container-fluid">
 
-    <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Inventory Report</h1>
     </div>
 
-    <!-- Month Picker -->
     <form method="GET" action="{{ route('admin.reports.inventory') }}" class="mb-4">
         <div class="row g-2 align-items-center">
             <div class="col-auto">
@@ -21,7 +19,6 @@
         </div>
     </form>
 
-    <!-- Active Inventory Table -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Active Inventory for {{ $month ?? \Carbon\Carbon::now()->month }}/{{ $year ?? \Carbon\Carbon::now()->year }}</h6>
@@ -62,7 +59,6 @@
         </div>
     </div>
 
-    <!-- Active Inventory Chart -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-info">Active Inventory Stock Chart</h6>
@@ -72,7 +68,6 @@
         </div>
     </div>
 
-    <!-- Archived Inventory Table -->
     @if($archived->count() > 0)
     <div class="card shadow mb-4">
         <div class="card-header py-3">
@@ -110,7 +105,6 @@
         </div>
     </div>
 
-    <!-- Archived Inventory Chart -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">Archived Inventory Chart</h6>
@@ -128,7 +122,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    // Active Inventory Chart
     const inventoryLabels = @json($inventory->pluck('item_name'));
     const inventoryData = @json($inventory->pluck('stock_quantity'));
     const ctx = document.getElementById('inventoryChart').getContext('2d');
@@ -155,7 +148,6 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fillText('No active inventory for this month', 20, 50);
     }
 
-    // Archived Inventory Chart
     @if($archived->count() > 0)
     const archivedLabels = @json($archived->pluck('item_name'));
     const archivedData = @json($archived->pluck('quantity'));

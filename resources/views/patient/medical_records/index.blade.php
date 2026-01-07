@@ -3,25 +3,26 @@
 @section('content')
 
 <div class="container my-5">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="h3 text-gray-800 mb-0">My Health Records</h1>
+        </div>
+    </div>
 
-    <!-- FLEXBOX CARDS -->
     <div class="d-flex flex-wrap gap-3 justify-content-center mb-5">
 
-        <!-- Checkups Card -->
         <div class="card flex-fill shadow-sm text-center p-3 hover-shadow" style="min-width: 250px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#checkupsModal">
             <i class="bi bi-heart-pulse-fill text-primary mb-2 fs-2"></i>
             <h5 class="card-title">Checkups</h5>
             <p class="card-text text-muted">{{ $checkups->count() }} Records</p>
         </div>
 
-        <!-- Clinic Sessions Card -->
         <div class="card flex-fill shadow-sm text-center p-3 hover-shadow" style="min-width: 250px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#clinicModal">
             <i class="bi bi-hospital-fill text-success mb-2 fs-2"></i>
             <h5 class="card-title">Clinic Visit</h5>
             <p class="card-text text-muted">{{ $clinicSessions->count() }} Records</p>
         </div>
 
-        <!-- Medical History Card -->
         <div class="card flex-fill shadow-sm text-center p-3 hover-shadow" style="min-width: 250px; cursor: pointer;" data-bs-toggle="modal" data-bs-target="#historyModal">
             <i class="bi bi-file-medical-fill text-warning mb-2 fs-2"></i>
             <h5 class="card-title">Medical History</h5>
@@ -59,18 +60,22 @@
                                 </thead>
                                 <tbody>
                                     @foreach($checkups as $cp)
-                                        @foreach($cp->vitals as $v)
+                                        @if($cp->vitals)
                                         <tr>
-                                            <td>{{ \Carbon\Carbon::parse($cp->checkup->date ?? now())->format('M d, Y') }}</td>
-                                            <td>{{ $v->height ?? '-' }}</td>
-                                            <td>{{ $v->weight ?? '-' }}</td>
-                                            <td>{{ $v->blood_pressure ?? '-' }}</td>
-                                            <td>{{ $v->respiratory_rate ?? '-' }}</td>
-                                            <td>{{ $v->pulse_rate ?? '-' }}</td>
-                                            <td>{{ $v->temperature ?? '-' }}</td>
-                                            <td>{{ $v->bmi ?? '-' }}</td>
+                                            <td>{{ $cp->checkup?->date ? \Carbon\Carbon::parse($cp->checkup->date)->format('M d, Y') : '-' }}</td>
+                                            <td>{{ $cp->vitals->height ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->weight ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->blood_pressure ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->respiratory_rate ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->pulse_rate ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->temperature ?? '-' }}</td>
+                                            <td>{{ $cp->vitals->bmi ?? '-' }}</td>
                                         </tr>
-                                        @endforeach
+                                        @else
+                                        <tr>
+                                            <td colspan="8" class="text-center">No vitals recorded.</td>
+                                        </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -91,15 +96,19 @@
                                 </thead>
                                 <tbody>
                                     @foreach($checkups as $cp)
-                                        @foreach($cp->dentals as $d)
+                                        @if($cp->dentals)
                                         <tr>
-                                            <td>{{ \Carbon\Carbon::parse($cp->checkup->date ?? now())->format('M d, Y') }}</td>
-                                            <td>{{ $d->dental_status ?? '-' }}</td>
-                                            <td>{{ $d->needs_treatment ?? '-' }}</td>
-                                            <td>{{ $d->treatment_type ?? '-' }}</td>
-                                            <td>{{ $d->note ?? '-' }}</td>
+                                            <td>{{ $cp->checkup?->date ? \Carbon\Carbon::parse($cp->checkup->date)->format('M d, Y') : '-' }}</td>
+                                            <td>{{ $cp->dentals->dental_status ?? '-' }}</td>
+                                            <td>{{ $cp->dentals->needs_treatment ?? '-' }}</td>
+                                            <td>{{ $cp->dentals->treatment_type ?? '-' }}</td>
+                                            <td>{{ $cp->dentals->note ?? '-' }}</td>
                                         </tr>
-                                        @endforeach
+                                        @else
+                                        <tr>
+                                            <td colspan="5" class="text-center">No dental records.</td>
+                                        </tr>
+                                        @endif
                                     @endforeach
                                 </tbody>
                             </table>
@@ -140,7 +149,7 @@
                                             <td>{{ \Carbon\Carbon::parse($cs->session_date)->format('M d, Y') }}</td>
                                             <td>{{ $cs->reason }}</td>
                                             <td>{{ $cs->remedy ?? '-' }}</td>
-                                            <td>{{ $cs->admin->first_name ?? 'N/A' }} {{ $cs->admin->last_name ?? 'N/A' }} {{ $cs->admin->credential->license_type ?? '-' }}</td>
+                                            <td>{{ $cs->admin?->first_name ?? 'N/A' }} {{ $cs->admin?->last_name ?? 'N/A' }} {{ $cs->admin?->credential?->license_type ?? '-' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -194,10 +203,6 @@
 
 </div>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<!-- Hover Shadow Effect -->
 <style>
 .hover-shadow:hover {
     transform: translateY(-5px);
@@ -205,46 +210,9 @@
     box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
 }
 
-/* Make inputs and textareas bigger */
-#historyModal .form-control {
-    font-size: 1.2rem;
-    padding: 1rem;
-}
-
-/* Make the submit button bigger */
-#historyModal .btn-primary {
-    font-size: 1.2rem;
-    padding: 0.8rem 2rem;
-}
-
-/* Optional: increase spacing between form fields */
-#historyModal .mb-3 {
-    margin-bottom: 1.5rem;
-}
-/* Form inside modal */
-.modal .form-control {
-    font-size: 1.2rem;
-    padding: 1rem;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.modal .btn-lg {
-    font-size: 1.2rem;
-    padding: 0.8rem 2rem;
-}
-
-.modal .mb-3 {
-    margin-bottom: 1.5rem;
-}
-
-/* Form container styling */
-.modal .bg-light {
-    background-color: #f8f9fa !important;
-}
 .big-card {
-    min-width: 500px;      /* Make cards wider */
-    min-height: 250px;     /* Make cards taller */
+    min-width: 500px;
+    min-height: 250px;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -254,15 +222,15 @@
 }
 
 .card i {
-    font-size: 3rem;       /* Bigger icon */
+    font-size: 3rem;
 }
 
 .card-title {
-    font-size: 1.5rem;     /* Bigger title */
+    font-size: 1.5rem;
 }
 
 .card-text {
-    font-size: 1.2rem;     /* Bigger text */
+    font-size: 1.2rem;
 }
 </style>
 

@@ -10,7 +10,7 @@ class Dental extends Model
     use HasFactory;
 
     protected $fillable = [
-        'checkup_patient_id', // REQUIRED
+        'checkup_patient_id', 
         'checkup_id',
         'dental_status',
         'needs_treatment',
@@ -18,7 +18,7 @@ class Dental extends Model
         'note',
     ];
 
-    // Relation to Checkup
+  
     public function checkup()
     {
         return $this->belongsTo(Checkup::class, 'checkup_id');

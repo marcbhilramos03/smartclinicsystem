@@ -11,7 +11,7 @@ protected $fillable = [
     'checkup_type',
     'date',
     'notes',
-    'personal_information_id', // add this!
+    'personal_information_id',
 ];
 
     public function staff() {

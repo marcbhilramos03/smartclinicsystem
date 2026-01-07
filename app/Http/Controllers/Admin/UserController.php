@@ -63,7 +63,7 @@ class UserController extends Controller
                     'emer_con_address'  => 'nullable|string|max:255',
                 ]);
 
-                // Capitalize names & gender
+          
                 $first_name = ucwords(trim($validated['first_name']));
                 $middle_name = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
                 $last_name = ucwords(trim($validated['last_name']));
@@ -109,7 +109,6 @@ class UserController extends Controller
                     'address'        => 'nullable|string|max:255',
                 ]);
 
-                // Capitalize names & gender
                 $first_name = ucwords(trim($validated['first_name']));
                 $middle_name = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
                 $last_name = ucwords(trim($validated['last_name']));
@@ -167,7 +166,6 @@ class UserController extends Controller
             'phone_number'   => 'nullable|string|max:20',
         ]);
 
-        // Capitalize names & gender
         $validated['first_name'] = ucwords(trim($validated['first_name']));
         $validated['middle_name'] = $validated['middle_name'] ? ucwords(trim($validated['middle_name'])) : null;
         $validated['last_name'] = ucwords(trim($validated['last_name']));

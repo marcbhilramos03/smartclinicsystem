@@ -4,14 +4,14 @@
 
 @section('content')
 <style>
-/* === General Container === */
+
 .create-user-container {
     max-width: 1400px;
     margin: 30px auto;
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* === Headings === */
+
 .create-user-container h2 {
     font-weight: 700;
     color: #0d6efd;
@@ -19,7 +19,7 @@
     text-align: center;
 }
 
-/* === Cards === */
+
 .card {
     border-radius: 12px;
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
@@ -32,7 +32,7 @@
     font-weight: 500;
 }
 
-/* === Form Inputs === */
+
 .form-control, .form-select {
     border-radius: 8px;
     border: 1px solid #ccc;
@@ -44,7 +44,7 @@
     box-shadow: 0 0 5px rgba(13,110,253,0.3);
 }
 
-/* === Buttons === */
+
 .btn {
     border-radius: 8px;
     padding: 10px 25px;
@@ -59,13 +59,13 @@
     background-color: #495057;
 }
 
-/* === Alerts === */
+
 .alert-danger {
     border-radius: 10px;
     font-size: 0.95rem;
 }
 
-/* === Responsive === */
+
 @media (max-width: 768px) {
     .create-user-container {
         padding: 15px;
@@ -89,7 +89,7 @@
     <form action="{{ route('admin.users.store') }}" method="POST">
         @csrf
 
-        {{-- ROLE SELECTION --}}
+       
         <div class="card">
             <div class="card-header bg-primary text-white">Role</div>
             <div class="card-body">
@@ -104,7 +104,7 @@
             </div>
         </div>
 
-        {{-- BASIC INFORMATION --}}
+        
         <div class="card">
             <div class="card-header bg-info text-white">Basic Information</div>
             <div class="card-body row g-3">
@@ -125,7 +125,7 @@
             </div>
         </div>
 
-        {{-- PATIENT FIELDS --}}
+       
         <div id="patientFields" style="display:none;">
             <div class="card">
                 <div class="card-header bg-success text-white">School Information</div>
@@ -190,7 +190,7 @@
                 </div>
             </div>
 
-            {{-- Emergency Contact --}}
+       
             <div class="card">
                 <div class="card-header bg-warning text-dark">Emergency Contact</div>
                 <div class="card-body row g-3">
@@ -214,7 +214,7 @@
             </div>
         </div>
 
-        {{-- STAFF/ADMIN FIELDS --}}
+     
         <div id="staffFields" style="display:none;">
             <div class="card">
                 <div class="card-header bg-info text-white">Staff / Admin Credentials</div>
@@ -260,7 +260,7 @@ function toggleUserFields(role) {
     document.getElementById('staffFields').style.display = (role === 'staff' || role === 'admin') ? 'block' : 'none';
 }
 
-// Keep old role selected on page reload
+
 window.onload = function() {
     const role = '{{ old('role') }}';
     if(role) toggleUserFields(role);

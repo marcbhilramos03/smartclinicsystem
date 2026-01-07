@@ -1,10 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- Main wrapper with sidebar offset --}}
+
 <div class="main-content" style="margin-left: 250px; min-height: 100vh; padding: 2rem;">
 
-    {{-- SUCCESS & ERROR MESSAGES --}}
     <div class="container-fluid mb-4">
         @if(session('success'))
             <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
@@ -28,9 +27,8 @@
         @endif
     </div>
 
-    {{-- MAIN CONTENT --}}
-    <div class="row g-4">
-        {{-- LEFT SIDE: Profile Info --}}
+
+    <div class="row g-3">
         <div class="col-lg-8 col-md-12 d-flex">
             <div class="card shadow-sm border-0 w-100 hover-scale">
                 <div class="card-header py-3 bg-dark text-white">
@@ -47,10 +45,6 @@
                         </h3>
 
                         <ul class="list-group list-group-flush text-start mb-4">
-                            <li class="list-group-item d-flex justify-content-between align-items-center fs-5">
-                                <span class="text-muted">Email:</span>
-                                <span class="fw-semibold">{{ auth()->user()->email }}</span>
-                            </li>
                             <li class="list-group-item d-flex justify-content-between align-items-center fs-5">
                                 <span class="text-muted">Profession:</span>
                                 <span class="fw-semibold">{{ auth()->user()->credential->profession ?? 'N/A' }}</span>

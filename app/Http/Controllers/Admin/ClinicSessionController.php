@@ -11,7 +11,7 @@ use App\Http\Controllers\Controller;
 
 class ClinicSessionController extends Controller
 {
-    // Show form to add a clinic session for a patient
+
     public function create(User $patient)
     {
         return view('admin.clinic_sessions.create', compact('patient'));
@@ -27,8 +27,8 @@ public function store(Request $request, User $patient)
 
     // Create the clinic session
     $session = ClinicSession::create([
-        'user_id'      => $patient->user_id,          // ✅ must exist
-        'admin_id'     => auth()->user()->user_id,   // current admin
+        'user_id'      => $patient->user_id,          
+        'admin_id'     => auth()->user()->user_id, 
         'session_date' => Carbon::parse($validated['session_date'])->format('Y-m-d'),
          'reason'       => $validated['reason'],
         'remedy'       => $validated['remedy'] ,

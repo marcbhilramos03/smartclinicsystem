@@ -5,30 +5,24 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash; // ✅ Make sure Hash is imported
+use Illuminate\Support\Facades\Hash; 
 use App\Models\User;
 
 class LoginController extends Controller
 {
-    /** 
-     * Show admin/staff login form 
-     */
+ 
     public function showLoginForm()
     {
-        return view('auth.admin-login'); // For admin/staff (email + password)
+        return view('auth.admin-login');
     }
 
-    /** 
-     * Show patient login form 
-     */
+
     public function showPatientLoginForm()
     {
-        return view('auth.patient-login'); // For patient (school_id)
+        return view('auth.patient-login'); 
     }
 
-    /** 
-     * Admin/Staff login 
-     */
+
     public function login(Request $request)
     {
         $request->validate([
@@ -38,7 +32,6 @@ class LoginController extends Controller
 
         $credentials = $request->only('email', 'password');
 
-        // Check if user exists and is admin/staff
         $user = User::where('email', $credentials['email'])
                     ->whereIn('role', ['admin', 'staff'])
                     ->first();
@@ -53,9 +46,6 @@ class LoginController extends Controller
         ])->withInput();
     }
 
-    /** 
-     * Patient login (School ID only)
-     */
     public function patientLogin(Request $request)
     {
         $request->validate([
@@ -70,7 +60,6 @@ class LoginController extends Controller
 
         $schoolId = trim($request->school_id);
 
-        // Ensure the relationship `personalInformation()` exists in User model
         $user = User::where('role', 'patient')
             ->whereHas('personalInformation', function ($query) use ($schoolId) {
                 $query->where('school_id', $schoolId);
@@ -88,9 +77,7 @@ class LoginController extends Controller
         ])->withInput();
     }
 
-    /** 
-     * Logout for all roles 
-     */
+
     public function logout(Request $request)
     {
         Auth::logout();
@@ -100,9 +87,7 @@ class LoginController extends Controller
         return redirect('/');
     }
 
-    /** 
-     * Update password (for logged-in users)
-     */
+
     public function update(Request $request)
     {
         $request->validate([

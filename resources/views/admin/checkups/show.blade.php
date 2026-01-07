@@ -5,13 +5,13 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Checkup Details</h2>
-        <a href="{{ route('admin.checkups.index') }}" class="btn btn-secondary btn-sm">Back</a>
+        <a href="{{ route('admin.checkups.index') }}" class="btn btn-secondary">Back</a>
     </div>
 
     <div class="card mb-4">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-3"><strong>Date:</strong> {{ $checkup->date }}</div>
+               <div class="col-md-3"><strong>Date:</strong> {{ \Carbon\Carbon::parse($checkup->date)->format('F d, Y') }}</div>
                 <div class="col-md-3"><strong>Perfomed By:</strong> {{ $checkup->staff->first_name }} {{ $checkup->staff->last_name }}  {{ $checkup->staff->credential->license_type }}</div>
                 <div class="col-md-3"><strong>Type:</strong> {{ ucfirst($checkup->checkup_type) }}</div>
                 <div class="col-md-3"><strong>Notes:</strong> {{ $checkup->notes ?? '𝘯𝘰 𝘯𝘰𝘵𝘦𝘴' }}</div>
@@ -59,7 +59,7 @@
                             @if($checkupPatient)
                                 <a href="{{ route('admin.checkups.edit_patient', $checkupPatient->id) }}" 
                                    class="btn btn-primary btn-sm">
-                                   Fill Record
+                                   Fill/Update Record
                                 </a>
                             @else
                                 <span class="text-muted">No record</span>
@@ -73,3 +73,4 @@
 
 </div>
 @endsection
+

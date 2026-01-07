@@ -217,3 +217,19 @@
 </div>
 
 @endsection
+<script>
+const heightInput = document.querySelector('input[name="height"]');
+const weightInput = document.querySelector('input[name="weight"]');
+const bmiInput = document.querySelector('input[name="bmi"]');
+
+function calculateBMI() {
+    const height = parseFloat(heightInput.value);
+    const weight = parseFloat(weightInput.value);
+    if (height > 0 && weight > 0) {
+        bmiInput.value = (weight / ((height/100)**2)).toFixed(2);
+    }
+}
+
+heightInput.addEventListener('input', calculateBMI);
+weightInput.addEventListener('input', calculateBMI);
+</script>

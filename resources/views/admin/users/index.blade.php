@@ -4,7 +4,6 @@
 
 @section('content')
 <style>
-    /* Course Card Styles */
     .course-card {
         color: #080808;
         text-shadow: 1px 1px 2px rgb(255, 255, 255);
@@ -59,7 +58,6 @@
 </style>
 
 @php
-// Color palette for course cards
 $colors = [
     'linear-gradient(135deg, #6a11cb, #2575fc)',
     'linear-gradient(135deg, #ff416c, #ff4b2b)',
@@ -82,7 +80,6 @@ function getFormColor($colors, &$formIndex) {
 <div class="container-fluid py-4">
     <h2 class="mb-4">Users Management</h2>
 
-    {{-- Success Message --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -90,14 +87,12 @@ function getFormColor($colors, &$formIndex) {
         </div>
     @endif
 
-    {{-- Add User Button --}}
     <div class="mb-3">
         <a href="{{ route('admin.users.create') }}" class="btn btn-primary btn-lg shadow-sm">
             <i class="fas fa-user-plus"></i> Add New User
         </a>
     </div>
 
-    {{-- Nav Tabs --}}
     <ul class="nav nav-tabs" id="userTabs" role="tablist">
         <li class="nav-item" role="presentation">
             <button class="nav-link active" id="patients-tab" data-bs-toggle="tab" data-bs-target="#patients" type="button" role="tab">
@@ -111,10 +106,8 @@ function getFormColor($colors, &$formIndex) {
         </li>
     </ul>
 
-    {{-- Tab Content --}}
     <div class="tab-content mt-4" id="userTabsContent">
 
-        {{-- Students Tab --}}
         <div class="tab-pane fade show active" id="patients" role="tabpanel" aria-labelledby="patients-tab">
             <h4 class="mb-4 text-dark">Courses</h4>
             <div class="row">
@@ -139,7 +132,6 @@ function getFormColor($colors, &$formIndex) {
             </div>
         </div>
 
-        {{-- Staff Tab --}}
         <div class="tab-pane fade" id="staff" role="tabpanel" aria-labelledby="staff-tab">
             <div class="card shadow-sm border-0">
                 <div class="card-body">
@@ -200,7 +192,6 @@ function getFormColor($colors, &$formIndex) {
     </div>
 </div>
 
-{{-- Delete Confirmation Modal --}}
 <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content border-0 shadow-lg">
@@ -223,7 +214,6 @@ function getFormColor($colors, &$formIndex) {
   </div>
 </div>
 
-{{-- Dynamic Delete Modal Script --}}
 @push('scripts')
 <script>
 var deleteUserModal = document.getElementById('deleteUserModal');

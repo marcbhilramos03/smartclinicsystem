@@ -98,7 +98,6 @@
         padding: 15px 20px;
     }
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .form-card {
             padding: 25px 20px;
@@ -142,7 +141,6 @@
             @csrf
             <input type="hidden" name="user_id" value="{{ $patient->user_id }}">
 
-            {{-- History Type --}}
             <div class="form-floating mb-3">
                 <select name="history_type" id="history_type" class="form-control" required>
                     <option value="allergy">Allergy</option>
@@ -152,25 +150,21 @@
                 <label for="history_type">History Type</label>
             </div>
 
-            {{-- Description --}}
             <div class="form-floating mb-3">
                 <textarea name="description" id="description" class="form-control" placeholder="Write details..." required>{{ old('description') }}</textarea>
                 <label for="description">Description</label>
             </div>
 
-            {{-- Notes --}}
             <div class="form-floating mb-3">
                 <textarea name="notes" id="notes" class="form-control" placeholder="Optional">{{ old('notes') }}</textarea>
                 <label for="notes">Notes (Optional)</label>
             </div>
 
-            {{-- Date Recorded --}}
             <div class="form-floating mb-3">
                 <input type="text" id="date_recorded" name="date_recorded" class="form-control" value="{{ now()->format('F j, Y') }}" readonly>
                 <label for="date_recorded">Date Recorded</label>
             </div>
 
-            {{-- Buttons --}}
             <div class="d-flex flex-column flex-sm-row gap-2 mt-4">
                 <button type="submit" class="btn btn-success w-100">
                     💾 Save Medical History

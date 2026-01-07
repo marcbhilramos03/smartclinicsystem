@@ -4,14 +4,14 @@
 
 @section('content')
 <div class="container-fluid">
-    {{-- Back Button --}}
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
         <a href="{{ route('admin.users.index') }}" class="btn btn-primary shadow-sm">
             <i class="fas fa-arrow-left"></i> Back to Users
         </a>
     </div>
 
-    {{-- Table --}}
+
     <div class="card shadow-sm">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">List of Students</h5>

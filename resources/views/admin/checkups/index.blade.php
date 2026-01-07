@@ -42,7 +42,6 @@
                                 </span>
                             </td>
 
-                            {{-- Performed by --}}
                             <td>
                                 {{ $checkup->staff?->first_name ?? '-' }}
                                 {{ $checkup->staff?->last_name ?? '-' }}
@@ -51,7 +50,6 @@
                                 </small>
                             </td>
 
-                            {{-- Scheduled by --}}
                             <td>
                                 {{ $checkup->admin?->first_name ?? '-' }}
                                 {{ $checkup->admin?->last_name ?? '-' }}
@@ -60,7 +58,6 @@
                                 </small>
                             </td>
 
-                            {{-- Actions --}}
                             <td>
                                 <a href="{{ route('admin.checkups.show', $checkup->id) }}" class="btn btn-info btn-sm">View</a>
 
@@ -68,7 +65,6 @@
                                     Delete
                                 </button>
 
-                                <!-- Delete Modal -->
                                 <div class="modal fade" id="deleteModal{{ $checkup->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $checkup->id }}" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content border-danger">
@@ -98,7 +94,6 @@
             </table>
         </div>
 
-        {{-- Pagination --}}
         <div class="mt-3">
             {{ $checkups->links() }}
         </div>

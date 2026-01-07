@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Auth;
 
 class StaffCheckupRecordController extends Controller
 {
-    // Show form to add/edit record
     public function addRecordForm($checkupId, $studentId)
     {
         $checkupPatient = CheckupPatient::firstOrCreate([
@@ -26,13 +25,13 @@ class StaffCheckupRecordController extends Controller
         return view('staff.checkups.add_records', compact('checkupPatient'));
     }
 
-    // Store or update vitals/dental
+  
     public function storeRecord(Request $request, $checkupId, $studentId)
     {
-        // Ensure checkup exists
+
         $checkup = Checkup::findOrFail($checkupId);
 
-        // Ensure CheckupPatient exists
+  
         $checkupPatient = CheckupPatient::firstOrCreate([
             'checkup_id' => $checkupId,
             'patient_id' => $studentId
@@ -54,7 +53,7 @@ class StaffCheckupRecordController extends Controller
     ['checkup_patient_id' => $checkupPatient->id],
     array_merge($validated, [
         'checkup_id' => $checkupId,
-        'checkup_patient_id' => $checkupPatient->id, // MUST include here
+        'checkup_patient_id' => $checkupPatient->id, 
     ])
 );
 
@@ -84,10 +83,10 @@ class StaffCheckupRecordController extends Controller
             ]);
 
            $dental = Dental::updateOrCreate(
-    ['checkup_patient_id' => $checkupPatient->id], // condition
+    ['checkup_patient_id' => $checkupPatient->id], 
     array_merge($validated, [
         'checkup_id' => $checkupId,
-        'checkup_patient_id' => $checkupPatient->id, // MUST include here too
+        'checkup_patient_id' => $checkupPatient->id,
     ])
 );
 

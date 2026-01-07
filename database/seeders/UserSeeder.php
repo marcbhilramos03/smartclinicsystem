@@ -12,7 +12,6 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        // ===== ADMIN =====
         $admin = User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [

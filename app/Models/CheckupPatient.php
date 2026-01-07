@@ -14,7 +14,7 @@ class CheckupPatient extends Model
         'status',
     ];
 
-    // Relationships
+    
     public function vitals()
 {
     return $this->hasOne(Vitals::class, 'checkup_patient_id');
@@ -36,7 +36,6 @@ public function dentals()
         return $this->belongsTo(Checkup::class, 'checkup_id');
     }
 
-    // Helper methods
     public function markAsCompleted()
     {
         $this->status = 'done';

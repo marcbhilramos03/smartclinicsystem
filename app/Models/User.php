@@ -25,18 +25,18 @@ class User extends Authenticatable
         'date_of_birth' => 'date',
     ];
 
-    // Personal Information
+
     public function personalInformation()
     {
         return $this->hasOne(PersonalInformation::class, 'user_id', 'user_id');
     }
-    // app/Models/User.php
+    
     public function credential()
     {
         return $this->hasOne(Credential::class, 'staff_id', 'user_id');
     }
 
-    // Admin tables
+ 
     public function medicalHistories()
     {
         return $this->hasMany(MedicalHistory::class, 'user_id', 'user_id');
@@ -54,7 +54,7 @@ public function checkupPatients()
 public function checkups()
 {
     return $this->belongsToMany(Checkup::class, 'checkup_patients', 'patient_id', 'checkup_id')
-                ->withPivot('id') // so you can access checkup_patient.id easily
+                ->withPivot('id') 
                 ->withTimestamps();
 }
 
@@ -63,10 +63,10 @@ public function vitals()
     return $this->hasManyThrough(
         Vitals::class,
         CheckupPatient::class,
-        'patient_id',          // FK on checkup_patients table
-        'checkup_patient_id',  // FK on vitals table
-        'user_id',             // local key on users
-        'id'                   // local key on checkup_patients
+        'patient_id',         
+        'checkup_patient_id', 
+        'user_id',             
+        'id'                   
     );
 }
 
@@ -75,10 +75,10 @@ public function dentals()
     return $this->hasManyThrough(
         Dental::class,
         CheckupPatient::class,
-        'patient_id',          // FK on checkup_patients table
-        'checkup_patient_id',  // FK on dentals table
-        'user_id',             // local key on users
-        'id'                   // local key on checkup_patients
+        'patient_id',          
+        'checkup_patient_id',  
+        'user_id',           
+        'id'                   
     );
 }
 public function getFormattedDobAttribute() {

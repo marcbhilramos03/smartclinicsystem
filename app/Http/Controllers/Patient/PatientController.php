@@ -6,13 +6,6 @@ use Illuminate\Http\Request;
 
 class PatientController extends Controller
 {
-    // Constructor to add auth & role middleware (optional if already applied in routes)
-    // public function __construct()
-    // {
-    //     $this->middleware(['auth', 'role:admin']);
-    // }
-
-    // Admin profile page
   public function profile()
 {
     $user = auth()->user();

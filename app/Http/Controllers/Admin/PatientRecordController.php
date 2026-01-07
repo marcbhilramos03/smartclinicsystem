@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB; // ✅ Correct place
+use Illuminate\Support\Facades\DB; 
 use App\Http\Controllers\Controller;
 
 class PatientRecordController extends Controller
@@ -13,12 +13,10 @@ class PatientRecordController extends Controller
     {
         $search = $request->input('search');
 
-        // Subquery: latest session per patient
         $latestSession = DB::table('clinic_sessions')
             ->select('user_id', DB::raw('MAX(session_date) as latest_session_date'))
             ->groupBy('user_id');
 
-        // Main query
         $patients = User::where('role', 'patient')
             ->joinSub($latestSession, 'latest_sessions', function ($join) {
                 $join->on('users.user_id', '=', 'latest_sessions.user_id');
@@ -34,23 +32,23 @@ class PatientRecordController extends Controller
             ->with(['clinicSessions' => function ($q) {
                 $q->latest('session_date');
             }])
-            ->paginate(10); // ✅ paginate works here
+            ->paginate(10); 
 
         return view('admin.patients.index', compact('patients', 'search'));
     }
 
    public function show(User $patient)
 {
-    // Load main patient info
+
     $patient->load('personalInformation');
 
-    // Paginate clinic sessions
+  
     $clinicSessions = $patient->clinicSessions()
         ->with('admin')
         ->orderBy('session_date', 'desc')
-        ->paginate(5, ['*'], 'clinic_page'); // unique page name for separate pagination
+        ->paginate(5, ['*'], 'clinic_page'); 
 
-    // Paginate checkups
+
     $checkups = $patient->checkups()
         ->with([
             'staff',
@@ -59,13 +57,13 @@ class PatientRecordController extends Controller
             'checkupPatients.patient'
         ])
         ->orderBy('created_at', 'desc')
-        ->paginate(5, ['*'], 'checkup_page'); // unique page name
+        ->paginate(5, ['*'], 'checkup_page'); 
 
-    // Paginate medical histories
+   
     $medicalHistories = $patient->medicalHistories()
         ->with('admin')
         ->orderBy('created_at', 'desc')
-        ->paginate(5, ['*'], 'history_page'); // unique page name
+        ->paginate(5, ['*'], 'history_page'); 
 
     return view('admin.patients.show', compact(
         'patient',
@@ -89,7 +87,7 @@ public function allMedicalHistories(User $patient)
 }
 public function allVitals(User $patient)
 {
-    // Fetch all vitals related to this patient
+  
     $vitals = $patient->vitals()
         ->with(['checkupPatient.checkup.staff'])
         ->latest()
@@ -100,7 +98,7 @@ public function allVitals(User $patient)
 
 public function allDentals(User $patient)
 {
-    // Fetch all dental records related to this patient
+  
     $dentals = $patient->dentals()
         ->with(['checkupPatient.checkup.staff'])
         ->latest()
@@ -108,8 +106,6 @@ public function allDentals(User $patient)
 
     return view('admin.patients.all_dentals', compact('patient', 'dentals'));
 }
-
-
 
 
 }

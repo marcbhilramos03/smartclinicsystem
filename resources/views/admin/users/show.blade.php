@@ -5,17 +5,15 @@
 @section('content')
 <div class="container-fluid">
 
-    {{-- Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="mb-0"
                         style="color:#000;"
 >User Details</h2>
         @php
-    // Determine back URL dynamically
     if($user->role === 'patient') {
         $backUrl = route('admin.users.by_course', $user->personalInformation->course ?? '');
     } else {
-        $backUrl = route('admin.users.index'); // Staff/Admin listing
+        $backUrl = route('admin.users.index'); 
     }
 @endphp
 
@@ -25,7 +23,6 @@
 
     </div>
 
-    {{-- Role Badge --}}
     <div class="mb-4">
         @if($user->role === 'admin')
             <span class="badge bg-dark fs-6">Administrator</span>
@@ -37,7 +34,6 @@
 >Student</span>
         @endif
     </div>
-{{-- Basic Info --}}
 <div class="card user-card mb-4 shadow-sm border-0 rounded-3">
     <div class="card-header bg-primary text-white fw-bold d-flex align-items-center">
         <i class="fas fa-user me-2"></i> Basic Information
@@ -58,7 +54,6 @@
            @foreach($basicInfo as $info)
     @if(!isset($info['condition']) || $info['condition'])
         @php
-            // Set column size based on role
             $colClass = isset($info['full']) && $info['full'] 
                         ? 'col-12' 
                         : ($user->role === 'patient' ? 'col-6 col-md-5' : 'col-6 col-md-4');
@@ -78,7 +73,6 @@
 </div>
 
 
-    {{-- Patient Info --}}
     @if($user->role === 'patient')
     <div class="row g-3 mb-4">
         <div class="col-md-6">
@@ -110,7 +104,6 @@
     </div>
     @endif
 
-    {{-- Staff/Admin Credentials --}}
     @if($user->role === 'staff' || $user->role === 'admin')
     <div class="card mb-4 shadow-sm border-0 rounded-3">
         <div class="card-header bg-info text-white fw-bold">
@@ -128,7 +121,7 @@
 
 <style>
     .card-body p, .card-body div {
-        color: #000 !important; /* Force black color for all card text */
+        color: #000 !important; 
     }
     .card-header i {
         color: rgba(255,255,255,0.9);
@@ -136,7 +129,6 @@
     .badge {
         padding: 0.5em 0.8em;
     }
- /* Card Styling */
 .user-card {
     border-radius: 12px;
     overflow: hidden;

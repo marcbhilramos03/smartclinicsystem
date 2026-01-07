@@ -136,7 +136,7 @@ class CheckupController extends Controller
             );
         }
 
-        // -----------------------
+
         // DENTAL RECORD
         if ($checkupPatient->checkup->checkup_type === 'dental') {
             $validated = $request->validate([

@@ -8,24 +8,20 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // Checkups table
         Schema::create('checkups', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('admin_id');
-            $table->unsignedBigInteger('staff_id'); // staff performing the checkup
-            // $table->unsignedBigInteger('personal_information_id')->nullable(); // batch scheduling
+            $table->unsignedBigInteger('staff_id'); 
             $table->string('checkup_type'); 
 
             $table->date('date');
-            $table->text('notes')->nullable(); // general notes
+            $table->text('notes')->nullable(); 
             $table->timestamps();
 
             $table->foreign('admin_id')->references('user_id')->on('users')->onDelete('cascade');
             $table->foreign('staff_id')->references('user_id')->on('users')->onDelete('cascade');
-            // $table->foreign('personal_information_id')->references('id')->on('personal_information')->onDelete('cascade');
         });
 
-        // Vitals table
         Schema::create('vitals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('checkup_id');
@@ -41,7 +37,7 @@ return new class extends Migration
             $table->foreign('checkup_id')->references('id')->on('checkups')->onDelete('cascade');
         });
 
-        // Dental table
+       
         Schema::create('dentals', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('checkup_id');

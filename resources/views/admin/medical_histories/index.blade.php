@@ -5,7 +5,6 @@
     <h2>Medical Histories</h2>
     <a href="{{ route('admin.medical_histories.create') }}" class="btn btn-primary mb-3">Add History</a>
 
-    <!-- Link to Import Medical History Page -->
     <div class="mb-3">
         <a href="{{ route('admin.medical_history.import_form') }}" class="btn btn-success">
             <i class="fas fa-upload"></i> Import Medical History

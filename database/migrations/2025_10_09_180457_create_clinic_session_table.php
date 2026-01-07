@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('clinic_sessions', function (Blueprint $table) {
     $table->id();
-    $table->unsignedBigInteger('user_id');  // patient
-    $table->unsignedBigInteger('admin_id'); // admin who added the session
+    $table->unsignedBigInteger('user_id');
+    $table->unsignedBigInteger('admin_id'); 
     $table->datetime('session_date');
     $table->text('reason');
     $table->text('remedy')->nullable();

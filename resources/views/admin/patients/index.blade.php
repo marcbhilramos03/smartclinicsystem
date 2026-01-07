@@ -10,16 +10,16 @@
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="card patient-card shadow-sm border-0">
 
-                        {{-- Card body --}}
+                    
                         <div class="card-body d-flex flex-column flex-md-row justify-content-start align-items-start">
 
-                            {{-- Patient Info --}}
+                           
                             <div class="patient-info me-md-3">
                                 <h5 class="card-title mb-2">
                                     {{ $patient->full_name ?? $patient->first_name . ' ' . $patient->last_name }}
                                 </h5>
 
-                                {{-- School ID Badge --}}
+                       
                                 <p class="mb-2">
                                     <i class="fas fa-id-card"></i>
                                     @if($patient->school_id)
@@ -29,7 +29,7 @@
                                     @endif
                                 </p>
 
-                                {{-- Latest Clinic Session --}}
+                              
                                 @if($patient->latestClinicSession)
                                     <span class="badge last-visit mb-0">
                                         Last Visit: {{ \Carbon\Carbon::parse($patient->latestClinicSession->session_date)->format('M d, Y') }}
@@ -39,7 +39,7 @@
                                 @endif
                             </div>
 
-                            {{-- Action Button --}}
+                          
                             <div class="patient-action mt-4 ms-auto">
                                 <a href="{{ route('admin.patients.show', $patient->user_id) }}" class="btn btn-info btn-sm shadow-sm patient-btn">
                                     <i class="fas fa-eye me-2"></i> Details
@@ -52,7 +52,7 @@
             @endforeach
         </div>
 
-        {{-- Pagination --}}
+      
         <div class="mt-4 d-flex justify-content-start">
             {{ $patients->links() }}
         </div>

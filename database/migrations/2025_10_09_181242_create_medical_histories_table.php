@@ -6,15 +6,13 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
+
     public function up(): void
     {
     Schema::create('medical_histories', function (Blueprint $table) {
     $table->id();
-    $table->unsignedBigInteger('user_id');   // patient
-    $table->unsignedBigInteger('admin_id');  // admin who recorded
+    $table->unsignedBigInteger('user_id');   
+    $table->unsignedBigInteger('admin_id');  
     $table->string('history_type');
     $table->text('description');
     $table->date('date_recorded')->nullable();
@@ -26,9 +24,7 @@ return new class extends Migration
 
     }
 
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         Schema::dropIfExists('medical_histories');

@@ -3,7 +3,6 @@
 @section('content')
 
 <style>
-/* ===== Body & Container ===== */
 body {
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #e6f4ea, #c8f0d2);
@@ -15,13 +14,11 @@ body {
     padding: 20px 15px;
 }
 
-/* ===== Heading ===== */
 h1.h3 {
     color: #198754;
     font-weight: 700;
 }
 
-/* ===== Profile Card ===== */
 .card-profile {
     border-radius: 16px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.08);
@@ -37,7 +34,6 @@ h1.h3 {
     transform: translateY(-3px);
 }
 
-/* ===== Profile Image ===== */
 .img-profile {
     width: 140px;
     height: 140px;
@@ -47,7 +43,6 @@ h1.h3 {
     box-shadow: 0 3px 10px rgba(0,0,0,0.1);
 }
 
-/* ===== Name & Typography ===== */
 h4.fw-bold {
     color: #198754;
     margin-top: 10px;
@@ -67,7 +62,6 @@ h4.fw-bold {
     color: #333;
 }
 
-/* ===== Credential Section ===== */
 .credential-section {
     background-color: #f6fdf7;
     padding: 15px 20px;
@@ -85,7 +79,6 @@ h4.fw-bold {
     margin-bottom: 5px;
 }
 
-/* ===== Responsive ===== */
 @media (max-width: 768px) {
     .row.g-0 {
         flex-direction: column;
@@ -102,23 +95,20 @@ h4.fw-bold {
 
 <div class="container-fluid">
 
-    <!-- Page Heading -->
     <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4">
         <h1 class="h3 mb-2 mb-md-0">Patient Profile</h1>
     </div>
 
-    <!-- Profile Card -->
     <div class="d-flex justify-content-center">
         <div class="card-profile shadow-sm mb-4">
             <div class="row g-0 align-items-center">
                 
-                <!-- Profile Image -->
+                
                 <div class="col-12 col-md-4 text-center p-4 border-end border-light">
                     <img class="img-profile mb-3" src="{{ asset('images/profile.png') }}" alt="Profile Image">
                     <h4 class="fw-bold">{{ $user->first_name }} {{ $user->last_name }}</h4>
                 </div>
 
-                <!-- Personal Info -->
                 <div class="col-12 col-md-8 p-4">
                     <ul class="list-group list-group-flush mb-3">
                         <li class="list-group-item"><strong>Gender:</strong> {{ $user->gender ?? 'N/A' }}</li>

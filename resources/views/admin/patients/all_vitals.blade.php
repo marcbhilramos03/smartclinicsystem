@@ -3,7 +3,6 @@
 @section('content')
 <div class="container-fluid mt-4">
 
-    {{-- Page Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2 class="fw-bold text-primary mb-2 mb-md-0">
             <i class="fas fa-heartbeat me-2"></i> 
@@ -14,7 +13,7 @@
         </a>
     </div>
 
-    {{-- Card Wrapper --}}
+
     <div class="card shadow-sm border-0">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0"><i class="fas fa-stethoscope me-2"></i> Patient Vital Records</h5>
@@ -74,29 +73,29 @@
     </div>
 </div>
 
-{{-- INTERNAL STYLES --}}
+
 <style>
-/* Overall look */
+
 body {
     background-color: #f8f9fc;
     font-family: 'Poppins', sans-serif;
 }
 
-/* Card styling */
+
 .card {
     border-radius: 12px;
     transition: 0.3s ease;
 }
 
 
-/* Card header */
+
 .card-header {
     background: linear-gradient(90deg, #007bff, #0056b3);
     font-weight: 600;
     border-bottom: none;
 }
 
-/* Table styling */
+
 .table {
     border-radius: 10px;
     overflow: hidden;
@@ -115,13 +114,13 @@ body {
     transition: 0.2s;
 }
 
-/* Table cells */
+
 .table td {
     padding: 0.8rem;
     vertical-align: middle;
 }
 
-/* Buttons */
+
 .btn {
     border-radius: 8px;
     transition: all 0.2s ease-in-out;
@@ -132,7 +131,7 @@ body {
     color: #fff;
 }
 
-/* Responsive adjustments */
+
 @media (max-width: 768px) {
     .card-header h5 {
         font-size: 1rem;

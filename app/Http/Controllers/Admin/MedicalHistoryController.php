@@ -24,7 +24,7 @@ public function create($patientId)
 }
 public function store(Request $request, $patient)
 {
-    // Make sure the patient exists
+  
     $patient = User::findOrFail($patient);
 
     // Validate the request

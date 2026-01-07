@@ -64,7 +64,16 @@
         }
     }
 </style>
+ {{-- Header --}}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div><br>
+            <h1 class="h3 text-gray-800 mb-0">Student's Dashboard</h1>
+        </div>
 
+        <span class="badge bg-light text-dark px-3 py-2 shadow-sm">
+            👋 Welcome, {{ auth()->user()->first_name }}
+        </span>
+    </div>
 <div class="bg-light min-vh-100 p-4">
     <!-- Dashboard Cards -->
     <div class="content-wrapper">

@@ -116,7 +116,6 @@
         <form action="{{ route('admin.checkups.store') }}" method="POST">
             @csrf
 
-            {{-- Assign Staff --}}
             <div class="mb-3">
                 <label for="staff_id" class="form-label">Assign Staff</label>
                 <select name="staff_id" id="staff_id" class="form-control" required>
@@ -127,7 +126,6 @@
                 </select>
             </div>
 
-            {{-- Course --}}
             <div class="mb-3">
                 <label for="course" class="form-label">Grade/Course</label>
                 <select name="course" id="course" class="form-control" required>
@@ -138,7 +136,6 @@
                 </select>
             </div>
 
-            {{-- Checkup Type --}}
             <div class="mb-3">
                 <label for="checkup_type" class="form-label">Checkup Type</label>
                 <select name="checkup_type" id="checkup_type" class="form-control" required>
@@ -147,13 +144,11 @@
                 </select>
             </div>
 
-            {{-- Date --}}
             <div class="mb-3">
                 <label for="date" class="form-label">Date</label>
                 <input type="date" name="date" id="date" class="form-control" required>
             </div>
 
-            {{-- Notes --}}
             <div class="mb-3">
                 <label for="notes" class="form-label">Notes</label>
                 <textarea name="notes" id="notes" class="form-control" rows="3" placeholder="Optional notes..."></textarea>

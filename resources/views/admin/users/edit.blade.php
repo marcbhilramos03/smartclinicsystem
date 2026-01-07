@@ -118,7 +118,6 @@
 <div class="container-fluid">
     <h2>Edit User</h2>
 
-    {{-- Display Validation Errors --}}
     @if ($errors->any())
         <div class="alert alert-danger">
             <ul class="mb-0">
@@ -132,7 +131,6 @@
     <form action="{{ route('admin.users.update', $user->user_id) }}" method="POST">
         @csrf
         @method('PUT')
-        {{-- BASIC INFORMATION --}}
         <div class="card mb-4 shadow-sm">
             <div class="card-header bg-primary text-white">
                 Basic Information
@@ -193,7 +191,6 @@
             </div>
         </div>
 
-        {{-- PATIENT FIELDS --}}
         @if($user->role === 'patient')
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-success text-white">
@@ -252,7 +249,6 @@
             </div>
         @endif
 
-        {{-- STAFF FIELDS --}}
         @if($user->role === 'staff')
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-info text-white">
@@ -280,14 +276,12 @@
             </div>
         @endif
 
-        {{-- ADMIN INFO --}}
         @if($user->role === 'admin')
             <div class="alert alert-dark">
                 This user is an <strong>Administrator</strong> and has full system privileges.
             </div>
         @endif
 
-        {{-- BUTTONS --}}
         <div class="d-flex justify-content-between mt-4">
             <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">
                 ✖ Cancel

@@ -3,7 +3,6 @@
 @section('content')
 <div class="container-fluid mt-4">
 
-    {{-- Page Header --}}
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2 class="fw-bold text-dark mb-2 mb-md-0">
             <i class="fas fa-briefcase-medical me-2 text-secondary"></i> 
@@ -14,7 +13,6 @@
         </a>
     </div>
 
-    {{-- Card Wrapper --}}
     <div class="card shadow-sm border-0">
         <div class="card-header bg-dark text-white">
             <h5 class="mb-0">
@@ -65,7 +63,6 @@
     </div>
 </div>
 
-{{-- INTERNAL STYLES --}}
 <style>
 body {
     background-color: #f4f4f4;
@@ -82,7 +79,6 @@ body {
     font-weight: 600;
 }
 
-/* Table styling */
 .table {
     border-radius: 10px;
     overflow: hidden;
@@ -106,7 +102,6 @@ body {
     vertical-align: middle;
 }
 
-/* Buttons */
 .btn {
     border-radius: 8px;
     transition: all 0.2s ease-in-out;
@@ -117,7 +112,6 @@ body {
     color: #fff;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
     .card-header h5 {
         font-size: 1rem;

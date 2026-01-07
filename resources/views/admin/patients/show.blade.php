@@ -8,12 +8,12 @@
     font-family: 'Poppins', sans-serif;
 }
 
-/* Section spacing */
+
 .container, .row {
     margin-top: 10px;
 }
 
-/* ===== CARD STYLING ===== */
+
 .card {
     border: none;
     border-radius: 12px;
@@ -43,7 +43,6 @@
     margin: 0;
 }
 
-/* ===== PERSONAL INFO SECTION ===== */
 .card-body p {
     margin-bottom: 8px;
     font-size: 0.95rem;
@@ -53,7 +52,7 @@
     color: #495057;
 }
 
-/* ===== BUTTONS ===== */
+
 .btn {
     border-radius: 8px;
     transition: all 0.2s ease;
@@ -95,7 +94,7 @@
     transform: scale(1.03);
 }
 
-/* ===== TABLE STYLING ===== */
+
 .table {
     margin-bottom: 0;
     border-collapse: separate;
@@ -119,7 +118,7 @@
     padding: 0.75rem 1rem;
 }
 
-/* ===== MODAL STYLING ===== */
+
 .modal-content {
     border-radius: 12px;
 }
@@ -142,14 +141,14 @@
     border-top: none;
 }
 
-/* ===== SCROLLABLE CONTENT ===== */
+
 .scrollable-content {
     max-height: calc(100vh - 120px);
     overflow-y: auto;
     padding-right: 15px;
 }
 
-/* ===== RESPONSIVE DESIGN ===== */
+
 @media (max-width: 991px) {
     .scrollable-content {
         max-height: none;
@@ -186,7 +185,7 @@
 </style>
 
 <div class="row g-3">
-    {{-- LEFT COLUMN: PERSONAL INFORMATION --}}
+   
     <div class="col-lg-4 mb-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
@@ -203,7 +202,7 @@
                     <p><strong>Phone:</strong> {{ $patient->phone_number ?? '-' }}</p>
                 </div>
 
-                {{-- View Details Button --}}
+               
                 <div class="text-center mb-3">
                     <button 
                         class="btn btn-light d-inline-flex align-items-center btn-sm shadow-sm rounded-3 px-3" 
@@ -217,7 +216,7 @@
 
                 <hr class="my-3">
 
-                {{-- Record Actions --}}
+                
                 <div class="d-flex flex-wrap gap-2">
                     <a href="{{ route('admin.patients.clinic_sessions.create', $patient->user_id) }}" 
                        class="btn btn-outline-primary shadow-sm flex-fill text-nowrap">
@@ -233,11 +232,11 @@
         </div>
     </div>
 
-    {{-- RIGHT COLUMN: RECORDS --}}
+    
     <div class="col-lg-8">
         <div class="scrollable-content">
             
-            {{-- MEDICAL HISTORIES --}}
+         
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-book-medical"></i> Medical Histories</h4>
@@ -276,7 +275,7 @@
                     @endif
                 </div>
             </div>
-            {{-- CLINIC SESSIONS --}}
+            
             <div class="card mb-4 shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-stethoscope"></i> Clinic Visits</h4>
@@ -317,7 +316,6 @@
                     @endif
                 </div>
             </div>
-            {{-- CHECKUPS --}}
             <div class="card shadow-sm">
                 <div class="card-header bg-light d-flex justify-content-between align-items-center">
                     <h4 class="mb-0"><i class="fas fa-heartbeat"></i> Checkups</h4>
@@ -368,7 +366,6 @@
     </div>
 </div>
 
-{{-- PATIENT INFO MODAL --}}
 <div class="modal fade" id="patientInfoModal" tabindex="-1" aria-labelledby="patientInfoModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg">

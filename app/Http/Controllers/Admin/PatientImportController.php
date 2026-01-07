@@ -17,16 +17,14 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class PatientImportController extends Controller
 {
-    // Show the import form
-    // Show the patient import form
     public function showPatientImportForm()
     {
-        return view('imports.import_patient'); // updated path
+        return view('imports.import_patient'); 
     }
-   // Show medical history import form
+
     public function showMedicalHistoryImportForm()
     {
-        return view('imports.import_medical_history'); // updated path
+        return view('imports.import_medical_history'); 
     }
 
     // Import patients/students
@@ -50,7 +48,7 @@ class PatientImportController extends Controller
             DB::beginTransaction();
 
             foreach ($rows as $index => $row) {
-                // Skip header row if present
+            
                 if ($index === 0 && strtolower(trim($row[0])) === 'school_id') continue;
 
                 $data = [
@@ -71,7 +69,7 @@ class PatientImportController extends Controller
                     'emergency_address' => $row[14] ?? null,
                 ];
 
-                // Validate essential fields
+          
                 $validator = Validator::make($data, [
                     'school_id' => 'required',
                     'first_name' => 'required',
@@ -83,13 +81,13 @@ class PatientImportController extends Controller
                     continue;
                 }
 
-                // Check if user already exists
+         
                 $user = User::whereHas('personalInformation', function ($q) use ($data) {
                     $q->where('school_id', $data['school_id']);
                 })->first();
 
                 if (!$user) {
-                    // Create new user
+                 
                     $user = User::create([
                         'first_name' => $data['first_name'],
                         'middle_name' => $data['middle_name'],
@@ -101,7 +99,7 @@ class PatientImportController extends Controller
                         'address' => $data['address'],
                     ]);
 
-                    // Create personal information
+                
                     PersonalInformation::create([
                         'user_id' => $user->user_id,
                         'school_id' => $data['school_id'],
@@ -115,7 +113,7 @@ class PatientImportController extends Controller
 
                     $added++;
                 } else {
-                    // Update existing user
+             
                     $user->update([
                         'first_name' => $data['first_name'],
                         'middle_name' => $data['middle_name'],
@@ -257,7 +255,7 @@ class PatientImportController extends Controller
 
         $filename = 'students_import_template.xlsx';
 
-        // Send file to browser
+     
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer->save('php://output');
@@ -265,20 +263,19 @@ class PatientImportController extends Controller
     }
 
     // Download medical history import template
-
 public function downloadMedicalHistoryTemplate()
 {
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
 
-    // Set header row
+
     $sheet->setCellValue('A1', 'school_id');
     $sheet->setCellValue('B1', 'history_type');
     $sheet->setCellValue('C1', 'description');
     $sheet->setCellValue('D1', 'date_recorded');
     $sheet->setCellValue('E1', 'notes');
 
-    // Set headers for download
+
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment;filename="medical_history_template.xlsx"');
     header('Cache-Control: max-age=0');

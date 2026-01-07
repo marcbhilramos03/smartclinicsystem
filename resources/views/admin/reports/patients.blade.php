@@ -3,12 +3,11 @@
 @section('content')
 <div class="container-fluid">
 
-    <!-- Page Heading -->
+
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Patients Report</h1>
     </div>
 
-    <!-- Total Patients Card -->
     <div class="row mb-4">
         <div class="col-xl-3 col-md-6 mb-4">
             <div class="card border-left-success shadow h-100 py-2">
@@ -20,7 +19,7 @@
         </div>
     </div>
 
-    <!-- Patients Table -->
+
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Patient List</h6>

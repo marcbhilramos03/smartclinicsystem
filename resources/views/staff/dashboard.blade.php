@@ -3,93 +3,131 @@
 @section('content')
 <div class="container-fluid py-4">
 
-    {{-- Page Heading --}}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Doctor's Dashboard</h1>
-        <span class="text-muted">Welcome, {{ auth()->user()->first_name }}</span>
+    {{-- Header --}}
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+        <div>
+            <h1 class="h3 text-gray-800 mb-0">Doctor's Dashboard</h1>
+            <small class="text-muted">Checkup's overview and statistics</small>
+        </div>
+
+        <span class="badge bg-light text-dark px-3 py-2 shadow-sm">
+            👋 Welcome, {{ auth()->user()->first_name }}
+        </span>
     </div>
 
-    {{-- Success message --}}
+    {{-- Success Alert --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
             {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     @endif
 
-    {{-- Dashboard Cards --}}
-    <div class="row mb-4">
+    {{-- Stats Cards --}}
+    <div class="row g-3 mb-4">
 
-        {{-- Total Patients --}}
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-success text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5>Total Patients</h5>
-                    <h2 class="fw-bold">{{ $totalPatients ?? 0 }}</h2>
+        {{-- Patients --}}
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-start border-success border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase">Patients</h6>
+                            <h2 class="fw-bold mb-0">{{ $totalPatients }}</h2>
+                        </div>
+                        <i class="fas fa-users fa-2x text-success opacity-50"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Total Courses --}}
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-info text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5>Total Courses</h5>
-                    <h2 class="fw-bold">{{ $totalCourses ?? 0 }}</h2>
+        {{-- Courses --}}
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-start border-info border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase">Courses</h6>
+                            <h2 class="fw-bold mb-0">{{ $totalCourses }}</h2>
+                        </div>
+                        <i class="fas fa-book fa-2x text-info opacity-50"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Pending Checkups --}}
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-warning text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5>Pending Checkups</h5>
-                    <h2 class="fw-bold">{{ $pendingCheckups ?? 0 }}</h2>
+        {{-- Pending --}}
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-start border-warning border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase">Pending</h6>
+                            <h2 class="fw-bold mb-0">{{ $pendingCheckups }}</h2>
+                        </div>
+                        <i class="fas fa-hourglass-half fa-2x text-warning opacity-50"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {{-- Completed Checkups --}}
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card bg-primary text-white shadow h-100">
-                <div class="card-body text-center">
-                    <h5>Completed Checkups</h5>
-                    <h2 class="fw-bold">{{ $completedCheckups ?? 0 }}</h2>
+        {{-- Completed --}}
+        <div class="col-xl-3 col-md-6">
+            <div class="card shadow-sm border-start border-primary border-4 h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase">Completed</h6>
+                            <h2 class="fw-bold mb-0">{{ $completedCheckups }}</h2>
+                        </div>
+                        <i class="fas fa-check-circle fa-2x text-primary opacity-50"></i>
+                    </div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    {{-- Optional: Checkups by Course Table --}}
-    <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Checkups by Course</h6>
+    {{-- Checkups by Course --}}
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-white">
+            <h6 class="fw-bold text-primary mb-0">
+                <i class="fas fa-chart-bar me-1"></i> Checkups by Course
+            </h6>
         </div>
-        <div class="card-body">
+
+        <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-bordered text-center">
+                <table class="table table-hover text-center mb-0">
                     <thead class="table-light">
                         <tr>
                             <th>Course</th>
-                            <th>Pending Checkups</th>
-                            <th>Completed Checkups</th>
+                            <th>Pending</th>
+                            <th>Completed</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($coursesWithCheckups ?? [] as $course)
+                        @forelse($coursesWithCheckups as $course)
                             <tr>
-                                <td>{{ $course->name }}</td>
-                                <td>{{ $course->pending_checkups }}</td>
-                                <td>{{ $course->completed_checkups }}</td>
+                                <td class="fw-semibold">{{ $course->name }}</td>
+                                <td>
+                                    <span class="badge bg-warning text-dark">
+                                        {{ $course->pending_checkups }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success">
+                                        {{ $course->completed_checkups }}
+                                    </span>
+                                </td>
                             </tr>
-                        @endforeach
-                        @if(empty($coursesWithCheckups))
+                        @empty
                             <tr>
-                                <td colspan="3">No data available</td>
+                                <td colspan="3" class="text-muted py-4">
+                                    No data available
+                                </td>
                             </tr>
-                        @endif
+                        @endforelse
                     </tbody>
                 </table>
             </div>

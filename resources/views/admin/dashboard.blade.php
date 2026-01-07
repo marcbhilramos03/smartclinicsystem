@@ -3,12 +3,10 @@
 @section('content')
 <div class="container-fluid">
 
-    <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Clinic In-charge Dashboard</h1>
     </div>
 
-    <!-- Import Cards -->
     <div class="row mb-4">
         <div class="col-md-6 mb-4">
             <div class="card shadow-sm border-primary">
@@ -31,7 +29,6 @@
         </div>
     </div>
 
-    <!-- Total Counts Cards -->
     <div class="row mb-4">
 
         <div class="col-xl-3 col-md-6 mb-4">
@@ -72,7 +69,6 @@
 
     </div>
 
-    <!-- Monthly Trends Chart -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-gray-800">Monthly Trends (Last 12 Months)</h6>
@@ -90,11 +86,9 @@
 <script>
 const ctx = document.getElementById('monthlyChart').getContext('2d');
 
-// Use raw JSON encoding to avoid Blade parsing issues
 const months = {!! json_encode($months ?? []) !!};
 const courseData = {!! json_encode($courseData ?? []) !!};
 
-// Convert courseData into Chart.js datasets
 const datasets = Object.keys(courseData).map((course,index)=>{
     const colors = ['#4e73df','#1cc88a','#36b9cc','#f6c23e','#e74a3b','#858796','#23a8f2','#a728f0'];
     return {
@@ -117,7 +111,6 @@ let monthlyChart = new Chart(ctx,{
     }
 });
 
-// --- Update Stats ---
 function updateStats(){
     fetch("{{ route('admin.stats') }}")
     .then(res=>res.json())
@@ -130,7 +123,6 @@ function updateStats(){
     .catch(err=>console.error('Error updating stats:',err));
 }
 
-// --- Update Chart ---
 function updateChart(){
     fetch("{{ route('admin.chart') }}")
     .then(res=>res.json())
@@ -153,7 +145,6 @@ function updateChart(){
     .catch(err=>console.error('Error updating chart:',err));
 }
 
-// --- Auto-refresh every 10 seconds ---
 setInterval(()=>{
     updateStats();
     updateChart();
